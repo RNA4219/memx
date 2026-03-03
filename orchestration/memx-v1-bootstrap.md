@@ -28,6 +28,7 @@ status: planned
 - [ ] フェーズ横断タスクを 0.5 日以内の単位へ分割する
 - [ ] 各タスクに Done 条件（検証コマンド or 成果物）を 1 つ以上付与する
 - [ ] 依存順に並べ替え、並行実行可能タスクを明示する
+- [ ] 個別 Task Seed を作成する（`TASK.recall-query-normalization-03-03-2026.md` / `TASK.gc-trigger-dryrun-03-03-2026.md` / `TASK.migrate-other-ddl-order-03-03-2026.md`）
 
 ## Phase 3: Execution Readiness
 ### Dependencies
