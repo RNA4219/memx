@@ -166,6 +166,23 @@ PY
 - 不具合起票時は GitHub Issue テンプレートを使用する: [.github/ISSUE_TEMPLATE/bug.yml](.github/ISSUE_TEMPLATE/bug.yml)
 - 再現手順・期待値/実際値・影響範囲・関連 Intent ID を必ず記入する。
 
+
+## Birdseye 鮮度不足時の復旧手順
+`docs/birdseye/index.json.generated_at` が判定時刻から7日を超える場合は、以下を順に実行する。
+
+1. index を更新する。
+```bash
+python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json --emit index
+```
+2. capsule を更新する。
+```bash
+python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/caps --emit caps
+```
+3. index/caps を再生成して再実行状態をそろえる。
+```bash
+python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps
+```
+
 ## Observability / 確認手順
 1. 必須指標の定義は `governance/metrics.yaml` を唯一の参照元として確認する。
 2. 日次確認では `response_time` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。

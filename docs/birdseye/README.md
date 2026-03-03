@@ -36,3 +36,9 @@
 | `governance/policy.yaml` | `docs/birdseye/caps/governance.policy.yaml.json` |
 | `governance/prioritization.yaml` | `docs/birdseye/caps/governance.prioritization.yaml.json` |
 
+
+
+## 更新責任者・更新トリガ
+- 更新責任者: memx-core（変更PRの作成者が更新を実施）
+- 更新トリガ: PR 作成前（必須）
+- 更新トリガ: 週次定期メンテナンス（少なくとも週1回）
