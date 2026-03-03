@@ -6,13 +6,12 @@
 - [SECURITY.md](../../SECURITY.md)
 - [付録 G: Security & Privacy](../addenda/G_Security_Privacy.md)
 
-## 1. データ分類ごとの保存・出力・マスキング方針
+## 1. データ分類ごとの運用参照手順
 
-- 正本要件: [memx 要件定義: 2-7-1. `sensitivity` 別の保存可否・マスキング・保持期間](../../memx_spec_v3/docs/requirements.md#2-7-1-sensitivity-別の保存可否マスキング保持期間)
-- 本ドキュメントでは運用時の補足のみ扱う。保存可否・保持期間の数値は要件本文を優先する。
-- 本ドキュメントは手順参照用（非正本）であり、要件の定義・変更は `memx_spec_v3/docs/requirements.md` のみで行う。
-- `needs_human` は `deny` 同等として扱い、自動保存・自動出力を行わない。
-- サンプル/テストは `.env.example` 等のダミー値のみ使用し、実秘密はリポジトリへ含めない。
+1. 正本要件 [requirements 2-7-1](../../memx_spec_v3/docs/requirements.md#2-7-1-sensitivity-別の保存可否マスキング保持期間) を開き、対象データの `sensitivity` を確認する。
+2. 保存可否・マスキング・保持期間は要件本文の値をそのまま採用する（本書へ数値を再定義しない）。
+3. 判定が `deny` または `needs_human` の場合は [§3 手順](#3-gatekeeper-deny--needs_human-発生時の運用手順) を実施する。
+4. サンプル/テストは `.env.example` 等のダミー値のみ使用し、実秘密はリポジトリへ含めない。
 
 ## 2. ログ保持期間と削除ルール（手順）
 
@@ -20,7 +19,7 @@
 2. 保持期間を要件本文（2-7-1）で確認する（internal/secret の最小保持 90 日を含む）。
 3. 期限超過分を週次で削除する（手動または定期ジョブ）。
 4. `archive` 退避/物理削除を実行する場合は、要件本文（2-7-3 / 2-7-4）の actor/approval/audit に従う。
-5. 監査ログ項目・要件IDは要件本文（2-7-2 / 2-7-3 / 2-7-4）を参照して確認する。
+5. 監査ログ項目・要件IDは要件本文（2-7-2 / 2-7-3 / 2-7-4）を参照して確認する（`archive_move` / `archive_purge` は固定項目 `result` / `reason` / `retryable` / `owner` / `next_attempt_at` を必須確認）。
 6. バックアップを保持する場合も要件本文と同一保持期間を適用する。
 
 ## 3. Gatekeeper `deny` / `needs_human` 発生時の運用手順
