@@ -21,6 +21,8 @@ next_review_due: 2026-06-03
 
 ### CLI `--json` と API レスポンスの変換ルール（v1必須3エンドポイント）
 
+契約の正本は `BLUEPRINT.md` の「v1 API Contract」とし、本節は `--json` 運用上の写像ルールを規定する。
+
 現行実装では差分なし（CLI `--json` は API レスポンス JSON をそのまま出力）。
 
 - `mem in short --json` ⇔ `POST /v1/notes:ingest`
