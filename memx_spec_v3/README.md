@@ -21,3 +21,40 @@
   - ツール/AI 向け API（HTTP と in-proc クライアント）。
 - `go/cmd/mem/main.go`
   - 人間向け CLI。API の薄いラッパ。
+
+## Status（v1必須 / v1.1以降）
+
+### 必須コマンド
+
+| 区分 | コマンド |
+| --- | --- |
+| v1必須 | `mem in short` |
+| v1必須 | `mem out search` |
+| v1必須 | `mem out show` |
+
+### 必須API
+
+| 区分 | API |
+| --- | --- |
+| v1必須 | `POST /v1/notes:ingest` |
+| v1必須 | `POST /v1/notes:search` |
+| v1必須 | `GET /v1/notes/{id}` |
+
+### 非対象（v1時点）
+
+| 区分 | 対象外項目 |
+| --- | --- |
+| v1.1以降 | GC |
+| v1.1以降 | recall |
+| v1.1以降 | working |
+| v1.1以降 | tag |
+| v1.1以降 | meta |
+| v1.1以降 | lineage |
+
+### 受け入れ条件
+
+| 区分 | 条件 |
+| --- | --- |
+| v1必須 | 入出力互換（CLI→API の入出力マッピングが保持されること） |
+| v1必須 | エラーコード（入力不備: 400系 / 内部障害: 500系 を返すこと） |
+| v1必須 | 最小性能目標（`ingest`/`search`/`show` がローカル単体で実用応答時間を維持すること） |
