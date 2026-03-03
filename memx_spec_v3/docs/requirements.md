@@ -879,15 +879,15 @@ gc:
 #### 5-4-1. waiver 時の必須記録（`docs/IN-*.md` 運用連動）
 
 - waiver を許容する場合でも、記録媒体は必ず `docs/IN-<実日付>-<連番>.md` とする（口頭/チャットのみは不可）。
-- 必須項目は `docs/IN-BASELINE.md` および `docs/IN-YYYYMMDD-001.md` の waiver セクションと同一フォーマットを用いる。
+- 必須項目は `docs/IN-BASELINE.md` および `docs/IN-YYYYMMDD-001.md` の waiver セクションと同一フォーマットを用い、`EVALUATION.md` の運用NFR合否判定で機械的に参照できること。
 - 必須記録項目:
-  1. waiver 対象要件ID
-  2. waiver 理由
-  3. 影響範囲
-  4. 暫定運用策
-  5. 是正期限
-  6. 責任者
-  7. 解除条件
+  1. waiver対象要件ID
+  2. waiver理由（技術的制約/外部依存/緊急運用の別）
+  3. 期限（UTC、失効日時）
+  4. 暫定リスク受容者（承認者）
+  5. 代替統制（監視強化・手動運用手順・追加検証）
+  6. 解除条件（どの証跡が揃えば waiver を解消するか）
+  7. 関連証跡パス（`artifacts/ops/incident-summary.json`、`artifacts/ops/recovery-log.ndjson` など）
 
 ---
 
