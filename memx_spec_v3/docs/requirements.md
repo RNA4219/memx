@@ -32,13 +32,13 @@ priority: high
 
 ### CLI
 
-| MUST (v1) | SHOULD (v1.x) | FUTURE (v1.1+) |
+| MUST (v1) | SHOULD (v1.x) | FUTURE (v2+) |
 | --- | --- | --- |
 | `mem in short`, `mem out search`, `mem out show` | `mem gc short`（`mem.features.gc_short=true` 時のみ有効な実験機能） | `mem out recall`, `mem working`, `mem tag`, `mem meta`, `mem lineage`, `mem distill`, `mem out context` |
 
 ### API
 
-| MUST (v1) | SHOULD (v1.x) | FUTURE (v1.1+) |
+| MUST (v1) | SHOULD (v1.x) | FUTURE (v2+) |
 | --- | --- | --- |
 | `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}` | `POST /v1/gc:run`（`mem.features.gc_short=true` 時のみ有効な実験機能） | Recall/Working/Tag/Meta/Lineage 系 API |
 
@@ -127,7 +127,7 @@ priority: high
 - [ ] エラーコード変更時は `memx_spec_v3/docs/requirements.md` と `memx_spec_v3/docs/error-contract.md` を更新対象に含めた
 - [ ] Commands に検証コマンドを順序付きで記載済み
 - [ ] Release Note Draft を記載済み
-- [ ] CHANGES/CHANGELOG への反映項目を記載済み
+- [ ] `memx_spec_v3/CHANGES.md` と `CHANGELOG.md` への反映項目を記載済み
 - [ ] `Status: done` 前に `Moved-to-CHANGES: YYYY-MM-DD` を追記する
 ```
 
@@ -137,7 +137,7 @@ priority: high
 
 ---
 
-## 0-2. 要件トレーサビリティ
+## 0-3. 要件トレーサビリティ
 
 ### 主要要件ID（CLI/API/GC/Security/Error 固定）
 
