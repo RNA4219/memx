@@ -57,6 +57,18 @@
 - `Status: done` へ遷移する条件として、Task Seed に `Release Note Draft` 記入済みであること。
 - `Status: done` へ遷移する条件として、移送後に `Moved-to-CHANGES: YYYY-MM-DD` を追記済みであること。
 
+## 2-1. 破壊変更時の追記チェックリスト（追加必須）
+CLI/API の既存必須フィールド削除、型変更、意味変更、既存コマンド/エンドポイント/エラーコード削除、`--json` 既定出力の非同型化を含む場合、Task Seed に次のチェックリストを追記する。
+
+- [ ] `Source` は `path#Section` で記載済み
+- [ ] `Node IDs` を記載済み（依存照合対象なら必須）
+- [ ] `Requirements` に後方互換/非機能制約を明記済み
+- [ ] エラーコード変更時は `memx_spec_v3/docs/requirements.md` と `memx_spec_v3/docs/error-contract.md` を更新対象に含めた
+- [ ] `Commands` に検証コマンドを順序付きで記載済み
+- [ ] `Release Note Draft` を記載済み
+- [ ] `memx_spec_v3/CHANGES.md` と `CHANGELOG.md` への反映項目を記載済み
+- [ ] `Status: done` 前に `Moved-to-CHANGES: YYYY-MM-DD` を追記する
+
 ## 3. CHANGES 連携ルール（memx_spec_v3/CHANGES.md / CHANGELOG.md）
 - 正本（canonical source）はリポジトリルートの `CHANGELOG.md` とする。
 - `memx_spec_v3/CHANGES.md` は v3 仕様の履歴・互換性破壊テンプレート管理用の補助台帳として扱う。

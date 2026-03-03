@@ -50,21 +50,26 @@ priority: high
 | v1必須 | エラーコード（入力不備: 400系 / 内部障害: 500系 を返すこと） |
 | v1必須 | 最小性能目標（`ingest`/`search`/`show` がローカル単体で実用応答時間を維持すること） |
 
-## 0-2. v1/v1.x/v2 移行ポリシー
+## 0-2. バージョニングと段階移行
 
 本節は、機能追加・仕様変更・廃止を `MUST(v1)` / `SHOULD(v1.x)` / `FUTURE(v2+)` の3段階で運用するための正本要件とする。
+`v1` は後方互換維持を最優先とし、破壊変更は `FUTURE(v2+)` へ隔離して段階移行する。
 
-### 0-2-1. 段階別ルール（追加のみ・非互換禁止・廃止条件）
+### 0-2-1. 段階別ルール（許可変更 / 禁止変更 / 廃止条件）
 
-| 区分 | 追加のみ | 非互換禁止 | 廃止条件 |
+| 区分 | 許可変更 | 禁止変更 | 廃止条件 |
 | --- | --- | --- | --- |
-| MUST (v1) | 後方互換を維持した拡張のみ追加可能（任意フィールド追加、任意オプション追加） | 既存 CLI/API 入出力の型・意味・必須性の変更、既存エラーコード削除、既存コマンド/エンドポイント削除 | v1 系では廃止不可。廃止は `FUTURE(v2+)` へ昇格して予告し、`CHANGELOG.md` と `memx_spec_v3/CHANGES.md` に破壊変更チェックリストを記載したうえで次メジャーで実施 |
-| SHOULD (v1.x) | 実験機能として追加可能（feature flag 既定 OFF） | 既定 ON 化、flag なし常時有効化、MUST と同名 I/F の上書き | まず feature flag を deprecated 扱いにし 1 つ以上のマイナー期間で警告、次メジャーで削除 |
-| FUTURE (v2+) | 次メジャー向けに仕様追加・再設計可能 | v1 系へ逆流させる破壊的導入（互換フラグなし） | `v1 -> v2` 移行手順を明示し、互換期間の並行提供方針を定義してから廃止 |
+| MUST (v1) | 後方互換を維持した拡張のみ追加可能（任意フィールド追加、任意オプション追加、任意パラメータ追加） | 既存 CLI/API 入出力の型・意味・必須性の変更、既存エラーコード削除、既存コマンド/エンドポイント削除、`--json` 既定出力の非同型化 | v1 系では廃止不可。廃止は `FUTURE(v2+)` へ昇格して予告し、`CHANGELOG.md` と `memx_spec_v3/CHANGES.md` に破壊変更チェックリストを記載したうえで次メジャーで実施 |
+| SHOULD (v1.x) | 実験機能として追加可能（feature flag 既定 OFF、既定挙動に影響しないこと） | 既定 ON 化、flag なし常時有効化、MUST と同名 I/F の上書き、flag 未指定での出力仕様変更 | まず feature flag を deprecated 扱いにし 1 つ以上のマイナー期間で警告、次メジャーで削除 |
+| FUTURE (v2+) | 次メジャー向けに仕様追加・再設計可能（互換フラグ/移行導線付き） | v1 系へ逆流させる破壊的導入（互換フラグなし）、移行手順未定義のままの強制切替 | `v1 -> v2` 移行手順を明示し、互換期間の並行提供方針を定義してから廃止 |
 
 ### 0-2-2. エラーコード拡張の昇格条件（service sentinel 連動）
 
 - `CONFLICT` / `GATEKEEP_DENY` / `FEATURE_DISABLED` は、**service 層に対応する sentinel error が実装済みである場合のみ** `INTERNAL` から個別コードへ昇格してよい。
+- 適用条件（実装有無との対応）は次の通り。
+  - `CONFLICT`: `service.ErrConflict`（同等 sentinel）実装済み時のみ適用。未実装時は `INTERNAL`。
+  - `GATEKEEP_DENY`: `service.ErrGatekeepDeny`（同等 sentinel）実装済み時のみ適用。未実装時は `INTERNAL`。
+  - `FEATURE_DISABLED`: `service.ErrFeatureDisabled`（同等 sentinel）実装済み時のみ適用。未実装時は `INTERNAL`。
 - 昇格時の必須条件は次の通り。
   1. `go/service` に sentinel error を追加し、再試行可否の意味が固定されていること。
   2. `go/api/errors.go`（または同等の `mapError`）に明示マッピングを追加すること。
@@ -127,6 +132,7 @@ priority: high
 ```
 
 - 本テンプレートは `docs/TASKS.md` の「Task Seed 必須項目」「CHANGES 連携ルール」と矛盾しないことを必須条件とする。
+- 特に `docs/TASKS.md` の `Requirements` / `Release Note Draft` / `Status: done` 条件（`Moved-to-CHANGES`）と同一基準で運用する。
 
 ---
 
