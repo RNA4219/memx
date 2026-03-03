@@ -37,6 +37,34 @@
 
 - オーケストレーション入力ソースとして `orchestration/*.md` を参照する。
 
+## 自動タスク分割フロー
+以下を入力として順序どおり処理し、Task Seed（`TASK.<slug>-MM-DD-YYYY.md`）へ写像する。
+
+1. 工程1: オーケストレーション要件抽出
+   - 入力: `orchestration/*.md`
+   - 処理: 実施ステップ、制約、役割分担を抽出して実行単位へ分割する。
+   - 出力（Task Seed への写像）: Objective 候補と Requirements 候補を生成する。
+
+2. 工程2: 実装指示の正規化
+   - 入力: `docs/IN-*.md`
+   - 処理: 指示の重複/競合を正規化し、受け入れ条件と検証観点を統一する。
+   - 出力（Task Seed への写像）: Requirements を確定し、Commands 候補を生成する。
+
+3. 工程3: 依存関係グラフ解決
+   - 入力: `docs/birdseye/index.json`
+   - 処理: 参照リンクと依存順を解決し、着手順とブロッカーを特定する。
+   - 出力（Task Seed への写像）: Dependencies を確定し、Status 初期値（planned）を設定する。
+
+4. 工程4: 既存 Task Seed との差分統合
+   - 入力: `TASK.*-MM-DD-YYYY.md`
+   - 処理: 既存タスクとの重複・競合を検出し、追記/新規作成の方針を決定する。
+   - 出力（Task Seed への写像）: Objective/Requirements/Commands/Dependencies/Status を差分反映する。
+
+5. 工程5: TASKS 形式への最終落とし込み
+   - 入力: 工程1〜4の統合結果
+   - 処理: `docs/TASKS.md` の必須項目規約に整形し、語彙・命名・並び順を検証する。
+   - 出力（Task Seed への写像）: 最終的に `Objective / Requirements / Commands / Dependencies / Status` を満たす Task Seed を確定する。
+
 ## 言語ポリシー
 - デフォルト言語は日本語。
 - コード識別子（変数名・関数名・型名・CLI フラグ・JSON キー）は英語を維持する。
