@@ -32,11 +32,15 @@
   - blocked
   - done
 
-## 3. CHANGES 連携ルール（memx_spec_v3/CHANGES.md）
-完了タスクは次の手順で `memx_spec_v3/CHANGES.md` に移送する。
+## 3. CHANGES 連携ルール（memx_spec_v3/CHANGES.md / CHANGELOG.md）
+- 正本（canonical source）はリポジトリルートの `CHANGELOG.md` とする。
+- `memx_spec_v3/CHANGES.md` は v3 仕様の履歴・互換性破壊テンプレート管理用の補助台帳として扱う。
+
+完了タスクは次の手順で `memx_spec_v3/CHANGES.md` と `CHANGELOG.md` に反映する。
 
 1. Task Seed の `Status` を `done` に更新する。
 2. Task Seed の Objective/Requirements の要点を 1〜3 行で要約する。
 3. `memx_spec_v3/CHANGES.md` の該当バージョン節に箇条書きで追記する。
-4. 互換性破壊がある場合は `CHANGES.md` の「互換性破壊時の記載テンプレート」を必ず併記する。
-5. 移送後、Task Seed 側には `Moved-to-CHANGES: YYYY-MM-DD` を追記してトレース可能にする。
+4. 同内容を `CHANGELOG.md` に 1〜3 行の最小要約で追記する（重複エントリは禁止）。
+5. 互換性破壊がある場合は `memx_spec_v3/CHANGES.md` の「互換性破壊時の記載テンプレート」を必ず併記する。
+6. 移送後、Task Seed 側には `Moved-to-CHANGES: YYYY-MM-DD` を追記してトレース可能にする。

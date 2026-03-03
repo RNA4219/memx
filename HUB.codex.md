@@ -73,6 +73,11 @@ next_review_due: 2026-06-03
    - 処理: `docs/TASKS.md` の必須項目規約に整形し、語彙・命名・並び順を検証する。
    - 出力（Task Seed への写像）: 最終的に `Objective / Requirements / Commands / Dependencies / Status` を満たす Task Seed を確定する。
 
+6. 工程6: 完了タスクの履歴反映
+   - 入力: `Status: done` の Task Seed と `memx_spec_v3/CHANGES.md` の差分
+   - 処理: 完了内容を重複排除して `CHANGELOG.md` に最小要約で反映し、必要に応じて `memx_spec_v3/CHANGES.md` に互換性情報を追記する。
+   - 出力: `CHANGELOG.md`（正本）更新と Task Seed への `Moved-to-CHANGES: YYYY-MM-DD` 記録。
+
 ## 出力例（YAML）
 ```yaml
 task_id: TASK.normalize-hub-yaml-03-03-2026
@@ -129,6 +134,7 @@ workflow-cookbook の補完資料をそのまま複製せず、memx の運用最
 - `docs/addenda/D_Context_Trimming.md`（コンテキスト削減基準）
 - `docs/addenda/G_Security_Privacy.md`（セキュリティ/プライバシー基準）
 - `datasets/README.md`（データセット台帳）
+- `CHANGELOG.md`（完了タスクの利用者向け変更履歴の正本）
 
 ### 非採用（workflow-cookbookとの差分）
 - workflow-cookbook 側の詳細テンプレート本文・運用例・CI 手順の全文移植は非採用。
