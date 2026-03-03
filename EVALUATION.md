@@ -16,6 +16,20 @@ next_review_due: 2026-06-03
   - `POST /v1/notes:search`: P50 <= 80ms, P95 <= 180ms
   - `GET /v1/notes/{id}`: P50 <= 40ms, P95 <= 90ms
 
+## 性能合否基準（fail / waiver）
+- 判定対象データセットは `short` 10,000 件 / 1件 約500文字（UTF-8）、ローカル単体（4 vCPU / 16GB RAM / NVMe SSD / Linux x86_64）、ウォームアップ20回、本計測200回で固定する。
+- 合格（pass）: `ingest` / `search` / `show` の **p50/p95 が全て閾値以内**。
+- 不合格（fail）: いずれか 1 指標でも閾値超過、または計測条件が不一致。
+- 例外承認（waiver）:
+  - fail を一時的に許容する場合のみ適用できる。
+  - 最低限、`docs/IN-YYYYMMDD-XXX.md` のインシデント記録、超過理由、是正期限、暫定運用策、責任者を明記する。
+  - waiver は期限付きとし、期限超過時は自動的に fail 扱いへ戻す。
+
+## governance/metrics.yaml 同期運用ルール
+- `governance/metrics.yaml` は本書（`EVALUATION.md`）を正本として同期する。
+- 少なくとも性能項目 `ingest` / `search` / `show` の **項目名** と **閾値文字列** は完全一致させる。
+- 不一致を検知したレビュー/CI は fail とし、同一コミットで差分を解消する。
+
 ## 閾値項目と RUNBOOK 出力項目の対応
 - 判定に使用する値は `RUNBOOK.md` の `artifacts/perf/perf-result.json` に含まれる `results.<endpoint>.p50_ms` / `results.<endpoint>.p95_ms` とする。
 - 対応は 1 対 1 で固定し、別名指標は使用しない。

@@ -551,6 +551,21 @@ gc:
 
 ## 5. 非機能要件
 
+### 5-1. 性能目標（v1必須3エンドポイント）
+
+計測条件は以下で固定する。
+
+- データセット条件: short ストア 10,000 件、本文 1 ノートあたり約 500 文字（UTF-8 プレーンテキスト）
+- 実行環境: ローカル単体（4 vCPU / 16GB RAM / NVMe SSD / Linux x86_64）
+- ウォームアップ: 各エンドポイント 20 回
+- 本計測: 各エンドポイント 200 回（ウォームアップ除外）
+
+| 操作 | API | p50 目標 | p95 目標 |
+| --- | --- | --- | --- |
+| ingest | `POST /v1/notes:ingest` | `<= 120ms` | `<= 250ms` |
+| search | `POST /v1/notes:search` | `<= 80ms` | `<= 180ms` |
+| show | `GET /v1/notes/{id}` | `<= 40ms` | `<= 90ms` |
+
 - OS：ローカル（Linux / macOS / Windows）で動作する CLI を想定。
 - DB：SQLite3（WAL モード、foreign_keys ON）。
 - 言語：Go（単一バイナリビルドを前提）。

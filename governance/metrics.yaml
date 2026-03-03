@@ -6,16 +6,31 @@ last_reviewed_at: 2026-03-03
 next_review_due: 2026-06-03
 ---
 
+sync_policy:
+  source_of_truth: EVALUATION.md
+  rule: "`governance/metrics.yaml` の項目名・閾値は `EVALUATION.md` と完全一致させる。差分があるコミットはマージ不可。"
+
 metrics:
-  - name: response_time
+  - name: ingest
     owner: memx-core
-    source: "CLI/APM (`mem in short`, `mem out search`, `mem out show`)"
-    threshold:
-      ingest: "P50 <= 120ms, P95 <= 250ms"
-      search: "P50 <= 80ms, P95 <= 180ms"
-      show: "P50 <= 40ms, P95 <= 90ms"
+    source: "CLI/APM (`mem in short`)"
+    threshold: "P50 <= 120ms, P95 <= 250ms"
     window: "24h rolling"
-    action_on_breach: "P1 incidentを起票し、直近デプロイをロールバック判定する"
+    action_on_breach: "fail。waiver が承認済みの場合のみ期限付きで暫定運用を許可する"
+
+  - name: search
+    owner: memx-core
+    source: "CLI/APM (`mem out search`)"
+    threshold: "P50 <= 80ms, P95 <= 180ms"
+    window: "24h rolling"
+    action_on_breach: "fail。waiver が承認済みの場合のみ期限付きで暫定運用を許可する"
+
+  - name: show
+    owner: memx-core
+    source: "CLI/APM (`mem out show`)"
+    threshold: "P50 <= 40ms, P95 <= 90ms"
+    window: "24h rolling"
+    action_on_breach: "fail。waiver が承認済みの場合のみ期限付きで暫定運用を許可する"
 
   - name: compatibility
     owner: memx-core

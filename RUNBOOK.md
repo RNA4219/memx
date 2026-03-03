@@ -67,13 +67,20 @@ next_review_due: 2026-06-03
 ### 実行前提
 - 必須バイナリ: `go`(1.22+), `python3`(3.10+)
 - 実行ディレクトリ: リポジトリルート（`/workspace/memx`）
-- コマンド正本: リポジトリルート起点の `go run ./memx_spec_v3/go/cmd/mem ...`
-- 代替表記: `cd memx_spec_v3/go` 後に `go run ./cmd/mem ...`（正本ではない）
+- コマンド正本: リポジトリルート起点の `go run ./memx_spec_v3/go/cmd/mem ...` のみを使用する
 - 入力データ形式: UTF-8 プレーンテキスト（1ノート約500文字、1行1ノートで生成）
 - 計測対象コマンド実体:
   - ingest: `go run ./memx_spec_v3/go/cmd/mem in short`
   - search: `go run ./memx_spec_v3/go/cmd/mem out search`
   - show: `go run ./memx_spec_v3/go/cmd/mem out show`
+
+### 計測コマンドと出力 JSON 項目の対応（正本）
+
+| 計測対象 | 正本コマンド | `artifacts/perf/perf-result.json` の対応項目 |
+| --- | --- | --- |
+| ingest | `go run ./memx_spec_v3/go/cmd/mem in short --stdin --title <title> --api-url http://127.0.0.1:7766` | `results.ingest.p50_ms` / `results.ingest.p95_ms` / `results.ingest.runs` |
+| search | `go run ./memx_spec_v3/go/cmd/mem out search '<query>' --api-url http://127.0.0.1:7766` | `results.search.p50_ms` / `results.search.p95_ms` / `results.search.runs` |
+| show | `go run ./memx_spec_v3/go/cmd/mem out show <id> --api-url http://127.0.0.1:7766` | `results.show.p50_ms` / `results.show.p95_ms` / `results.show.runs` |
 
 ### 出力 JSON スキーマ（`artifacts/perf/perf-result.json`）
 ```json
@@ -203,8 +210,8 @@ python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.j
 ```
 
 ## Observability / 確認手順
-1. 性能閾値の正本は `EVALUATION.md` とし、`governance/metrics.yaml` はその同期先として一致を維持する。
-2. 日次確認では `response_time` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。
+1. 性能閾値の正本は `EVALUATION.md` とし、`governance/metrics.yaml` の `ingest` / `search` / `show` の項目名・閾値を完全一致で同期維持する。
+2. 日次確認では `ingest` / `search` / `show` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。
 3. breach 発生時は `governance/metrics.yaml` の `action_on_breach` に従ってインシデントを起票する。
 
 ## リリース前確認（Release Drafter）
