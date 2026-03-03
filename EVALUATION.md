@@ -35,6 +35,31 @@ next_review_due: 2026-06-03
 - pass 条件は上記 6 指標がすべて閾値以内（`<=`）であること。
 - `p50_ms` / `p95_ms` の欠損、または計測条件不一致は fail 扱いとする。
 
+
+## 運用NFR（可用性/復旧/整合性回復）合否基準
+
+- 対象要件: `REQ-NFR-002` / `REQ-NFR-003` / `REQ-NFR-004` / `REQ-NFR-005` / `REQ-NFR-006`
+
+### 証跡ファイル（必須）
+- `artifacts/ops/incident-summary.json`
+  - 必須キー: `incident_id`, `detected_at`, `mitigated_at`, `resolved_at`, `rto_minutes`, `rpo_minutes`, `retry_count`
+- `artifacts/ops/recovery-log.ndjson`
+  - 必須イベント: `detect`, `retry`, `rollback`（実施時）, `replan`（実施時）, `mitigate`, `resolve`
+- `docs/IN-*.md`
+  - `REQ-NFR-006` で定義した最小監査項目を満たすこと
+
+### 判定ロジック
+- pass 条件（全件必須）:
+  1. `incident-summary.json.rto_minutes <= 30`（`REQ-NFR-002`）
+  2. `incident-summary.json.rpo_minutes <= 5`（`REQ-NFR-002`）
+  3. `mitigated_at - detected_at <= 15分`（`REQ-NFR-003`）
+  4. `retry_count <= 2`（`REQ-NFR-004`）
+  5. `recovery-log.ndjson` に整合性回復イベント（`rollback` または `replan`）が存在し、30 分以内に収束または `docs/IN-*.md` 起票済み（`REQ-NFR-005`）
+  6. 対応する `docs/IN-*.md` が最小監査項目を欠落なく記載（`REQ-NFR-006`）
+- fail 条件:
+  - 上記 1〜6 のいずれか 1 つでも不成立
+  - 証跡ファイル欠損、または時刻/回数の整合が取れない
+
 ## governance/metrics.yaml 同期運用ルール
 - `governance/metrics.yaml` は本書（`EVALUATION.md`）を正本として同期する。
 - 少なくとも性能項目 `ingest` / `search` / `show` の **項目名** と **閾値文字列** は完全一致させる。
