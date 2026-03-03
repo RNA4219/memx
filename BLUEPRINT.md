@@ -1,5 +1,5 @@
 ---
-intent_id: memx-blueprint
+intent_id: memx-governance-blueprint-v1
 owner: memx-core
 status: active
 last_reviewed_at: 2026-03-03
@@ -8,38 +8,33 @@ next_review_due: 2026-06-03
 
 # BLUEPRINT
 
-## 目的
-- 個人用・ローカル運用の「知識＋記憶」管理基盤を提供する。
-- 短期メモ（short）/時系列ログ（chronicle）/知識ベース（memopedia）/保管庫（archive）を分離して管理する。
-- CLI + API + SQLite を前提に、実行環境依存の小さい知識OS下層を構成する。
+## 目的とスコープ
+- memx は個人用・ローカル運用の「知識＋記憶」管理システムとして、short / chronicle / memopedia / archive の4ストアを分離運用する。
+- CLI + API + SQLite を前提に、実行環境依存を減らした知識基盤を提供する。
+- v1 非ゴール: Web UI、マルチユーザー公開運用、常駐必須設計、完全自動エージェント。
 
-## スコープ/非ゴール
-- 非ゴール: Web UI、マルチユーザー運用前提の認証/権限/監査、常駐必須設計、完全自動運転エージェント。
-- v1 必須:
-  - CLI: `mem in short`, `mem out search`, `mem out show`
-  - API: `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}`
-- v1.1 以降: GC/recall/working/tag/meta/lineage の拡張。
+## レイヤリング方針
+- 基本フロー: Human CLI → Tool/AI API → Service(Usecase) → DB/LLM/Gatekeeper。
+- CLI は入力整形と表示のみを担当し、DB へ直接アクセスしない。
+- API は安定 JSON I/F を提供し、Service を唯一のビジネスロジック入口とする。
 
-## 制約
-- レイヤリング: `CLI -> API -> Service -> DB/LLM/Gatekeeper`。
-- CLI は入出力整形のみを担当し、DB へ直接アクセスしない。
-- API は安定 JSON I/F を提供し、CLI と 1:1 対応を維持する。
-- DB は 4 分割（`short.db`, `chronicle.db`, `memopedia.db`, `archive.db`）を維持する。
-- schema 移行は SQL ファイル適用 + `PRAGMA user_version` ルールに従う。
+## ストア・スキーマ方針
+- 物理 DB: `short.db`, `chronicle.db`, `memopedia.db`, `archive.db`。
+- 共通テーブル: `notes`, `tags`, `note_tags`, `note_embeddings`, `notes_fts`（archive は一部省略可）。
+- short 固有: `short_meta`（GCトリガ用メタ）と `lineage`（蒸留/昇格/退避の系譜）。
+- スキーマバージョンは `PRAGMA user_version` を利用し、破壊的/非互換 DDL 時のみインクリメントする。
 
-## 非機能要件
-- OS: Linux/macOS/Windows 上でローカル実行。
-- DB: SQLite3（WAL, foreign_keys=ON）。
-- 言語/実装前提: Go 単一バイナリ、HTTP は `net/http` 想定。
-- セキュリティ: 秘密情報は保存前に policy + Gatekeeper で遮断。
-- 拡張性: 将来機能追加時も CLI/API/DB の後方互換を維持する。
-- 一貫性方針: ATTACH 跨ぎの完全原子性は前提にせず、「データ喪失より重複許容」。
+## 検索・評価方針
+- 検索は FTS5 + 埋め込みベクター検索を併用し、将来の SQLite 拡張差し替えを前提に API を固定する。
+- 評価軸は `relevance`, `quality`, `novelty`, `importance_static`。
+- `memory_policy.yaml` で閾値・禁止パターン・decay を管理する。
 
-## 性能/信頼性方針
-- v1 の最小性能目標として `ingest/search/show` のローカル実用応答を維持。
-- 外部クライアント呼び出し契約:
-  - タイムアウト 15 秒/回
-  - 最大 2 回リトライ（指数バックオフ）
-  - 429/502/503/504 と接続系は再試行可
-  - 400/401/403/スキーマ不整合は再試行不可
-- ingest 部分失敗時は `notes` 保存成功を最小コミット境界とし、Gatekeeper deny 時のみ fail-closed。
+## Gatekeeper 方針
+- `memory_store` / `memory_output` の2タイミングで判定フックを持つ。
+- 判定は `allow` / `deny` / `needs_human`、v1.3 では `needs_human` を deny 相当で fail-closed 扱い。
+- エラーマッピングは service 層で sentinel error 化し、API 側で集約マッピングする。
+
+## API/互換性方針
+- v1 必須 API: `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}`。
+- v1 互換性は後方互換維持を原則とし、必須フィールド削除・既存意味変更・成功レスポンス構造破壊を禁止する。
+- 破壊変更は並行エンドポイント追加または `/v2` 新設で段階移行する。

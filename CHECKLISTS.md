@@ -1,5 +1,5 @@
 ---
-intent_id: memx-checklists
+intent_id: memx-implementation-checklists-v1
 owner: memx-core
 status: active
 last_reviewed_at: 2026-03-03
@@ -8,29 +8,28 @@ next_review_due: 2026-06-03
 
 # CHECKLISTS
 
-## リリース前確認項目
+## 仕様反映チェック
+- [ ] 4ストア（short/chronicle/memopedia/archive）の責務分離を維持している。
+- [ ] CLI は API ラッパに徹し、DB 直接アクセスを持たない。
+- [ ] Service を唯一の業務ロジック入口にしている。
 
-### 互換性
-- [ ] v1 API の既存 request/response 必須項目を破壊していない。
-- [ ] CLI 主要コマンド（`mem in short`, `mem out search`, `mem out show`）が後方互換で動作する。
-- [ ] 未分類エラーが `INTERNAL` にフォールバックしている。
+## DB/マイグレーションチェック
+- [ ] `schema/*.sql` 適用方式に統一している。
+- [ ] DDL 適用順序（notes→fts→tags→embeddings→user_version）を守っている。
+- [ ] `PRAGMA user_version` 運用ルール（初期1、破壊的変更のみ+1）を守っている。
 
-### 動作確認
-- [ ] `POST /v1/notes:ingest` が成功し note を返す。
-- [ ] `POST /v1/notes:search` が期待件数で返る。
-- [ ] `GET /v1/notes/{id}` が単一 note を返す。
-- [ ] `mem gc short --dry-run` が予定操作を表示し DB を変更しない。
+## API/CLI 互換性チェック
+- [ ] v1 必須コマンド（in short / out search / out show）が動作する。
+- [ ] v1 必須 API（ingest / search / get）が動作する。
+- [ ] v1 内で必須フィールド削除・意味変更・成功レスポンス破壊を行っていない。
+- [ ] `--json` 出力互換を維持している。
 
-### セーフティ/失敗時
-- [ ] Gatekeeper `deny` / `needs_human` で fail-closed になる。
-- [ ] retry/timeout（15 秒、最大 2 回）が外部クライアント呼び出しに適用される。
-- [ ] ingest 部分失敗時に `notes` 保存が維持される。
+## Safety/Policy チェック
+- [ ] Gatekeeper の `needs_human` を deny 相当で扱っている。
+- [ ] 保存前/出力前フックを維持している。
+- [ ] secrets ブロック方針（policy + gatekeeper）を守っている。
 
-### データ/スキーマ
-- [ ] DB 4 分割（short/chronicle/memopedia/archive）の前提を壊していない。
-- [ ] 非互換 DDL 時のみ `PRAGMA user_version` を +1 している。
-- [ ] GC 閾値が `memory_policy.yaml.gc.short` を単一参照している。
-
-### 運用
-- [ ] `BLUEPRINT.md`, `RUNBOOK.md`, `GUARDRAILS.md`, `EVALUATION.md`, `CHECKLISTS.md` の front matter が更新されている。
-- [ ] `last_reviewed_at`/`next_review_due` が妥当な日付で設定されている。
+## 運用・品質チェック
+- [ ] GC トリガ判定は `memory_policy.yaml.gc.short` のみを参照している。
+- [ ] `short_meta` はヒント運用とし、GC 前に正確値再計算を行う。
+- [ ] インシデント記録をテンプレート要件に沿って作成できる。

@@ -1,5 +1,5 @@
 ---
-intent_id: memx-runbook
+intent_id: memx-operations-runbook-v1
 owner: memx-core
 status: active
 last_reviewed_at: 2026-03-03
@@ -8,51 +8,32 @@ next_review_due: 2026-06-03
 
 # RUNBOOK
 
-## 1. API サーバー起動
-```bash
-mem api serve
-```
-- 既定のローカル API（例: `http://127.0.0.1:7766`）を起動する。
+## v1 必須運用フロー
+1. **ingest**: `mem in short`（または `POST /v1/notes:ingest`）で short へ投入。
+2. **search**: `mem out search`（または `POST /v1/notes:search`）で FTS 検索。
+3. **show**: `mem out show`（または `GET /v1/notes/{id}`）で単一ノート参照。
 
-## 2. ノート投入（ingest）
-```bash
-mem in short \
-  --title "Qwen3.5-27B ローカルメモ" \
-  --file ./note.txt \
-  --source-type web \
-  --origin "https://example.com/article"
-```
-- `--no-llm`: LLM/Embedding を使わず最小メタで保存する。
-- `--tags`: 手動タグをカンマ区切りで付与する。
+## `mem in short` 手順
+1. CLI で `file` または stdin から本文を読み込み、request を生成。
+2. API へ request を送信（in-proc または HTTP）。
+3. Service 側で Gatekeeper(`memory_store`)・ノート保存・タグ/埋め込み更新・`short_meta` 更新を実行。
+4. CLI が note id 等を整形表示。
 
-## 3. キーワード検索（FTS）
-```bash
-mem out search "Qwen3.5 ベンチ" --store short --limit 10
-```
-- FTS5 ベースの検索。対象ストア/件数を指定可能。
+## `mem out recall` 手順
+1. クエリを EmbeddingClient で埋め込み化。
+2. 対象ストアの `note_embeddings` で類似度計算し、閾値以上を抽出。
+3. 上位 `top-k` を anchor として `created_at` 前後 `range` を連結取得。
+4. `--stores` 入力を正規化し、不正値は 400 系で失敗。
+5. 埋め込みクライアント未設定時はデフォルトエラー、明示フラグ時のみ FTS フォールバック。
 
-## 4. 単一ノート表示
-```bash
-mem out show <note-id>
-```
-- note id を指定して単一ノートを取得する。
+## `mem gc short` 手順
+1. `short_meta` と `memory_policy.yaml.gc.short` からトリガ判定。
+2. soft/hard limit 条件と `min_interval_minutes` で実行可否を決定。
+3. 実行時は正確値を再計算して閾値を再確認。
+4. `--dry-run` は DB 変更せず予定操作 JSON のみ返却。
 
-## 5. セマンティック検索（recall）
-```bash
-mem out recall "Qwen3.5-27B ベンチマーク結果" \
-  --scope self \
-  --stores short,chronicle,memopedia \
-  --top-k 8 \
-  --range 3
-```
-- `top-k` は `1..50`（未指定 8、超過時 50 に丸め）。
-- `range` は `0..10`（未指定 3）。
-- `Conn.Embed == nil` では既定エラー。明示フラグ時のみ FTS フォールバック。
-
-## 6. GC 実行
-```bash
-mem gc short
-mem gc short --dry-run
-```
-- `--dry-run` は DB 変更なしで予定操作のみ表示。
-- 閾値は `memory_policy.yaml.gc.short` を単一の参照元として使用する。
+## LLM クライアント運用
+- `EmbeddingClient`: 埋め込み生成。
+- `MiniLLMClient`: タグ・スコア・機密度推定。
+- `ReflectLLMClient`: Observer/Reflector 要約更新。
+- タイムアウト 15 秒、最大 2 回リトライ（指数バックオフ）、再試行可/不可を区別して実装する。

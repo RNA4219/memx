@@ -20,6 +20,16 @@ Local-first personal memory & knowledge store for LLM agents.
 
 ---
 
+## Governance Docs
+
+- [BLUEPRINT.md](./BLUEPRINT.md) - 方針（目的・設計原則・互換性方針）
+- [RUNBOOK.md](./RUNBOOK.md) - 手順（主要運用フロー・実行手順）
+- [GUARDRAILS.md](./GUARDRAILS.md) - ガードレール（安全性・互換性・移行制約）
+- [EVALUATION.md](./EVALUATION.md) - 受け入れ基準（評価条件・判定基準）
+- [CHECKLISTS.md](./CHECKLISTS.md) - チェックリスト（実装・運用確認項目）
+
+---
+
 ## Goals
 
 - ローカルで完結する「個人用・長期メモリ＆知識ストア」を提供する

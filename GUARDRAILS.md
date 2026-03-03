@@ -1,5 +1,5 @@
 ---
-intent_id: memx-guardrails
+intent_id: memx-safety-guardrails-v1
 owner: memx-core
 status: active
 last_reviewed_at: 2026-03-03
@@ -8,24 +8,28 @@ next_review_due: 2026-06-03
 
 # GUARDRAILS
 
-## 絶対遵守ルール
+## セーフティ・判定
+- Gatekeeper 判定は `allow` / `deny` / `needs_human`。
+- v1.3 では `needs_human` を deny 相当として fail-closed 運用する。
+- 保存前(`memory_store`)と出力前(`memory_output`)で必ずフック可能な構造を維持する。
 
-### 1) 破壊的変更の禁止
-- v1 系（`/v1/*`）の既存クライアントを壊す変更を禁止する。
-- 既存必須フィールドの削除/意味変更を禁止する。
-- DB スキーマの非互換変更は `user_version` の +1 と移行手順を必須化する。
+## エラー・互換性
+- API 最小保証コードは `INVALID_ARGUMENT` / `NOT_FOUND` / `INTERNAL`。
+- 未分類エラーは互換維持のため `INTERNAL` にフォールバック。
+- v1 内で禁止:
+  - 必須フィールド削除
+  - 既存フィールド意味変更
+  - 既存成功レスポンスの型/構造破壊
 
-### 2) 後方互換の維持
-- v1 内で許可されるのは任意フィールド追加などの後方互換変更のみ。
-- CLI オプションは API request フィールドへの 1:1 マッピングを維持する。
-- エラー互換は `INVALID_ARGUMENT` / `NOT_FOUND` / `INTERNAL` 最小集合を保証し、未分類は `INTERNAL` にフォールバックする。
+## スキーマ/移行
+- `migrate_other.go` は `schema/*.sql` 適用に統一し、部分適用失敗時はロールバック。
+- DDL 適用順序は notes → notes_fts(採用時) → tags/note_tags → note_embeddings(採用時) → user_version。
+- `user_version` は初期 1、破壊的/非互換 DDL のみ +1。
 
-### 3) 失敗時挙動（fail-safe/fail-closed）
-- Gatekeeper が `deny` または `needs_human` を返した場合は fail-closed で処理中断する。
-- ingest の部分失敗は `notes` 保存成功を優先し、タグ/埋め込み失敗は後追い再実行対象として扱う。
-- クライアント呼び出しは 15 秒 timeout、再試行規約（最大 2 回）に従う。
+## データ一貫性
+- ATTACH 跨ぎ完全原子性は前提にせず、「データ喪失より重複許容」で設計する。
+- `lineage` により追跡・再蒸留可能性を確保する。
 
-### 4) 変更適用ルール
-- レイヤ境界（CLI→API→Service→Infra）を越えた直接依存を追加しない。
-- 設定の単一情報源（例: GC 閾値は `memory_policy.yaml.gc.short`）を崩さない。
-- 秘密情報は保存前に policy + Gatekeeper でブロックする。
+## セキュリティ
+- APIキーや秘密情報は `memory_policy.yaml` と Gatekeeper で保存前ブロックを行う。
+- v1 はローカル運用前提とし、認証・権限・監査を伴う公開運用は対象外。
