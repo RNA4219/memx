@@ -4,10 +4,10 @@
 
 ## 構成
 - `index.json`: HUB とノード一覧（`node_id`, `role`, `depends_on`, `generated_at` を保持）
-- `caps/*.json`: 主要文書ごとの capsule（HUB からの ±2 hop 参照情報を保持）
+- `caps/*.json`: 主要文書ごとの capsule（要点・依存ノードを保持）
 
-## 更新トリガー
-以下の変更時は `index.json` と関連 `caps/*.json` を更新してください。
+## 更新タイミング
+以下の変更が入るたびに `index.json` と関連 `caps/*.json` を同時更新してください。
 
 1. **設計変更時**
    - `memx_spec_v3/docs/requirements.md` の要件・レイヤ構成・ストア責務を更新したとき
@@ -19,4 +19,4 @@
 ## 更新ルール
 - `generated_at` は更新時刻（UTC, RFC3339）で揃える。
 - `depends_on` は「そのノードが成立するために先に読む/参照するノード」を記述する。
-- capsule の `hops` は HUB 基準で ±2 hop 以内を維持する。
+- PR 作成前に `index.json` のノード一覧と `caps/*.json` の内容整合を確認する。

@@ -2,51 +2,55 @@
   "schema_version": "1.0",
   "generated_at": "2026-03-03T00:00:00Z",
   "hub": {
-    "node_id": "hub_memx_spec_v3",
+    "node_id": "hub_memx_birdseye",
     "role": "HUB",
     "depends_on": [
-      "memx_spec_v3/docs/requirements.md",
-      "memx_spec_v3/docs/quickstart.md",
-      "memx_spec_v3/go/service/service.go",
-      "memx_spec_v3/go/api/http_server.go"
+      "requirements",
+      "quickstart",
+      "service",
+      "api"
     ],
     "generated_at": "2026-03-03T00:00:00Z"
   },
   "nodes": [
     {
-      "node_id": "memx_spec_v3/docs/requirements.md",
+      "node_id": "requirements",
       "role": "spec",
       "depends_on": [],
       "generated_at": "2026-03-03T00:00:00Z",
-      "capsule": "docs/birdseye/caps/memx_spec_v3__docs__requirements.md.json"
+      "source": "memx_spec_v3/docs/requirements.md",
+      "capsule": "docs/birdseye/caps/requirements.json"
     },
     {
-      "node_id": "memx_spec_v3/docs/quickstart.md",
+      "node_id": "quickstart",
       "role": "guide",
       "depends_on": [
-        "memx_spec_v3/docs/requirements.md"
+        "requirements"
       ],
       "generated_at": "2026-03-03T00:00:00Z",
-      "capsule": "docs/birdseye/caps/memx_spec_v3__docs__quickstart.md.json"
+      "source": "memx_spec_v3/docs/quickstart.md",
+      "capsule": "docs/birdseye/caps/quickstart.json"
     },
     {
-      "node_id": "memx_spec_v3/go/service/service.go",
+      "node_id": "service",
       "role": "domain_service",
       "depends_on": [
-        "memx_spec_v3/docs/requirements.md"
+        "requirements"
       ],
       "generated_at": "2026-03-03T00:00:00Z",
-      "capsule": "docs/birdseye/caps/memx_spec_v3__go__service__service.go.json"
+      "source": "memx_spec_v3/go/service/service.go",
+      "capsule": "docs/birdseye/caps/service.json"
     },
     {
-      "node_id": "memx_spec_v3/go/api/http_server.go",
+      "node_id": "api",
       "role": "http_api",
       "depends_on": [
-        "memx_spec_v3/go/service/service.go",
-        "memx_spec_v3/docs/quickstart.md"
+        "service",
+        "quickstart"
       ],
       "generated_at": "2026-03-03T00:00:00Z",
-      "capsule": "docs/birdseye/caps/memx_spec_v3__go__api__http_server.go.json"
+      "source": "memx_spec_v3/go/api/http_server.go",
+      "capsule": "docs/birdseye/caps/api.json"
     }
   ]
 }
