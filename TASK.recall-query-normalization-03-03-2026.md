@@ -19,6 +19,7 @@ status: planned
 - `memx_spec_v3/go/db/recall.go` の検索入力正規化と閾値判定を安定化し、`top-k`/`range`/`stores` の解釈差分と埋め込み未設定時の挙動を明確化する。
 
 ## Requirements
+- インシデント再発防止: [`docs/IN-202603xx-001.md`](docs/IN-202603xx-001.md) の `TP-01/TP-02` に従い、実インシデント由来条件を要件とテストへ明示的に転記する。
 - 正常系: `top-k`/`range`/`stores` を含む有効入力で、期待件数・期待ストア集合が返ることを検証する。
 - 入力エラー: 不正な `top-k`（0未満、非数値）または `range` 逆転入力で、既存ポリシーに沿ったエラー応答になることを検証する。
 - 境界値: `top-k=1`、`range` の下限/上限一致、`stores` 空配列時の正規化結果を検証する。
@@ -33,6 +34,9 @@ status: planned
 ## Dependencies
 - `memx_spec_v3/docs/requirements.md` の検索仕様確定
 - `TASK.memx-bootstrap-03-03-2026.md`
+
+## Release Note Draft
+- 検索入力正規化と閾値判定を安定化し、`top-k`/`range`/`stores` 指定時の検索結果一貫性を向上させる。
 
 ## Status
 - planned

@@ -63,6 +63,7 @@ next_review_due: 2026-06-03
 
 2. 工程2: 実装指示の正規化
    - 入力: `docs/IN-*.md`
+   - 運用ルール: `docs/IN-BASELINE.md` は補助資料として扱い、`docs/IN-<実日付>-<連番>.md` の実インシデント記録を優先入力する。
    - 処理: 指示の重複/競合を正規化し、受け入れ条件と検証観点を統一する。
    - 出力（Task Seed への写像）: Requirements を確定し、Commands 候補を生成する。
 

@@ -7,6 +7,7 @@
 - 粒度: 1タスクにつき1〜3行の最小要約。実装詳細ではなく「何が変わったか」と「影響範囲」を記録する。
 - 日付形式: `YYYY-MM-DD`（ISO 8601）で統一する。
 - 重複回避: 既存エントリと同一内容は追記しない。`memx_spec_v3/CHANGES.md` から移送する際は要約のみ転記する。
+- 転記手順: Task Seed が `done` になったら、Task Seed の `Release Note Draft` を正本として `CHANGELOG.md` に1〜3行で転記し、転記後に Task Seed へ `Moved-to-CHANGES: YYYY-MM-DD` を追記してトレース可能にする。
 
 ## 2026-03-03
 - v3 要件として CLI/API 分離、HTTP + in-proc API 追加、Service 層追加、DB 層再編（`OpenAll` 追加、`MustOpenAll` 互換維持）を反映。

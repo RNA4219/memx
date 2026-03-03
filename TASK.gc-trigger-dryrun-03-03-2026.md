@@ -18,6 +18,7 @@ status: planned
 - `memx_spec_v3/go/db/gc.go` の GC trigger 判定と dry-run JSON を固定化し、dry-run で副作用が発生しないことを保証する。
 
 ## Requirements
+- インシデント再発防止: [`docs/IN-202603xx-001.md`](docs/IN-202603xx-001.md) の `TP-01/TP-02` に従い、実インシデント由来条件を要件とテストへ明示的に転記する。
 - 正常系: trigger 条件を満たす入力で GC 対象が抽出され、dry-run JSON が期待スキーマで出力されることを検証する。
 - 入力エラー: 不正な trigger パラメータ（負値、未定義モード）で、既存のエラーハンドリング方針に一致することを検証する。
 - 境界値: trigger 閾値ちょうど一致時に実行/非実行判定が仕様通りであることを検証する。
@@ -32,6 +33,9 @@ status: planned
 ## Dependencies
 - `memx_spec_v3/docs/requirements.md` の GC ポリシー節
 - `TASK.memx-bootstrap-03-03-2026.md`
+
+## Release Note Draft
+- GC trigger 判定と dry-run JSON の挙動を固定し、dry-run 実行時にDB副作用が起きないことを利用者向けに保証する。
 
 ## Status
 - planned
