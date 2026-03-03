@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://memx.local/contracts/cli-json.schema.json",
+  "title": "memx CLI --json contract",
+  "description": "Canonical schema for successful CLI --json outputs.",
+  "x-requirement-id": "REQ-CLI-001",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/NotesIngestResponse"
+    },
+    {
+      "$ref": "#/definitions/NotesSearchResponse"
+    },
+    {
+      "$ref": "#/definitions/Note"
+    }
+  ],
+  "definitions": {
+    "Note": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-requirement-id": "REQ-API-001",
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "body",
+        "created_at",
+        "updated_at",
+        "last_accessed_at",
+        "access_count",
+        "source_type",
+        "origin",
+        "source_trust",
+        "sensitivity"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "body": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" },
+        "last_accessed_at": { "type": "string" },
+        "access_count": { "type": "integer" },
+        "source_type": { "type": "string" },
+        "origin": { "type": "string" },
+        "source_trust": { "type": "string" },
+        "sensitivity": { "type": "string" }
+      }
+    },
+    "NotesIngestResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-requirement-id": "REQ-CLI-001",
+      "required": ["note"],
+      "properties": {
+        "note": {
+          "$ref": "#/definitions/Note"
+        }
+      }
+    },
+    "NotesSearchResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-requirement-id": "REQ-CLI-001",
+      "required": ["notes"],
+      "properties": {
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Note"
+          }
+        }
+      }
+    }
+  }
+}

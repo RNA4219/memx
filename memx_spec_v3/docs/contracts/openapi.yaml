@@ -1,0 +1,239 @@
+openapi: 3.1.0
+info:
+  title: memx v1 API Contract
+  version: 1.0.0
+  description: |
+    Canonical contract for v1 required endpoints.
+    Requirement mapping is embedded via x-requirement-id.
+servers:
+  - url: http://127.0.0.1:7766
+paths:
+  /v1/notes:ingest:
+    post:
+      operationId: notesIngest
+      x-requirement-id: REQ-API-001
+      summary: Ingest a new note.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotesIngestRequest'
+      responses:
+        '200':
+          description: Note was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotesIngestResponse'
+        '400':
+          $ref: '#/components/responses/InvalidArgumentError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/notes:search:
+    post:
+      operationId: notesSearch
+      x-requirement-id: REQ-API-001
+      summary: Search notes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotesSearchRequest'
+      responses:
+        '200':
+          description: Search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotesSearchResponse'
+        '400':
+          $ref: '#/components/responses/InvalidArgumentError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/notes/{id}:
+    get:
+      operationId: notesGet
+      x-requirement-id: REQ-API-001
+      summary: Get one note by id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+          x-requirement-id: REQ-API-001
+      responses:
+        '200':
+          description: Requested note.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '400':
+          $ref: '#/components/responses/InvalidArgumentError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+components:
+  responses:
+    InvalidArgumentError:
+      description: Invalid request.
+      x-requirement-id: REQ-ERR-001
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  code:
+                    const: INVALID_ARGUMENT
+    NotFoundError:
+      description: Resource not found.
+      x-requirement-id: REQ-ERR-001
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  code:
+                    const: NOT_FOUND
+    InternalError:
+      description: Internal error.
+      x-requirement-id: REQ-ERR-001
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  code:
+                    const: INTERNAL
+  schemas:
+    ErrorCode:
+      type: string
+      enum:
+        - INVALID_ARGUMENT
+        - NOT_FOUND
+        - CONFLICT
+        - GATEKEEP_DENY
+        - INTERNAL
+      x-requirement-id: REQ-ERR-001
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        message:
+          type: string
+        details:
+          description: Optional machine-readable details.
+      x-requirement-id: REQ-ERR-001
+    Note:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - summary
+        - body
+        - created_at
+        - updated_at
+        - last_accessed_at
+        - access_count
+        - source_type
+        - origin
+        - source_trust
+        - sensitivity
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        last_accessed_at:
+          type: string
+        access_count:
+          type: integer
+          format: int64
+        source_type:
+          type: string
+        origin:
+          type: string
+        source_trust:
+          type: string
+        sensitivity:
+          type: string
+      x-requirement-id: REQ-API-001
+    NotesIngestRequest:
+      type: object
+      additionalProperties: false
+      required: [title, body]
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        summary:
+          type: string
+        source_type:
+          type: string
+        origin:
+          type: string
+        source_trust:
+          type: string
+        sensitivity:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      x-requirement-id: REQ-API-001
+    NotesIngestResponse:
+      type: object
+      additionalProperties: false
+      required: [note]
+      properties:
+        note:
+          $ref: '#/components/schemas/Note'
+      x-requirement-id: REQ-API-001
+    NotesSearchRequest:
+      type: object
+      additionalProperties: false
+      required: [query]
+      properties:
+        query:
+          type: string
+        top_k:
+          type: integer
+      x-requirement-id: REQ-API-001
+    NotesSearchResponse:
+      type: object
+      additionalProperties: false
+      required: [notes]
+      properties:
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+      x-requirement-id: REQ-API-001
