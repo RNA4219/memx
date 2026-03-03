@@ -1,8 +1,9 @@
 # Error Contract (v1)
 
-`memx_spec_v3/docs/contracts/openapi.yaml` を API/Error 契約の正本とし、本書は運用向け要約とする。
+`memx_spec_v3/docs/contracts/openapi.yaml` を API/Error 契約の正本とし、本書は `requirements.md` に従属する運用向け要約とする。
 
-> request/response のフィールド契約は `memx_spec_v3/docs/contracts/openapi.yaml`（API）および `memx_spec_v3/docs/contracts/cli-json.schema.json`（CLI `--json`）を参照。
+- 本書の位置づけと参照導線は `spec.md` を起点に確認する。
+- request/response のフィールド契約は `memx_spec_v3/docs/contracts/openapi.yaml`（API）および `memx_spec_v3/docs/contracts/cli-json.schema.json`（CLI `--json`）を参照する。
 
 ## 正本運用ルール（重複定義解消）
 

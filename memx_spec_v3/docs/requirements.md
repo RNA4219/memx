@@ -8,6 +8,14 @@ priority: high
 
 # memx 要求事項（MUST / SHOULD / FUTURE）
 
+## 仕様文書の正本範囲
+
+- 本書（`requirements.md`）は memx v1.3 の要件正本であり、要件ID・受け入れ条件・NFR・運用要件の判定根拠を定義する。
+- API 契約の正本は `contracts/openapi.yaml`、CLI `--json` 契約の正本は `contracts/cli-json.schema.json` とする。
+- `error-contract.md` と `quickstart.md` は本書に従属する補助文書であり、正本との差分要約と運用手順のみを記載する。
+- 参照起点は `spec.md` とし、仕様レビュー時は同ファイルから辿る。
+
+## 0. 目的とスコープ
 設計詳細は `design.md`、I/F 詳細は `interfaces.md`、契約詳細は `CONTRACTS.md` を正本とする。
 
 ## 1. MUST（v1）

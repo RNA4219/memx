@@ -61,6 +61,9 @@ go run ./cmd/mem out show <NOTE_ID> --api-url http://127.0.0.1:7766
 - SQLite ドライバは `modernc.org/sqlite` を想定しています。環境に合わせて差し替えてください。
 
 ## 関連ドキュメント
-- エラー契約の正本は `./requirements.md` の「6-4. エラーモデル」、`./error-contract.md` は運用向け要約。
-- エラー契約: `./error-contract.md`
+- 仕様参照の起点: `./spec.md`
+- 要件正本: `./requirements.md`（本書 `quickstart.md` は運用手順の補助文書）
+- API 契約正本: `./contracts/openapi.yaml`
+- CLI `--json` 契約正本: `./contracts/cli-json.schema.json`
+- エラー契約要約: `./error-contract.md`
 - v1必須3エンドポイント契約表: `./requirements.md` の「6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）」

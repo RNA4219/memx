@@ -4,6 +4,11 @@
 
 ## 構成
 
+- `docs/spec.md`
+  仕様インデックス（正本/補助の役割分担、API/CLI/エラー/NFR/運用要件の参照導線）。
+- `docs/requirements.md`
+  システム全体の要件定義の正本（目的・アーキテクチャ・CLI・GC・LLM役割など、レビュー内容を反映）。
+- `schema/short.sql`  
 - `docs/requirements.md`
   要求事項（MUST/SHOULD/FUTURE）と ID 定義の正本。
 - `docs/spec.md`
