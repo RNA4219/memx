@@ -170,3 +170,8 @@ PY
 1. 必須指標の定義は `governance/metrics.yaml` を唯一の参照元として確認する。
 2. 日次確認では `response_time` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。
 3. breach 発生時は `governance/metrics.yaml` の `action_on_breach` に従ってインシデントを起票する。
+
+## リリース前確認（Release Drafter）
+1. マージ済み PR に `feature` / `fix` / `chore` / `breaking` ラベルが正しく付与されていることを確認する。
+2. GitHub の Releases 画面で Draft Release を開き、カテゴリ分類（Features/Fixes/Chores/Breaking Changes）とタイトルを確認する。
+3. 誤分類や欠落がある場合は PR ラベルを修正し、Release Drafter の再実行でドラフトを更新する。

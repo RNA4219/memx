@@ -1,0 +1,30 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+no-changes-template: '- 変更なし'
+template: |
+  ## 変更内容
+  $CHANGES
+
+  ## コントリビューター
+  $CONTRIBUTORS
+
+categories:
+  - title: '⚠️ Breaking Changes'
+    labels:
+      - breaking
+  - title: '✨ Features'
+    labels:
+      - feature
+  - title: '🐛 Fixes'
+    labels:
+      - fix
+  - title: '🧹 Chores'
+    labels:
+      - chore
+
+exclude-labels:
+  - skip-changelog
+
+sort-by: merged_at
+sort-direction: descending
