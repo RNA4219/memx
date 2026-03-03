@@ -1,0 +1,36 @@
+---
+intent_id: memx-governance-metrics-v1
+owner: memx-core
+status: active
+last_reviewed_at: 2026-03-03
+next_review_due: 2026-06-03
+---
+
+metrics:
+  - name: response_time
+    owner: memx-core
+    source: "CLI/APM (`mem in short`, `mem out search`, `mem out show`)"
+    threshold: "p95 <= 2000ms"
+    window: "24h rolling"
+    action_on_breach: "P1 incidentを起票し、直近デプロイをロールバック判定する"
+
+  - name: compatibility
+    owner: memx-core
+    source: "contract tests (CLI↔API mapping, JSON output)"
+    threshold: "必須コマンド/APIの互換率 100%"
+    window: "per release"
+    action_on_breach: "リリースを停止し、破壊変更を修正して再検証する"
+
+  - name: error_classification
+    owner: memx-core
+    source: "API access logs (`/v1/notes:*`)"
+    threshold: "入力不備は 400 系、内部障害は 500 系の誤分類 0 件"
+    window: "24h rolling"
+    action_on_breach: "誤分類インシデントを記録し、ハンドラの分類ロジックを修正する"
+
+  - name: recall_threshold
+    owner: memx-core
+    source: "recall query logs (`score`, `top-k`, `range`)"
+    threshold: "score >= 0.20 の適用率 100%"
+    window: "24h rolling"
+    action_on_breach: "recall設定を fail-closed で停止し、閾値適用ロジックを復旧する"

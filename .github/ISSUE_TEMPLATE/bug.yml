@@ -26,17 +26,27 @@ body:
       required: true
 
   - type: textarea
-    id: expected_result
+    id: expected_vs_actual
     attributes:
-      label: 期待値
-      description: 本来の挙動を記載してください。
+      label: 期待値/実際値
+      description: 期待される挙動と実際の挙動を両方記載してください。
+      placeholder: |
+        期待値:
+        - ...
+
+        実際値:
+        - ...
     validations:
       required: true
 
   - type: textarea
-    id: actual_result
+    id: impact_scope
     attributes:
-      label: 実測値
-      description: 実際の挙動・ログ・エラーを記載してください。
+      label: 影響範囲
+      description: 影響する機能、ユーザー範囲、業務影響を記載してください。
+      placeholder: |
+        - 機能:
+        - ユーザー範囲:
+        - 業務影響:
     validations:
       required: true

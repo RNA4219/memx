@@ -75,3 +75,12 @@ python scripts/perf_probe.py \
 - シード結果: `artifacts/perf/seed-result.json`
 - ウォームアップ結果: `artifacts/perf/warmup-result.json`
 - 本計測結果（P50/P95 含む）: `artifacts/perf/perf-result.json`
+- 
+## インシデント/不具合起票
+- 不具合起票時は GitHub Issue テンプレートを使用する: [.github/ISSUE_TEMPLATE/bug.yml](.github/ISSUE_TEMPLATE/bug.yml)
+- 再現手順・期待値/実際値・影響範囲・関連 Intent ID を必ず記入する。
+
+## Observability / 確認手順
+1. 必須指標の定義は `governance/metrics.yaml` を唯一の参照元として確認する。
+2. 日次確認では `response_time` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。
+3. breach 発生時は `governance/metrics.yaml` の `action_on_breach` に従ってインシデントを起票する。
