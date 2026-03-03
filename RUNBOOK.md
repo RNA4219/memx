@@ -38,6 +38,10 @@ next_review_due: 2026-06-03
 - `ReflectLLMClient`: Observer/Reflector 要約更新。
 - タイムアウト 15 秒、最大 2 回リトライ（指数バックオフ）、再試行可/不可を区別して実装する。
 
+## インシデント/不具合起票
+- 不具合起票時は GitHub Issue テンプレートを使用する: [.github/ISSUE_TEMPLATE/bug.yml](.github/ISSUE_TEMPLATE/bug.yml)
+- 再現手順・期待値/実際値・影響範囲・関連 Intent ID を必ず記入する。
+
 ## Observability / 確認手順
 1. 必須指標の定義は `governance/metrics.yaml` を唯一の参照元として確認する。
 2. 日次確認では `response_time` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。
