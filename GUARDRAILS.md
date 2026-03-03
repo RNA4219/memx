@@ -34,3 +34,5 @@ next_review_due: 2026-06-03
 ## セキュリティ
 - APIキーや秘密情報は `memory_policy.yaml` と Gatekeeper で保存前ブロックを行う。
 - v1 はローカル運用前提とし、認証・権限・監査を伴う公開運用は対象外。
+- `archive_move` / `archive_purge` の監査ログは、成功/失敗を問わず `result`, `reason`, `retryable`, `owner`, `next_attempt_at` を必須記録とする。
+- requirements（`memx_spec_v3/docs/requirements.md` 2-7節）と矛盾時は requirements を正本とし、本書を追従更新する。
