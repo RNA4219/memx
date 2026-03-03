@@ -38,6 +38,7 @@ next_review_due: YYYY-MM-DD
 
 ## Requirements
 - Behavior / I/O / Constraints / Acceptance Criteria を `TASK.codex.md` の粒度で箇条書き。
+- セキュリティ関連タスクでは `REQ-SEC-001` / `REQ-RET-001` / `REQ-SEC-AUD-001` / `REQ-SEC-AUD-002` の参照を明記する。
 - Lint/Type/Test のゼロエラーを必須条件として明記する。
 
 ## Affected Paths

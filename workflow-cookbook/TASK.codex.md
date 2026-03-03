@@ -42,6 +42,9 @@ langs: [auto]   # auto | python | typescript | go | rust | etc.
 - Acceptance Criteria:
   - {{検収条件1}}
   - {{検収条件2}}
+- Security Requirement IDs（該当時は必須記載）:
+  - `REQ-SEC-001` / `REQ-RET-001`
+  - `REQ-SEC-AUD-001` / `REQ-SEC-AUD-002`
 
 ## Affected Paths
 
