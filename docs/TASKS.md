@@ -32,6 +32,7 @@
 ### Requirements
 - 満たすべき要件を箇条書きで記載する。
 - 互換性や非機能制約がある場合はここに明記する。
+- エラーコードを新規追加・変更するタスクでは、`memx_spec_v3/docs/requirements.md` の「6-4. エラーモデル」と `memx_spec_v3/docs/error-contract.md` を同時更新対象に含める。
 
 ### Commands
 - 実行・検証コマンドを列挙する。
