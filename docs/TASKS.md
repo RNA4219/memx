@@ -18,6 +18,8 @@
 - 要件の出典を `path#Section` 形式で記載する。
 - 例: `orchestration/memx-v1-bootstrap.md#Phase 2`
 - 複数ある場合は箇条書きで列挙する。
+- `HUB.codex.md` 工程2の運用ルールに従い、要件根拠として許可するインシデント記録は **`docs/IN-<実日付>-<連番>.md` のみ** とする（`docs/IN-BASELINE.md` は補助資料、`docs/IN-YYYYMMDD-001.md` などのテンプレートIDは不可）。
+- `Source` にテンプレートID（例: `IN-YYYYMMDD-001`）または `TBD` を含む Task Seed は、`reviewing` を継続して差し戻す。
 
 ### Node IDs
 - `docs/birdseye/index.json` の `node_id` を記載する。

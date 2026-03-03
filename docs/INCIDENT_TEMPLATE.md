@@ -1,6 +1,7 @@
 # INCIDENT TEMPLATE
 
 - インシデントID: `IN-YYYYMMDD-XXX`
+- Task Seed 参照ID（必須）: `IN-YYYYMMDD-XXX`（Task Seed の Source/Requirements から逆引きするため、インシデントIDと同値で記載）
 - 発生日（UTC）:
 - 起票日（UTC）:
 - 重大度: `SEV1 | SEV2 | SEV3 | SEV4`
@@ -35,6 +36,7 @@
 
 ## 4. 再発防止策（Preventive Actions）
 
+- 再発防止項目ID（必須・複数可）: `PA-01`, `PA-02` ...（Task Seed Requirements から参照するID）
 - 恒久対策:
 - 検知強化:
 - 運用改善:
