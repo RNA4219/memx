@@ -1,10 +1,16 @@
 # Error Contract (v1)
 
-`memx_spec_v3/docs/requirements.md` の「6-4. エラーモデル」を正本とし、本書は運用向け要約とする。
+`memx_spec_v3/docs/contracts/openapi.yaml` を API/Error 契約の正本とし、本書は運用向け要約とする。
 
-> request/response のフィールド契約は `memx_spec_v3/docs/requirements.md` の「6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）」を参照。
+> request/response のフィールド契約は `memx_spec_v3/docs/contracts/openapi.yaml`（API）および `memx_spec_v3/docs/contracts/cli-json.schema.json`（CLI `--json`）を参照。
 
-## ErrorCode 区分（requirements 6-4 同期）
+## 正本運用ルール（重複定義解消）
+
+- エラーコード・HTTP ステータス・エラーボディ構造の正本は `memx_spec_v3/docs/contracts/openapi.yaml` の `components.responses` / `components.schemas.Error*` とする。
+- 本書に同一内容を再定義しない。必要な記載は「実装差分」「運用メモ」「移行手順」に限定する。
+- 契約変更時は schema を先に更新し、その後に本書へ差分要約を反映する。
+
+## ErrorCode 区分（schema 同期）
 
 | 区分 | Error code | HTTP status | 契約レベル | 実装メモ |
 | --- | --- | --- | --- | --- |
@@ -20,16 +26,6 @@
   ただし `go/api/errors.go` の現行マップは `ErrInvalidArgument` / `ErrNotFound` 優先で、それ以外を `INTERNAL` にフォールバックするため、sentinel 未実装時に 409/403 は実運用で返らない。
 - `go/api/http_server.go` の `writeErr` は `CONFLICT=409` / `GATEKEEP_DENY=403` を処理可能。
   ただし上流から当該 `Error.code` が渡された場合に限り有効で、未実装時のフォールバックは `INTERNAL=500`。
-
-## 代表 JSON スキーマ例
-
-- `INVALID_ARGUMENT`: `{ "code": "INVALID_ARGUMENT", "message": "invalid argument", "details": {"field": "query"} }`（`details` は任意）
-- `NOT_FOUND`: `{ "code": "NOT_FOUND", "message": "not found" }`
-- `INTERNAL`: `{ "code": "INTERNAL", "message": "<internal error message>" }`
-- `mapError` の分岐順は `ErrNotFound` → `ErrInvalidArgument` → 文字列救済 (`contains("invalid argument")`) → `INTERNAL`。
-- HTTP ステータス変換は `writeErr` にて `INVALID_ARGUMENT=400`, `NOT_FOUND=404`, それ以外未定義コードは `500`。
-- JSON のエラーレスポンスは `api.Error` 型（`code`, `message`, `details?`）。
-
 
 ## 追加ケース: GC feature disabled（`POST /v1/gc:run`）
 

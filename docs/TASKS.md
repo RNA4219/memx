@@ -33,6 +33,7 @@
 - 満たすべき要件を箇条書きで記載する。
 - 互換性や非機能制約がある場合はここに明記する。
 - エラーコードを新規追加・変更するタスクでは、`memx_spec_v3/docs/requirements.md` の「6-4. エラーモデル」と `memx_spec_v3/docs/error-contract.md` を同時更新対象に含める。
+- API/CLI の契約（request/response/error/`--json`）を変更するタスクでは、`memx_spec_v3/docs/contracts/openapi.yaml` と `memx_spec_v3/docs/contracts/cli-json.schema.json` の更新を必須とする。
 
 ### Commands
 - 実行・検証コマンドを列挙する。
@@ -64,6 +65,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 - [ ] `Node IDs` を記載済み（依存照合対象なら必須）
 - [ ] `Requirements` に後方互換/非機能制約を明記済み
 - [ ] エラーコード変更時は `memx_spec_v3/docs/requirements.md` と `memx_spec_v3/docs/error-contract.md` を更新対象に含めた
+- [ ] 契約変更時は `memx_spec_v3/docs/contracts/openapi.yaml` と `memx_spec_v3/docs/contracts/cli-json.schema.json` を更新した
 - [ ] `Commands` に検証コマンドを順序付きで記載済み
 - [ ] `Release Note Draft` を記載済み
 - [ ] `memx_spec_v3/CHANGES.md` と `CHANGELOG.md` への反映項目を記載済み
