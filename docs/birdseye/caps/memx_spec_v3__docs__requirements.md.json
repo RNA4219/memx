@@ -1,0 +1,18 @@
+{
+  "node_id": "memx_spec_v3/docs/requirements.md",
+  "role": "spec",
+  "depends_on": [],
+  "generated_at": "2026-03-03T00:00:00Z",
+  "summary": "memx v1.3 の要件定義。CLI/API/Service/DB レイヤと必須コマンド・APIを定義。",
+  "hops": {
+    "plus_1": [
+      "memx_spec_v3/docs/quickstart.md",
+      "memx_spec_v3/go/service/service.go"
+    ],
+    "plus_2": [
+      "memx_spec_v3/go/api/http_server.go"
+    ],
+    "minus_1": [],
+    "minus_2": []
+  }
+}
