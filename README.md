@@ -28,6 +28,16 @@ Local-first personal memory & knowledge store for LLM agents.
 - [EVALUATION.md](./EVALUATION.md) - 受け入れ基準（評価条件・判定基準）
 - [CHECKLISTS.md](./CHECKLISTS.md) - チェックリスト（実装・運用確認項目）
 
+### 補完ドキュメント導線
+
+- ADR: [docs/ADR/README.md](./docs/ADR/README.md)
+- Upstream 取り込み方針: [docs/UPSTREAM.md](./docs/UPSTREAM.md)
+- Upstream 週次ログ: [docs/UPSTREAM_WEEKLY_LOG.md](./docs/UPSTREAM_WEEKLY_LOG.md)
+- 付録 A（Glossary）: [docs/addenda/A_Glossary.md](./docs/addenda/A_Glossary.md)
+- 付録 D（Context Trimming）: [docs/addenda/D_Context_Trimming.md](./docs/addenda/D_Context_Trimming.md)
+- 付録 G（Security & Privacy）: [docs/addenda/G_Security_Privacy.md](./docs/addenda/G_Security_Privacy.md)
+- データセット管理: [datasets/README.md](./datasets/README.md)
+
 ---
 
 ## Goals

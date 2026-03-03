@@ -41,3 +41,20 @@
 - デフォルト言語は日本語。
 - コード識別子（変数名・関数名・型名・CLI フラグ・JSON キー）は英語を維持する。
 - 外部仕様や既存 API 名は原文尊重で改変しない。
+
+## memx側で採用する補完資料一覧
+
+workflow-cookbook の補完資料をそのまま複製せず、memx の運用最小セットとして以下を採用する。
+
+### 採用
+- `docs/ADR/README.md`（ADR 運用入口）
+- `docs/UPSTREAM.md`（upstream 取り込み方針）
+- `docs/UPSTREAM_WEEKLY_LOG.md`（upstream 週次ログ）
+- `docs/addenda/A_Glossary.md`（用語統一）
+- `docs/addenda/D_Context_Trimming.md`（コンテキスト削減基準）
+- `docs/addenda/G_Security_Privacy.md`（セキュリティ/プライバシー基準）
+- `datasets/README.md`（データセット台帳）
+
+### 非採用（workflow-cookbookとの差分）
+- workflow-cookbook 側の詳細テンプレート本文・運用例・CI 手順の全文移植は非採用。
+- 理由: memx では導線統一を優先し、詳細規定は BLUEPRINT / RUNBOOK / GUARDRAILS / EVALUATION を正本とするため。
