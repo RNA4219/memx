@@ -5,6 +5,12 @@
 - 日付は `date +%m-%d-%Y` の結果をそのまま使う（例: `03-03-2026`）。
 - `slug` は英小文字・数字・ハイフンのみを使用する。
 
+## 推奨 front matter キー
+- Task Seed 冒頭に YAML front matter を付与し、以下キーの記載を推奨する。
+  - `priority`: `high` / `medium` / `low` のいずれか。
+  - `owner`: 担当チームまたは担当者（例: `memx-core`）。
+  - `deadline`: 期日を `YYYY-MM-DD` 形式で記載する。
+
 ## 2. Task Seed 必須項目
 各 Task Seed には次の5項目を必須で含める。
 

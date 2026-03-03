@@ -1,3 +1,12 @@
+---
+priority_phase_1: high
+priority_phase_2: high
+priority_phase_3: medium
+owner: memx-core
+deadline: 2026-03-17
+status: planned
+---
+
 # memx v1 Bootstrap Orchestration
 
 ## Phase 1: Alignment & Scope Freeze

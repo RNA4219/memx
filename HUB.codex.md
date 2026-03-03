@@ -121,6 +121,7 @@ status: planned
 - ステータス遷移の標準フローは `planned → active → in_progress → reviewing → done` とする。
 - 例外として、ブロッカー発生時のみ `in_progress → blocked → in_progress` を許可する。
 - ステータス語彙の正本は [`docs/TASKS.md`](docs/TASKS.md) とし、差異が出ないように本節と同一語彙で運用する。
+- front matter が未設定の Task Seed は `priority=medium` / `owner=unassigned` / `deadline=tbd` / `status=planned` をフォールバック値として補完する。
 
 ## memx側で採用する補完資料一覧
 

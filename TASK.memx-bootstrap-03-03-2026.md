@@ -1,3 +1,10 @@
+---
+priority: high
+owner: memx-core
+deadline: 2026-03-10
+status: planned
+---
+
 # TASK.memx-bootstrap-03-03-2026
 
 ## Objective
