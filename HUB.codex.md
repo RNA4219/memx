@@ -42,6 +42,38 @@
 - コード識別子（変数名・関数名・型名・CLI フラグ・JSON キー）は英語を維持する。
 - 外部仕様や既存 API 名は原文尊重で改変しない。
 
+## 出力例（YAML）
+タスク化時は、追跡可能な最小単位として次の YAML 形式を採用する。
+
+```yaml
+task_id: TASK.sync-hub-yaml-03-03-2026
+source: orchestration/roadmap.md#Phase2
+objective: HUB 出力契約に YAML 例と転記規約を追加する
+requirements:
+  - task_id/source/objective/requirements/commands/dependencies/status を必須化する
+  - source は orchestration/...#Phase... 形式で記載する
+commands:
+  - rg "出力例（YAML）" HUB.codex.md
+  - rg "対応表" HUB.codex.md
+dependencies:
+  - none
+status: in_progress
+```
+
+- `source` は `orchestration/<file>.md#Phase<N>` 形式を正とし、作業起点を一意に追跡可能にする。
+
+## `docs/TASKS.md` 必須項目との対応表
+
+| YAML キー | 転記先（`docs/TASKS.md`） | 固定ルール |
+| --- | --- | --- |
+| `task_id` | 1. 命名規則（Task Seed ファイル名） | `TASK.<slug>-<MM-DD-YYYY>.md` を生成し、識別子として維持 |
+| `source` | Dependencies | `orchestration/...#Phase...` を依存・起点情報として先頭に記載 |
+| `objective` | Objective | 1〜3 行でそのまま転記 |
+| `requirements` | Requirements | 箇条書きで順序を維持して転記 |
+| `commands` | Commands | 実行順を維持して転記 |
+| `dependencies` | Dependencies | `- none` を含め原文維持で転記 |
+| `status` | Status | `planned/active/in_progress/reviewing/blocked/done` のみ許可 |
+
 ## memx側で採用する補完資料一覧
 
 workflow-cookbook の補完資料をそのまま複製せず、memx の運用最小セットとして以下を採用する。
