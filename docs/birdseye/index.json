@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-03-03T00:00:00Z",
+  "hub": {
+    "node_id": "hub_memx_spec_v3",
+    "role": "HUB",
+    "depends_on": [
+      "memx_spec_v3/docs/requirements.md",
+      "memx_spec_v3/docs/quickstart.md",
+      "memx_spec_v3/go/service/service.go",
+      "memx_spec_v3/go/api/http_server.go"
+    ],
+    "generated_at": "2026-03-03T00:00:00Z"
+  },
+  "nodes": [
+    {
+      "node_id": "memx_spec_v3/docs/requirements.md",
+      "role": "spec",
+      "depends_on": [],
+      "generated_at": "2026-03-03T00:00:00Z",
+      "capsule": "docs/birdseye/caps/memx_spec_v3__docs__requirements.md.json"
+    },
+    {
+      "node_id": "memx_spec_v3/docs/quickstart.md",
+      "role": "guide",
+      "depends_on": [
+        "memx_spec_v3/docs/requirements.md"
+      ],
+      "generated_at": "2026-03-03T00:00:00Z",
+      "capsule": "docs/birdseye/caps/memx_spec_v3__docs__quickstart.md.json"
+    },
+    {
+      "node_id": "memx_spec_v3/go/service/service.go",
+      "role": "domain_service",
+      "depends_on": [
+        "memx_spec_v3/docs/requirements.md"
+      ],
+      "generated_at": "2026-03-03T00:00:00Z",
+      "capsule": "docs/birdseye/caps/memx_spec_v3__go__service__service.go.json"
+    },
+    {
+      "node_id": "memx_spec_v3/go/api/http_server.go",
+      "role": "http_api",
+      "depends_on": [
+        "memx_spec_v3/go/service/service.go",
+        "memx_spec_v3/docs/quickstart.md"
+      ],
+      "generated_at": "2026-03-03T00:00:00Z",
+      "capsule": "docs/birdseye/caps/memx_spec_v3__go__api__http_server.go.json"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "node_id": "memx_spec_v3/go/service/service.go",
+  "role": "domain_service",
+  "depends_on": [
+    "memx_spec_v3/docs/requirements.md"
+  ],
+  "generated_at": "2026-03-03T00:00:00Z",
+  "summary": "ノートの ingest/search/get を実装するサービス層。",
+  "hops": {
+    "plus_1": [
+      "memx_spec_v3/go/api/http_server.go"
+    ],
+    "plus_2": [],
+    "minus_1": [
+      "memx_spec_v3/docs/requirements.md"
+    ],
+    "minus_2": []
+  }
+}

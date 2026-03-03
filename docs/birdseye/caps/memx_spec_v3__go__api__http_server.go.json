@@ -1,0 +1,21 @@
+{
+  "node_id": "memx_spec_v3/go/api/http_server.go",
+  "role": "http_api",
+  "depends_on": [
+    "memx_spec_v3/go/service/service.go",
+    "memx_spec_v3/docs/quickstart.md"
+  ],
+  "generated_at": "2026-03-03T00:00:00Z",
+  "summary": "HTTP エンドポイントを定義し、InProc 経由でサービス層を呼び出す API 層。",
+  "hops": {
+    "plus_1": [],
+    "plus_2": [],
+    "minus_1": [
+      "memx_spec_v3/go/service/service.go",
+      "memx_spec_v3/docs/quickstart.md"
+    ],
+    "minus_2": [
+      "memx_spec_v3/docs/requirements.md"
+    ]
+  }
+}
