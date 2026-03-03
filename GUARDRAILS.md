@@ -14,6 +14,7 @@ next_review_due: 2026-06-03
 - 保存前(`memory_store`)と出力前(`memory_output`)で必ずフック可能な構造を維持する。
 
 ## エラー・互換性
+- 閾値定義（`EVALUATION.md` と `governance/metrics.yaml`）に不整合がある場合は deploy block とする。
 - API 最小保証コードは `INVALID_ARGUMENT` / `NOT_FOUND` / `INTERNAL`。
 - 未分類エラーは互換維持のため `INTERNAL` にフォールバック。
 - v1 内で禁止:

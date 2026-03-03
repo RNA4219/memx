@@ -10,7 +10,10 @@ metrics:
   - name: response_time
     owner: memx-core
     source: "CLI/APM (`mem in short`, `mem out search`, `mem out show`)"
-    threshold: "p95 <= 2000ms"
+    threshold:
+      ingest: "P50 <= 120ms, P95 <= 250ms"
+      search: "P50 <= 80ms, P95 <= 180ms"
+      show: "P50 <= 40ms, P95 <= 90ms"
     window: "24h rolling"
     action_on_breach: "P1 incidentを起票し、直近デプロイをロールバック判定する"
 

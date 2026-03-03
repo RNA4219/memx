@@ -12,10 +12,12 @@
 
 `governance/metrics.yaml` の必須指標で breach が発生した場合に起票する。
 
-- `response_time` の閾値超過
+- `response_time` の閾値超過（ingest/search/show のいずれかで `threshold` を超過）
 - `compatibility` の閾値未達
 - `error_classification` の逸脱
 - `recall_threshold` の閾値未達
+
+※ breach の語彙は `governance/metrics.yaml` と同一（`threshold` / `action_on_breach`）で運用する。
 
 ## 3. 起票責任者と SLA
 
