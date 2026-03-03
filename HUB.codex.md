@@ -73,6 +73,36 @@ next_review_due: 2026-06-03
    - 処理: `docs/TASKS.md` の必須項目規約に整形し、語彙・命名・並び順を検証する。
    - 出力（Task Seed への写像）: 最終的に `Objective / Requirements / Commands / Dependencies / Status` を満たす Task Seed を確定する。
 
+## 出力例（YAML）
+```yaml
+task_id: TASK.normalize-hub-yaml-03-03-2026
+source:
+  - orchestration/plan.md#Phase1
+  - orchestration/implementation.md#Phase2
+objective: docs/TASKS.md 準拠の Task Seed 生成規約を固定化する
+requirements:
+  - source は orchestration/...#Phase... の追跡可能形式を使う
+  - docs/TASKS.md の必須項目へ欠落なく写像できること
+commands:
+  - rg "^## " orchestration/*.md
+  - python scripts/task_seed_validate.py TASK.normalize-hub-yaml-03-03-2026.md
+dependencies:
+  - TASK.extract-orchestration-03-03-2026
+status: planned
+```
+
+### `docs/TASKS.md` 必須項目との対応表
+
+| YAML キー | 転記先（Task Seed） | 転記ルール |
+| --- | --- | --- |
+| `task_id` | ファイル名 `TASK.<slug>-<MM-DD-YYYY>.md` | `task_id` の `TASK.` 以降をファイル名として使用 |
+| `source` | `Requirements` 補足行 | 追跡元として `- source: <path>#Phase...` 形式で列挙 |
+| `objective` | `Objective` | 1〜3 行で要約せず原文転記 |
+| `requirements` | `Requirements` | 箇条書きで順序維持して転記 |
+| `commands` | `Commands` | 実行順を維持して上から転記 |
+| `dependencies` | `Dependencies` | 依存なしは `- none` に正規化 |
+| `status` | `Status` | `docs/TASKS.md` の許可語彙のみ受理 |
+
 ## 言語ポリシー
 - デフォルト言語は日本語。
 - コード識別子（変数名・関数名・型名・CLI フラグ・JSON キー）は英語を維持する。
