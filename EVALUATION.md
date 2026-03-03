@@ -16,6 +16,13 @@ next_review_due: 2026-06-03
   - `POST /v1/notes:search`: P50 <= 80ms, P95 <= 180ms
   - `GET /v1/notes/{id}`: P50 <= 40ms, P95 <= 90ms
 
+## 閾値項目と RUNBOOK 出力項目の対応
+- 判定に使用する値は `RUNBOOK.md` の `artifacts/perf/perf-result.json` に含まれる `results.<endpoint>.p50_ms` / `results.<endpoint>.p95_ms` とする。
+- 対応は 1 対 1 で固定し、別名指標は使用しない。
+  - `POST /v1/notes:ingest` ↔ `results.ingest.p50_ms` / `results.ingest.p95_ms`
+  - `POST /v1/notes:search` ↔ `results.search.p50_ms` / `results.search.p95_ms`
+  - `GET /v1/notes/{id}` ↔ `results.show.p50_ms` / `results.show.p95_ms`
+
 ## 性能計測条件
 - ノート件数: 10,000 件（short ストア）
 - 本文長: 1 ノートあたり約 500 文字（UTF-8 プレーンテキスト）

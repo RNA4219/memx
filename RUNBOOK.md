@@ -47,37 +47,119 @@ next_review_due: 2026-06-03
 3. ウォームアップとして各エンドポイントを 20 回実行。
 4. 本計測として各エンドポイントを 200 回実行し、P50/P95 を算出。
 
+### 実行前提
+- 必須バイナリ: `go`(1.22+), `python3`(3.10+)
+- 実行ディレクトリ: リポジトリルート（`/workspace/memx`）
+- 入力データ形式: UTF-8 プレーンテキスト（1ノート約500文字、1行1ノートで生成）
+- 計測対象コマンド実体:
+  - ingest: `go run ./memx_spec_v3/go/cmd/mem in short`
+  - search: `go run ./memx_spec_v3/go/cmd/mem out search`
+  - show: `go run ./memx_spec_v3/go/cmd/mem out show`
+
+### 出力 JSON スキーマ（`artifacts/perf/perf-result.json`）
+```json
+{
+  "environment": {
+    "cpu": "4 vCPU",
+    "ram": "16GB",
+    "storage": "NVMe SSD",
+    "os": "Linux x86_64"
+  },
+  "dataset": {
+    "store": "short",
+    "note_count": 10000,
+    "body_chars": 500
+  },
+  "results": {
+    "ingest": { "p50_ms": 0.0, "p95_ms": 0.0, "runs": 200 },
+    "search": { "p50_ms": 0.0, "p95_ms": 0.0, "runs": 200 },
+    "show": { "p50_ms": 0.0, "p95_ms": 0.0, "runs": 200 }
+  }
+}
+```
+
 ### 実行コマンド例
 ```bash
 mkdir -p artifacts/perf
+rm -f artifacts/perf/short.db
 
-# 1) データ投入（同条件データセット）
-python scripts/perf_seed_notes.py \
-  --store short \
-  --count 10000 \
-  --body-length 500 \
-  --output artifacts/perf/seed-result.json
+# API サーバー起動（別ターミナル）
+go run ./memx_spec_v3/go/cmd/mem api serve \
+  --addr 127.0.0.1:7766 \
+  --short ./artifacts/perf/short.db
 
-# 2) ウォームアップ（20回）
-python scripts/perf_probe.py \
-  --endpoint ingest --endpoint search --endpoint show \
-  --warmup 20 \
-  --runs 0 \
-  --output artifacts/perf/warmup-result.json
+# 1) データ投入（同条件データセット: 10,000件 / 500文字）
+python3 - <<'PY'
+import json
+import subprocess
+from pathlib import Path
 
-# 3) 本計測（200回）
-python scripts/perf_probe.py \
-  --endpoint ingest --endpoint search --endpoint show \
-  --warmup 0 \
-  --runs 200 \
-  --output artifacts/perf/perf-result.json
+out = Path("artifacts/perf/seed-result.json")
+out.parent.mkdir(parents=True, exist_ok=True)
+body = "あ" * 500
+ids = []
+for i in range(10000):
+    cmd = (
+        f"printf '%s' '{body}' | "
+        f"go run ./memx_spec_v3/go/cmd/mem in short --stdin --title perf-{i} "
+        f"--api-url http://127.0.0.1:7766"
+    )
+    r = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
+    ids.append(r.stdout.strip())
+out.write_text(json.dumps({"count": len(ids), "note_ids": ids[:5]}, ensure_ascii=False, indent=2), encoding="utf-8")
+PY
+
+# 2) ウォームアップ + 3) 本計測（JSON 出力）
+python3 - <<'PY'
+import json
+import statistics
+import subprocess
+import time
+from pathlib import Path
+
+API = "http://127.0.0.1:7766"
+WARMUP = 20
+RUNS = 200
+query = "あ"
+known_id = "1"
+
+def ms(cmd: str) -> float:
+    t0 = time.perf_counter()
+    subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return (time.perf_counter() - t0) * 1000
+
+def pct(values, p):
+    values = sorted(values)
+    i = int((len(values) - 1) * p)
+    return round(values[i], 2)
+
+for _ in range(WARMUP):
+    ms(f"printf '%s' 'warmup' | go run ./memx_spec_v3/go/cmd/mem in short --stdin --title warmup --api-url {API}")
+    ms(f"go run ./memx_spec_v3/go/cmd/mem out search '{query}' --api-url {API}")
+    ms(f"go run ./memx_spec_v3/go/cmd/mem out show {known_id} --api-url {API}")
+
+ingest = [ms(f"printf '%s' 'bench' | go run ./memx_spec_v3/go/cmd/mem in short --stdin --title bench --api-url {API}") for _ in range(RUNS)]
+search = [ms(f"go run ./memx_spec_v3/go/cmd/mem out search '{query}' --api-url {API}") for _ in range(RUNS)]
+show = [ms(f"go run ./memx_spec_v3/go/cmd/mem out show {known_id} --api-url {API}") for _ in range(RUNS)]
+
+Path("artifacts/perf/warmup-result.json").write_text(json.dumps({"warmup": WARMUP}, indent=2), encoding="utf-8")
+Path("artifacts/perf/perf-result.json").write_text(json.dumps({
+    "environment": {"cpu": "4 vCPU", "ram": "16GB", "storage": "NVMe SSD", "os": "Linux x86_64"},
+    "dataset": {"store": "short", "note_count": 10000, "body_chars": 500},
+    "results": {
+        "ingest": {"p50_ms": pct(ingest, 0.50), "p95_ms": pct(ingest, 0.95), "runs": RUNS},
+        "search": {"p50_ms": pct(search, 0.50), "p95_ms": pct(search, 0.95), "runs": RUNS},
+        "show": {"p50_ms": pct(show, 0.50), "p95_ms": pct(show, 0.95), "runs": RUNS}
+    }
+}, ensure_ascii=False, indent=2), encoding="utf-8")
+PY
 ```
 
 ### 出力保存先
 - シード結果: `artifacts/perf/seed-result.json`
 - ウォームアップ結果: `artifacts/perf/warmup-result.json`
 - 本計測結果（P50/P95 含む）: `artifacts/perf/perf-result.json`
-- 
+
 ## インシデント/不具合起票
 - 不具合起票時は GitHub Issue テンプレートを使用する: [.github/ISSUE_TEMPLATE/bug.yml](.github/ISSUE_TEMPLATE/bug.yml)
 - 再現手順・期待値/実際値・影響範囲・関連 Intent ID を必ず記入する。
