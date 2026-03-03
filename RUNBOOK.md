@@ -19,6 +19,21 @@ next_review_due: 2026-06-03
 3. Service 側で Gatekeeper(`memory_store`)・ノート保存・タグ/埋め込み更新・`short_meta` 更新を実行。
 4. CLI が note id 等を整形表示。
 
+### CLI `--json` と API レスポンスの変換ルール（v1必須3エンドポイント）
+
+現行実装では差分なし（CLI `--json` は API レスポンス JSON をそのまま出力）。
+
+- `mem in short --json` ⇔ `POST /v1/notes:ingest`
+  - 変換ルール: なし（`NotesIngestResponse` をそのまま表示）。
+- `mem out search ... --json` ⇔ `POST /v1/notes:search`
+  - 変換ルール: なし（`NotesSearchResponse` をそのまま表示）。
+- `mem out show <id> --json` ⇔ `GET /v1/notes/{id}`
+  - 変換ルール: なし（`Note` をそのまま表示）。
+
+運用ルール:
+- 互換性維持のため、上記3コマンドの `--json` は API と同一スキーマを維持する。
+- 差分が必要な場合は、CLI 側で明示的なバージョンフラグを導入し、既定出力は維持する。
+
 ## `mem out recall` 手順
 1. クエリを EmbeddingClient で埋め込み化。
 2. 対象ストアの `note_embeddings` で類似度計算し、閾値以上を抽出。

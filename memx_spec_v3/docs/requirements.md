@@ -597,6 +597,82 @@ gc:
   - request: `{target, options?}`
   - response: `{status}`
 
+### 6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）
+
+#### POST `/v1/notes:ingest`
+
+**request (`NotesIngestRequest`)**
+
+| field | type | required | default | validation | backward-compatibility note |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | 必須 | なし | trim 後に空文字不可（空の場合 `INVALID_ARGUMENT`） | 必須を維持。v1 では削除・意味変更禁止。 |
+| `body` | `string` | 必須 | なし | trim 後に空文字不可（空の場合 `INVALID_ARGUMENT`） | 必須を維持。v1 では削除・意味変更禁止。 |
+| `summary` | `string` | 任意 | `""` | 追加バリデーションなし | 任意フィールドのため、未指定互換を維持。 |
+| `source_type` | `string` | 任意 | `"manual"` | trim 後、空ならデフォルト補完 | 既定値補完ルールを固定（クライアント未送信を維持）。 |
+| `origin` | `string` | 任意 | `""` | trim のみ | 任意フィールドとして後方互換追加可。 |
+| `source_trust` | `string` | 任意 | `"user_input"` | trim 後、空ならデフォルト補完 | 既定値補完ルールを固定。 |
+| `sensitivity` | `string` | 任意 | `"internal"` | trim 後、空ならデフォルト補完 | 既定値補完ルールを固定。 |
+| `tags` | `[]string` | 任意 | `[]` 扱い（未指定時は処理なし） | 各要素 trim、空要素は無視 | 任意配列として未指定・空配列を同等扱い。 |
+
+**response (`NotesIngestResponse`)**
+
+| field | type | required | default | validation | backward-compatibility note |
+| --- | --- | --- | --- | --- | --- |
+| `note` | `Note` | 必須 | なし | 保存成功時に返却 | v1 では wrapper 構造（`{note: ...}`）を維持。 |
+| `note.id` | `string` | 必須 | なし | 32 hex 形式の ID を生成 | 型・キー名固定。 |
+| `note.title` | `string` | 必須 | なし | request 値（trim 後） | 型固定。 |
+| `note.summary` | `string` | 必須 | `""` 許容 | request 値 | 必須キーだが空文字を許容。 |
+| `note.body` | `string` | 必須 | なし | request 値（trim 後） | 型固定。 |
+| `note.created_at` | `string` | 必須 | なし | UTC RFC3339Nano | 日時文字列フォーマットを維持。 |
+| `note.updated_at` | `string` | 必須 | なし | UTC RFC3339Nano | 日時文字列フォーマットを維持。 |
+| `note.last_accessed_at` | `string` | 必須 | なし | UTC RFC3339Nano | 日時文字列フォーマットを維持。 |
+| `note.access_count` | `int64` | 必須 | `0` | ingest 直後は `0` | 数値型固定。 |
+| `note.source_type` | `string` | 必須 | `"manual"` 補完あり | request/補完値 | 補完込みで常に返却。 |
+| `note.origin` | `string` | 必須 | `""` | request 値 | 必須キーとして維持。 |
+| `note.source_trust` | `string` | 必須 | `"user_input"` 補完あり | request/補完値 | 補完込みで常に返却。 |
+| `note.sensitivity` | `string` | 必須 | `"internal"` 補完あり | request/補完値 | 補完込みで常に返却。 |
+
+#### POST `/v1/notes:search`
+
+**request (`NotesSearchRequest`)**
+
+| field | type | required | default | validation | backward-compatibility note |
+| --- | --- | --- | --- | --- | --- |
+| `query` | `string` | 必須 | なし | trim 後に空文字不可（空の場合 `INVALID_ARGUMENT`） | 必須を維持。 |
+| `top_k` | `int` | 任意 | `20`（`<=0` 時） | `<=0` は service で `20` に補正 | 任意数値として未指定互換を維持。 |
+
+**response (`NotesSearchResponse`)**
+
+| field | type | required | default | validation | backward-compatibility note |
+| --- | --- | --- | --- | --- | --- |
+| `notes` | `[]Note` | 必須 | `[]` | 一致結果を最大 `top_k` 件返却 | v1 では配列 wrapper 構造を維持。 |
+| `notes[].*` | `Note` 各フィールド | 必須 | `Note` 契約準拠 | `Note` と同一 | `Note` フィールドの型・キー名を維持。 |
+
+#### GET `/v1/notes/{id}`
+
+**request（path parameter）**
+
+| field | type | required | default | validation | backward-compatibility note |
+| --- | --- | --- | --- | --- | --- |
+| `id` | `string` | 必須 | なし | trim 後に空文字不可（空の場合 `INVALID_ARGUMENT`） | path パラメータ必須を維持。 |
+
+**response (`Note`)**
+
+| field | type | required | default | validation | backward-compatibility note |
+| --- | --- | --- | --- | --- | --- |
+| `id` | `string` | 必須 | なし | ノート存在時に返却、非存在は `NOT_FOUND` | 型・キー名固定。 |
+| `title` | `string` | 必須 | なし | 保存済み値 | 型固定。 |
+| `summary` | `string` | 必須 | `""` 許容 | 保存済み値 | 必須キーとして維持。 |
+| `body` | `string` | 必須 | なし | 保存済み値 | 型固定。 |
+| `created_at` | `string` | 必須 | なし | UTC RFC3339Nano | 日時文字列フォーマットを維持。 |
+| `updated_at` | `string` | 必須 | なし | UTC RFC3339Nano | 日時文字列フォーマットを維持。 |
+| `last_accessed_at` | `string` | 必須 | なし | 取得時刻で更新 | 取得時更新の挙動を維持。 |
+| `access_count` | `int64` | 必須 | なし | 取得ごとに +1 | カウンタ型・加算挙動を維持。 |
+| `source_type` | `string` | 必須 | なし | 保存済み値 | 型固定。 |
+| `origin` | `string` | 必須 | なし | 保存済み値 | 型固定。 |
+| `source_trust` | `string` | 必須 | なし | 保存済み値 | 型固定。 |
+| `sensitivity` | `string` | 必須 | なし | 保存済み値 | 型固定。 |
+
 ### 6-4. エラーモデル
 
 共通：

@@ -2,6 +2,8 @@
 
 `memx_spec_v3/go/api/errors.go` と `memx_spec_v3/go/api/http_server.go` の現行実装に合わせた、v1 のエラー契約。
 
+> request/response のフィールド契約は `memx_spec_v3/docs/requirements.md` の「6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）」を参照。
+
 ## 対応表
 
 | Error code | HTTP status | JSON スキーマ例 | 代表原因（実装準拠） |

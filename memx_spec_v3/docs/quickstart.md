@@ -42,3 +42,4 @@ go run ./cmd/mem out show <NOTE_ID> --api-url http://127.0.0.1:7766
 
 ## 関連ドキュメント
 - エラー契約: `./error-contract.md`
+- v1必須3エンドポイント契約表: `./requirements.md` の「6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）」
