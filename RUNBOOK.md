@@ -202,6 +202,8 @@ python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/caps --
 python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps
 ```
 
+鮮度更新時に `memx_spec_v3/docs/requirements.md` の節構成・Requirement ID（例: `REQ-CLI-001`）を変更した場合は、`docs/birdseye/index.json` の `nodes[].node_id=requirements` と `docs/birdseye/caps/requirements.json`（必要に応じて `docs/birdseye/caps/memx_spec_v3__docs__requirements.md.json`）の `summary`/`depends_on` を同一コミットで更新し、`python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps` を再実行して要件ノード紐付けを鮮度管理フローへ組み込む。
+
 ## Observability / 確認手順
 1. 性能閾値の正本は `EVALUATION.md` とし、`governance/metrics.yaml` はその同期先として一致を維持する。
 2. 日次確認では `response_time` / `compatibility` / `error_classification` / `recall_threshold` の breach 有無を確認する。
