@@ -31,6 +31,7 @@ next_review_due: 2026-06-03
 - [ ] secrets ブロック方針（policy + gatekeeper）を守っている。
 
 ## 運用・品質チェック
+- [ ] Birdseye鮮度確認（`docs/birdseye/index.json.generated_at` が7日以内、超過時は RUNBOOK 手順を実施）を完了している。
 - [ ] PRテンプレ項目の記入完了を確認している。
 - [ ] ドラフトノート確認（担当: リリース担当者、タイミング: PR マージ後〜リリースタグ作成前）を完了している。
 - [ ] GC トリガ判定は `memory_policy.yaml.gc.short` のみを参照している。
