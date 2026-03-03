@@ -8,10 +8,11 @@ next_review_due: 2026-06-03
 
 # EVALUATION
 
-## v1 受け入れ基準
-- 入出力互換: CLI→API の入出力マッピングが保持される。
-- エラーコード整合: 入力不備は 400 系、内部障害は 500 系を返す。
-- 最小性能目標（同一計測条件）:
+## v1 受け入れ基準（Release Scope Matrix 準拠）
+- 判定対象（MUST (v1)）: `mem in short` / `mem out search` / `mem out show` と `POST /v1/notes:ingest` / `POST /v1/notes:search` / `GET /v1/notes/{id}`。
+- 入出力互換: MUST (v1) の CLI→API 入出力マッピングが保持される。
+- エラーコード整合: MUST (v1) の入力不備は 400 系、内部障害は 500 系を返す。
+- 最小性能目標（同一計測条件、MUST (v1) API のみ）:
   - `POST /v1/notes:ingest`: P50 <= 120ms, P95 <= 250ms
   - `POST /v1/notes:search`: P50 <= 80ms, P95 <= 180ms
   - `GET /v1/notes/{id}`: P50 <= 40ms, P95 <= 90ms
@@ -30,16 +31,15 @@ next_review_due: 2026-06-03
 - ウォームアップ有無: あり（各エンドポイント 20 リクエスト）
 - 計測回数: 各エンドポイント 200 リクエスト（ウォームアップ除外）
 
-## 必須スコープ評価
-- 必須コマンド: `mem in short`, `mem out search`, `mem out show`。
-- 必須 API: `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}`。
-- v1 非対象（将来機能）: GC / recall / working / tag / meta / lineage。
+## スコープ別評価ポリシー
+- MUST (v1): 合否判定対象（本ドキュメントの全受け入れ判定に使用）。
+- SHOULD (v1.x): 判定対象外。`mem.features.gc_short=true` で有効化した実験運用時のみ、参考指標として別レポート化する。
+- FUTURE (v1.1+): 判定対象外（v1 の受け入れ結果に影響させない）。
 
-## Recall 評価条件
-- 類似度閾値 `score >= 0.20` を適用。
-- `top-k` は 1..50 に正規化（既定 8）。
-- `range` は 0..10（既定 3）。
-- `--stores` は trim/小文字/重複排除で正規化し、不正値は入力エラー。
+## 明示的な判定対象外
+- CLI: `mem gc short`（SHOULD 実験機能）, `mem out recall`, `mem working`, `mem tag`, `mem meta`, `mem lineage`, `mem distill`, `mem out context`。
+- API: `POST /v1/gc:run`（SHOULD 実験機能）, Recall/Working/Tag/Meta/Lineage 系 API。
+- よって Recall 評価条件は v1 受け入れ判定に使用しない（必要時は別紙評価）。
 
 ## LLM 呼び出し評価条件
 - 1リクエスト 15 秒タイムアウト。

@@ -32,7 +32,7 @@ status: planned
 - `git status --short`
 
 ## Dependencies
-- `memx_spec_v3/docs/requirements.md` の検索仕様確定
+- `memx_spec_v3/docs/requirements.md` の「0-1. Release Scope Matrix」および検索仕様節
 - `TASK.memx-bootstrap-03-03-2026.md`
 
 ## Release Note Draft

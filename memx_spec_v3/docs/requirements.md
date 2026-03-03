@@ -28,34 +28,19 @@ priority: high
 - 「常駐が必須」なプロセス設計（API サーバーは任意で起動できればよい）。
 - 完全自動運転のエージェントフレームワーク。あくまで「記憶と知識の基盤」。
 
-## 0-1. Status（v1必須 / v1.1以降）
+## 0-1. Release Scope Matrix
 
-### 必須コマンド
+### CLI
 
-| 区分 | コマンド |
-| --- | --- |
-| v1必須 | `mem in short` |
-| v1必須 | `mem out search` |
-| v1必須 | `mem out show` |
+| MUST (v1) | SHOULD (v1.x) | FUTURE (v1.1+) |
+| --- | --- | --- |
+| `mem in short`, `mem out search`, `mem out show` | `mem gc short`（`mem.features.gc_short=true` 時のみ有効な実験機能） | `mem out recall`, `mem working`, `mem tag`, `mem meta`, `mem lineage`, `mem distill`, `mem out context` |
 
-### 必須API
+### API
 
-| 区分 | API |
-| --- | --- |
-| v1必須 | `POST /v1/notes:ingest` |
-| v1必須 | `POST /v1/notes:search` |
-| v1必須 | `GET /v1/notes/{id}` |
-
-### 非対象（v1時点）
-
-| 区分 | 対象外項目 |
-| --- | --- |
-| v1.1以降 | GC |
-| v1.1以降 | recall |
-| v1.1以降 | working |
-| v1.1以降 | tag |
-| v1.1以降 | meta |
-| v1.1以降 | lineage |
+| MUST (v1) | SHOULD (v1.x) | FUTURE (v1.1+) |
+| --- | --- | --- |
+| `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}` | `POST /v1/gc:run`（`mem.features.gc_short=true` 時のみ有効な実験機能） | Recall/Working/Tag/Meta/Lineage 系 API |
 
 ### 受け入れ条件
 
@@ -425,6 +410,8 @@ mem out recall "Qwen3.5-27B ベンチマーク結果"   --scope self   --stores 
 
 ### 3-5. `mem gc short`（Observer / Reflector）
 
+スコープ区分：**SHOULD (v1.x)**。v1 では `mem.features.gc_short=true` を明示した場合のみ有効化する実験機能とし、デフォルトでは無効。
+
 Mastra の Observational Memory を参考にした GC。
 
 例：
@@ -676,9 +663,11 @@ gc:
   - request: `{query, top_k?}`
   - response: `{notes: Note[]}`
 - `GET /v1/notes/{id}` → `Note`
-- `POST /v1/gc:run`
+- `POST /v1/gc:run`（SHOULD (v1.x): `mem.features.gc_short=true` 時のみ有効な実験機能）
   - request: `{target, options?}`
   - response: `{status}`
+
+`POST /v1/gc:run` は v1 MUST には含めない。feature flag 無効時は 404（未提供）または 409（feature disabled）のいずれかを返し、デプロイ単位で挙動を固定する。
 
 ### 6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）
 

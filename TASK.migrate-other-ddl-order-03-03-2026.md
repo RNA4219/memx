@@ -31,7 +31,7 @@ status: planned
 - `git status --short`
 
 ## Dependencies
-- `memx_spec_v3/docs/requirements.md` のマイグレーション方針
+- `memx_spec_v3/docs/requirements.md` の「0-1. Release Scope Matrix」およびマイグレーション方針
 - `TASK.memx-bootstrap-03-03-2026.md`
 
 ## Release Note Draft
