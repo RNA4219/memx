@@ -761,6 +761,8 @@ gc:
 
 ### 6-4. エラーモデル
 
+本節を ErrorCode 契約の正本とし、`error-contract.md` は本節の運用向け要約として同期する。
+
 共通：
 
 ```json
@@ -773,7 +775,23 @@ gc:
 - `GATEKEEP_DENY` → 403
 - `INTERNAL` → 500
 
-`go/service/errors` と `go/api/errors.go` の現行方針（`ErrInvalidArgument` / `ErrNotFound` を明示マッピングし、それ以外は `INTERNAL` へフォールバック）に整合する運用分類を以下で固定する。
+`go/service/errors` と `go/api/errors.go` の現行方針（`ErrInvalidArgument` / `ErrNotFound` を明示マッピングし、それ以外は `INTERNAL` へフォールバック）を前提に、ErrorCode を 2 段で再定義する。
+
+#### ErrorCode 区分（v1）
+
+| 区分 | ErrorCode | HTTP | 契約レベル | 条件 |
+| --- | --- | --- | --- | --- |
+| v1必須保証 | `INVALID_ARGUMENT` | 400 | MUST | 常時有効。 |
+| v1必須保証 | `NOT_FOUND` | 404 | MUST | 常時有効。 |
+| v1必須保証 | `INTERNAL` | 500 | MUST | 常時有効。未分類エラーのフォールバック先。 |
+| v1.x拡張（feature/sentinel依存） | `CONFLICT` | 409 | SHOULD | service sentinel（例: `ErrConflict`）を実装し `mapError` へ明示追加した場合のみ返却。未実装時は `INTERNAL`。 |
+| v1.x拡張（feature/sentinel依存） | `GATEKEEP_DENY` | 403 | SHOULD | gatekeeper deny 系 sentinel（例: `ErrGatekeepDeny`）を実装し `mapError` へ明示追加した場合のみ返却。未実装時は `INTERNAL`。 |
+
+#### 現行実装との差分注記（`go/api/types.go` / `go/api/http_server.go`）
+
+- `go/api/types.go` には `CONFLICT` / `GATEKEEP_DENY` 定数が定義済みだが、返却は service sentinel と `mapError` 実装に依存する。
+- `go/api/http_server.go` は `writeErr` で `CONFLICT=409` / `GATEKEEP_DENY=403` を処理可能だが、上流が当該コードを返さない限り到達しない。
+- sentinel 未実装時は `mapError` 方針に従って `INTERNAL`（500）へフォールバックする。
 
 | 代表事象 | service 層の分類 | API `code` | HTTP | 再試行可否 | 備考 |
 | --- | --- | --- | --- | --- | --- |
