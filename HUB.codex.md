@@ -1,3 +1,11 @@
+---
+intent_id: hub-codex-contract
+owner: memx-core
+status: active
+last_reviewed_at: 2026-03-03
+next_review_due: 2026-06-03
+---
+
 # HUB.codex.md
 
 ## 目的
