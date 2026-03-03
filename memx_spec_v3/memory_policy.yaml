@@ -1,0 +1,12 @@
+version: 1
+
+security:
+  deny_patterns: []
+
+gc:
+  short:
+    soft_limit_notes: 1200
+    hard_limit_notes: 2000
+    min_interval_minutes: 180
+    target_delete_batch_size: 200
+    max_archive_retries: 1
