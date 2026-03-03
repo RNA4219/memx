@@ -9,5 +9,13 @@
 - 重複回避: 既存エントリと同一内容は追記しない。`memx_spec_v3/CHANGES.md` から移送する際は要約のみ転記する。
 - 転記手順: Task Seed が `done` になったら、Task Seed の `Release Note Draft` を正本として `CHANGELOG.md` に1〜3行で転記し、転記後に Task Seed へ `Moved-to-CHANGES: YYYY-MM-DD` を追記してトレース可能にする。
 
+- 破壊変更時必須チェックリスト（未完了の変更は記載不可）:
+  - [ ] 対象 I/F（CLI/API/`--json`）を明記
+  - [ ] 変更種別（削除/型変更/意味変更）を明記
+  - [ ] 影響範囲（影響クライアント/コマンド）を明記
+  - [ ] 移行先と移行期限を明記
+  - [ ] 移行手順（最小2ステップ以上）を明記
+  - [ ] 互換期間中の挙動（並行提供/警告/明示フラグ要否）を明記
+
 ## 2026-03-03
 - v3 要件として CLI/API 分離、HTTP + in-proc API 追加、Service 層追加、DB 層再編（`OpenAll` 追加、`MustOpenAll` 互換維持）を反映。
