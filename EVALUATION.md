@@ -17,12 +17,23 @@ next_review_due: 2026-06-03
   - `POST /v1/notes:search`: P50 <= 80ms, P95 <= 180ms
   - `GET /v1/notes/{id}`: P50 <= 40ms, P95 <= 90ms
 
+## 要件IDトレーサビリティ（判定基準との相互参照）
+| Requirement ID | 判定基準 | 判定ルール参照 |
+| --- | --- | --- |
+| `REQ-CLI-001` | pass/fail | 本書「v1 受け入れ基準（Release Scope Matrix 準拠）」・`RUNBOOK.md` manual 手順 |
+| `REQ-API-001` | pass/fail | 本書「v1 受け入れ基準（Release Scope Matrix 準拠）」・`RUNBOOK.md` manual 手順 |
+| `REQ-GC-001` | pass/fail | `RUNBOOK.md` の `mem gc short` 手順および manual コマンド |
+| `REQ-SEC-001` | pass/fail | `requirements.md` 2-7-1 の `sensitivity` 契約 |
+| `REQ-RET-001` | pass/fail/waiver | 本書「性能合否基準（fail / waiver）」の運用を準用し、保持期限逸脱は waiver 記録必須 |
+| `REQ-ERR-001` | pass/fail | 本書「エラーコード整合」および `requirements.md` 6-4 |
+| `REQ-NFR-001` | pass/fail/waiver | 本書「性能合否基準（fail / waiver）」および「REQ-NFR-001 合否判定ルール」 |
+
 ## 性能合否基準（fail / waiver）
 - 判定対象データセットは `short` 10,000 件 / 1件 約500文字（UTF-8）、ローカル単体（4 vCPU / 16GB RAM / NVMe SSD / Linux x86_64）、ウォームアップ20回、本計測200回で固定する。
-- 合格（pass）: `ingest` / `search` / `show` の **p50/p95 が全て閾値以内**。
-- 不合格（fail）: いずれか 1 指標でも閾値超過、または計測条件が不一致。
+- 合格（pass）: `REQ-NFR-001` の `ingest` / `search` / `show` の **p50/p95 が全て閾値以内**。
+- 不合格（fail）: `REQ-NFR-001` でいずれか 1 指標でも閾値超過、または計測条件が不一致。
 - 例外承認（waiver）:
-  - fail を一時的に許容する場合のみ適用できる。
+  - `REQ-NFR-001` / `REQ-RET-001` の fail を一時的に許容する場合のみ適用できる。
   - 最低限、`docs/IN-YYYYMMDD-XXX.md` のインシデント記録、超過理由、是正期限、暫定運用策、責任者を明記する。
   - waiver は期限付きとし、期限超過時は自動的に fail 扱いへ戻す。
 
@@ -34,6 +45,31 @@ next_review_due: 2026-06-03
   - `results.show.p50_ms > 40` または `results.show.p95_ms > 90`
 - pass 条件は上記 6 指標がすべて閾値以内（`<=`）であること。
 - `p50_ms` / `p95_ms` の欠損、または計測条件不一致は fail 扱いとする。
+
+
+## 運用NFR（可用性/復旧/整合性回復）合否基準
+
+- 対象要件: `REQ-NFR-002` / `REQ-NFR-003` / `REQ-NFR-004` / `REQ-NFR-005` / `REQ-NFR-006`
+
+### 証跡ファイル（必須）
+- `artifacts/ops/incident-summary.json`
+  - 必須キー: `incident_id`, `detected_at`, `mitigated_at`, `resolved_at`, `rto_minutes`, `rpo_minutes`, `retry_count`
+- `artifacts/ops/recovery-log.ndjson`
+  - 必須イベント: `detect`, `retry`, `rollback`（実施時）, `replan`（実施時）, `mitigate`, `resolve`
+- `docs/IN-*.md`
+  - `REQ-NFR-006` で定義した最小監査項目を満たすこと
+
+### 判定ロジック
+- pass 条件（全件必須）:
+  1. `incident-summary.json.rto_minutes <= 30`（`REQ-NFR-002`）
+  2. `incident-summary.json.rpo_minutes <= 5`（`REQ-NFR-002`）
+  3. `mitigated_at - detected_at <= 15分`（`REQ-NFR-003`）
+  4. `retry_count <= 2`（`REQ-NFR-004`）
+  5. `recovery-log.ndjson` に整合性回復イベント（`rollback` または `replan`）が存在し、30 分以内に収束または `docs/IN-*.md` 起票済み（`REQ-NFR-005`）
+  6. 対応する `docs/IN-*.md` が最小監査項目を欠落なく記載（`REQ-NFR-006`）
+- fail 条件:
+  - 上記 1〜6 のいずれか 1 つでも不成立
+  - 証跡ファイル欠損、または時刻/回数の整合が取れない
 
 ## governance/metrics.yaml 同期運用ルール
 - `governance/metrics.yaml` は本書（`EVALUATION.md`）を正本として同期する。

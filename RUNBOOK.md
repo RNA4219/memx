@@ -49,6 +49,27 @@ next_review_due: 2026-06-03
 3. 実行時は正確値を再計算して閾値を再確認。
 4. `--dry-run` は DB 変更せず予定操作 JSON のみ返却。
 
+
+## 障害時手順（要件ID紐付け）
+
+- 適用要件: `REQ-NFR-002` / `REQ-NFR-003` / `REQ-NFR-004` / `REQ-NFR-005` / `REQ-NFR-006`
+
+### 1) 再試行（Retry）
+- 要件紐付け: `REQ-NFR-003`, `REQ-NFR-004`
+- 初動で一時障害を判定した場合のみ再試行を実施する。
+- 1 リクエスト（または 1 ノート）あたり再試行は最大 2 回までとし、3 回目は実施しない。
+- 障害検知から暫定復旧まで 15 分を超過する見込みの場合、再試行を打ち切ってロールバック/再計画へ移行する。
+
+### 2) ロールバック（Rollback）
+- 要件紐付け: `REQ-NFR-002`, `REQ-NFR-005`
+- `archive 実在 + 対応 lineage 実在` を満たさない状態では short 側 Delete を禁止し、ロールバックしてデータ喪失を回避する。
+- 復旧手順の実行後、RTO 30 分以内に暫定系（縮退運用を含む）へ復帰できることを確認する。
+
+### 3) 再計画（Re-plan）
+- 要件紐付け: `REQ-NFR-003`, `REQ-NFR-006`
+- 再試行上限到達または 30 分以内に収束しない場合、`docs/IN-*.md` を起票して再計画チケットを発行する。
+- `docs/IN-*.md` には検知時刻/暫定復旧完了時刻/恒久復旧完了時刻・再試行回数・ロールバック実施有無を必須記録する。
+
 ## LLM クライアント運用
 - `EmbeddingClient`: 埋め込み生成。
 - `MiniLLMClient`: タグ・スコア・機密度推定。
@@ -67,6 +88,55 @@ next_review_due: 2026-06-03
 
 ## 関連ドキュメント
 - エラー契約: `memx_spec_v3/docs/error-contract.md`
+
+## 要件トレーサビリティ用 検証コマンド（正本）
+
+<a id="trace-lint"></a>
+
+### lint（ruff）
+```bash
+python3 -m ruff check .
+```
+
+<a id="trace-type"></a>
+
+### type（mypy/strict）
+```bash
+python3 -m mypy --strict memx_spec_v3
+```
+
+<a id="trace-test-pytest"></a>
+
+### test（pytest）
+```bash
+python3 -m pytest -q
+```
+
+<a id="trace-test-node"></a>
+
+### test（node:test）
+```bash
+node --test
+```
+
+<a id="trace-manual"></a>
+
+### manual（CLI/API/GC/Error）
+```bash
+# CLI/API ingest
+printf '%s' 'traceability-sample' | go run ./memx_spec_v3/go/cmd/mem in short --stdin --title traceability --api-url http://127.0.0.1:7766
+
+# CLI/API search
+go run ./memx_spec_v3/go/cmd/mem out search 'traceability' --api-url http://127.0.0.1:7766
+
+# CLI/API show
+go run ./memx_spec_v3/go/cmd/mem out show 1 --api-url http://127.0.0.1:7766
+
+# GC dry-run
+go run ./memx_spec_v3/go/cmd/mem gc short --dry-run --api-url http://127.0.0.1:7766
+```
+
+<a id="trace-perf"></a>
 
 ## 性能再計測手順（EVALUATION.md 同条件）
 1. テストデータ投入（10,000 件 / 1件 約500文字）を実施。
