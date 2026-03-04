@@ -169,13 +169,63 @@ Birdseye 入力の健全性を事前判定し、`ready | degraded | blocked` の
 
 ### Birdseye Readiness Preflight
 
+本節は **判定のみ** を扱う。復旧コマンド列は [`RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」](RUNBOOK.md#birdseye-鮮度不足時の復旧手順) を正本とし、HUB には重複掲載しない。
+
+#### 最低限の実行コマンド例（判定用）
+1. 存在確認
+   ```bash
+   test -f docs/birdseye/index.json
+   ```
+2. JSON パース確認
+   ```bash
+   python -m json.tool docs/birdseye/index.json >/dev/null
+   ```
+3. `caps` 存在確認
+   ```bash
+   python - <<'PY'
+   import json
+   from pathlib import Path
+
+   idx = json.loads(Path('docs/birdseye/index.json').read_text())
+   nodes = idx.get('nodes', {})
+   items = nodes.values() if isinstance(nodes, dict) else nodes
+   missing = []
+   for n in items:
+       cap = n.get('caps')
+       if cap and not Path(cap).exists():
+           missing.append((n.get('node_id', 'unknown'), cap))
+   print('missing_caps=', missing)
+   raise SystemExit(1 if missing else 0)
+   PY
+   ```
+4. `generated_at` 鮮度確認（7日以内）
+   ```bash
+   python - <<'PY'
+   import datetime as dt
+   import json
+   from pathlib import Path
+
+   idx = json.loads(Path('docs/birdseye/index.json').read_text())
+   gen = dt.datetime.fromisoformat(idx['generated_at'].replace('Z', '+00:00'))
+   age_days = (dt.datetime.now(dt.timezone.utc) - gen).total_seconds() / 86400
+   print(f'age_days={age_days:.2f}')
+   raise SystemExit(1 if age_days > 7 else 0)
+   PY
+   ```
+
 #### チェック項目（固定順）
-1. `docs/birdseye/index.json` 存在確認。
-2. JSON パース可否（`docs/birdseye/index.json`）。
-3. `index.nodes` 形式妥当性（`object` / `array` の互換入力を許容）。
-4. 各ノードの `caps` 参照先ファイルの存在。
-5. `generated_at` の7日以内判定（本ファイル「運用メモ（Birdseye 鮮度判定）」に従う）。
-6. `nodes[].capsule` 実体存在確認。
+1. `docs/birdseye/index.json` 存在確認。  
+   判定条件: 存在なら `ready`、欠損なら `blocked`。
+2. JSON パース可否（`docs/birdseye/index.json`）。  
+   判定条件: パース成功なら `ready`、失敗なら `blocked`。
+3. `index.nodes` 形式妥当性（`object` / `array` の互換入力を許容）。  
+   判定条件: `object|array` のいずれかなら `ready`、それ以外は `blocked`。
+4. 各ノードの `caps` 参照先ファイルの存在。  
+   判定条件: 全件存在なら `ready`、一部欠損なら `degraded`、全件欠損または走査不能なら `blocked`。
+5. `generated_at` の7日以内判定（本ファイル「運用メモ（Birdseye 鮮度判定）」に従う）。  
+   判定条件: 7日以内なら `ready`、7日超なら `degraded`、値欠損/不正なら `blocked`。
+6. `nodes[].capsule` 実体存在確認。  
+   判定条件: 全件存在なら `ready`、一部欠損なら `degraded`、全件欠損または走査不能なら `blocked`。
 
 ---
 
@@ -190,8 +240,7 @@ Birdseye 入力の健全性を事前判定し、`ready | degraded | blocked` の
   - 処置:
     - 既知ノードのみ処理継続
     - 欠損 `caps` 依存ノードは `Status: blocked` として分離管理
-  - 復旧手順:
-    [`RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」](RUNBOOK.md#birdseye-鮮度不足時の復旧手順)
+  - 復旧参照先: [`RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」](RUNBOOK.md#birdseye-鮮度不足時の復旧手順)
 
 - **ケースC: `hot.json` 欠損**
   - 判定: `ready`（警告付き）
@@ -209,17 +258,27 @@ Birdseye 入力の健全性を事前判定し、`ready | degraded | blocked` の
 - `provisional_decision`
 - `regen_request_to`
 
-#### `notes` 記載テンプレート（例）
+#### `notes` 記載例（実コマンド結果との対応）
+
+| コマンド結果（例） | `notes` に記載するキー/値（例） |
+| --- | --- |
+| `test -f docs/birdseye/index.json` が非ゼロ終了 | `readiness_status: blocked` / `missing_files: [docs/birdseye/index.json]` |
+| `python -m json.tool docs/birdseye/index.json` が失敗 | `readiness_status: blocked` / `provisional_decision: stop task seeding and request regen via RUNBOOK` |
+| `missing_caps=[('requirements','docs/birdseye/caps/requirements.json')]` | `readiness_status: degraded` / `missing_files: [docs/birdseye/caps/requirements.json]` / `impacted_node_ids: [requirements]` |
+| `age_days=8.20`（7日超） | `readiness_status: degraded` / `provisional_decision: continue with unaffected nodes and run RUNBOOK recovery` |
+| 復旧担当未アサイン | `regen_request_to: unassigned` |
 
 ```yaml
 notes:
   readiness_status: degraded
   missing_files:
-    - docs/birdseye/caps/<node>.json
+    - docs/birdseye/caps/requirements.json
   impacted_node_ids:
-    - <node_id>
-  provisional_decision: run RUNBOOK.md#birdseye-鮮度不足時の復旧手順
+    - requirements
+  provisional_decision: continue with unaffected nodes and run RUNBOOK.md#birdseye-鮮度不足時の復旧手順
   regen_request_to: unassigned
+```
+
 - `ready | degraded | blocked` は Birdseye 入力健全性専用語彙として `notes.readiness_status` に限定して使用する。
 - Task Seed の `Status` は `docs/TASKS.md` 許可語彙（`planned/active/in_progress/reviewing/blocked/done`）のみを使用する。
 - 語彙衝突回避のため、`degraded` は `notes.readiness_status` のみに限定し、Task Seed `Status` に流用しない。
@@ -234,10 +293,7 @@ notes:
 birdseye_regen_request:
   requested_to_role: "<依頼先ロール>"
   execute_emit: "index|caps|hot"
-  execute_command_canonical:
-    - "python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json --emit index"
-    - "python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/caps --emit caps"
-    - "python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps"
+  recovery_runbook: "RUNBOOK.md#birdseye-鮮度不足時の復旧手順"
   execute_command_alias_note: "`tools/codemap/update.py` は別名パス（注記扱い）"
   post_checks:
     generated_files:
