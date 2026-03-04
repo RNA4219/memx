@@ -157,8 +157,10 @@ go run ./memx_spec_v3/go/cmd/mem out search 'traceability' --api-url http://127.
 # CLI/API show
 go run ./memx_spec_v3/go/cmd/mem out show 1 --api-url http://127.0.0.1:7766
 
-# GC dry-run
+# GC dry-run (flag ON 想定)
 go run ./memx_spec_v3/go/cmd/mem gc short --dry-run --api-url http://127.0.0.1:7766
+# GC API (flag OFF 想定: route公開時は INTERNAL, 非公開時は NOT_FOUND)
+curl -sS -X POST http://127.0.0.1:7766/v1/gc:run -H "content-type: application/json" -d '{"target":"short","options":{"dry_run":true}}'
 ```
 
 <a id="trace-req-cli-001"></a>
@@ -179,7 +181,11 @@ go run ./memx_spec_v3/go/cmd/mem in short --stdin --title traceability --api-url
 
 ### REQ-GC-001 検証コマンド（IF: IF-GC-SHORT-REQ / IF-GC-SHORT-RES）
 ```bash
+# Case 1: flag ON（dry-run 成功）
 go run ./memx_spec_v3/go/cmd/mem gc short --dry-run --api-url http://127.0.0.1:7766
+
+# Case 2: flag OFF（期待: route非公開なら NOT_FOUND / route公開なら INTERNAL）
+curl -i -sS -X POST http://127.0.0.1:7766/v1/gc:run -H "content-type: application/json" -d '{"target":"short","options":{"dry_run":true}}'
 ```
 
 <a id="trace-req-sec-001"></a>

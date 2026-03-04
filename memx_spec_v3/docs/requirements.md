@@ -27,7 +27,10 @@ priority: high
 - ingest/search/show の最小性能目標を満たすこと。
 
 ## 2. SHOULD（v1.x）
-- `mem.features.gc_short=true` 時のみ `mem gc short` / `POST /v1/gc:run` を有効化する。
+- `POST /v1/gc:run` は「公開可否（ルートを公開するか）」と「実行可否（feature flag で実処理を許可するか）」を分離して扱う。
+  - 公開可否: 非公開構成では `/v1/gc:run` をマウントしない（`NOT_FOUND` 相当）。
+  - 実行可否: 公開構成でも `mem.features.gc_short=false` の間は実処理を許可しない（エラーコードは `error-contract.md` の運用定義に従う）。
+- `mem.features.gc_short=true` 時のみ `mem gc short` / `POST /v1/gc:run` の実行を有効化する。
 - SHOULD 機能は feature flag 既定 OFF で提供し、既定挙動を壊さない。
 
 ## 3. FUTURE（v2+）
@@ -1000,9 +1003,9 @@ gc:
   - request: `{target, options?}`
   - response: `{status}`
 
-`POST /v1/gc:run` は v1 MUST には含めない。`mem.features.gc_short=false` の場合、全環境で **HTTP 409 + `{ "code": "FEATURE_DISABLED", "message": "gc_short feature is disabled" }`** を固定で返す（404 へのフォールバック禁止）。
+`POST /v1/gc:run` は v1 MUST には含めない。SHOULD としては、公開可否（route mount）と実行可否（flag 判定）を分離し、無効時は `NOT_FOUND`（公開 OFF）または `INTERNAL`（公開 ON かつ実行不可時の現行フォールバック）を返す。
 
-この無効時挙動は「デプロイ単位で選択」ではなく **全環境共通固定** とし、クライアントは `FEATURE_DISABLED` を恒久エラーとして扱う（同一条件での自動リトライ不可、運用者による feature flag 変更後のみ再試行可）。
+クライアントは `NOT_FOUND` を「未公開（または未提供）」、`INTERNAL` を「公開中だが実行不可を含むサーバー側失敗」の運用解釈で扱う。`FAILED_PRECONDITION` 相当コードは v1 契約外とし、導入時は `REQ-ERR-001` の拡張手順に従う。
 
 ### 6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）
 

@@ -82,6 +82,41 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalError'
+  /v1/gc:run:
+    post:
+      operationId: gcRun
+      x-requirement-id: REQ-GC-001
+      summary: Run short-store GC (experimental).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GCRunRequest'
+      responses:
+        '200':
+          description: GC completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GCRunResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          description: Flag disabled fallback or internal error.
+          x-requirement-id: REQ-ERR-001
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      code:
+                        const: INTERNAL
+                    description: |
+                      When /v1/gc:run is published but mem.features.gc_short is OFF,
+                      current implementation returns INTERNAL (FAILED_PRECONDITION-equivalent fallback).
 components:
   responses:
     InvalidArgumentError:
@@ -274,3 +309,26 @@ components:
           items:
             $ref: '#/components/schemas/Note'
       x-requirement-id: REQ-API-001
+
+    GCRunRequest:
+      type: object
+      additionalProperties: false
+      required: [target]
+      properties:
+        target:
+          type: string
+        options:
+          type: object
+          additionalProperties: false
+          properties:
+            dry_run:
+              type: boolean
+      x-requirement-id: REQ-GC-001
+    GCRunResponse:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+      x-requirement-id: REQ-GC-001

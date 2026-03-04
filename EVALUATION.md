@@ -24,7 +24,7 @@ next_review_due: 2026-06-03
 | --- | --- | --- | --- |
 | <a id="req-cli-001-passfail"></a>`REQ-CLI-001` | pass/fail | `mem out search --json` 出力が API 応答と同型。 | JSON キー/型/意味のいずれかが API 契約から逸脱。 | 本書「v1 受け入れ基準（Release Scope Matrix 準拠）」・`RUNBOOK.md` の `trace-req-cli-001` | [requirements: REQ-CLI-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
 | <a id="req-api-001-passfail"></a>`REQ-API-001` | pass/fail | `POST /v1/notes:ingest` が v1 契約（入力/出力/HTTP）を維持。 | HTTP/JSON 契約が v1 から逸脱。 | 本書「v1 受け入れ基準（Release Scope Matrix 準拠）」・`RUNBOOK.md` の `trace-req-api-001` | [requirements: REQ-API-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
-| <a id="req-gc-001-passfail"></a>`REQ-GC-001` | pass/fail | `mem gc short --dry-run` が DB 非更新で判定結果のみ返却。 | dry-run 実行で DB 更新/削除等の副作用が発生。 | `RUNBOOK.md` の `trace-req-gc-001` | [requirements: REQ-GC-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
+| <a id="req-gc-001-passfail"></a>`REQ-GC-001` | pass/fail | flag ON では `mem gc short --dry-run` が DB 非更新で判定結果のみ返却し、flag OFF では `NOT_FOUND`（route非公開）または `INTERNAL`（route公開）を返す。 | ON で副作用が発生、または OFF で期待コード以外を返す。 | `RUNBOOK.md` の `trace-req-gc-001` | [requirements: REQ-GC-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
 | <a id="req-sec-001-passfail"></a>`REQ-SEC-001` | pass/fail | `sensitivity=secret` 相当入力を fail-closed で拒否。 | `secret` 入力が保存される、または fail-open 挙動。 | `RUNBOOK.md` の `trace-req-sec-001` | [requirements: REQ-SEC-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
 | <a id="req-ret-001-passfail-waiver"></a>`REQ-RET-001` | pass/fail/waiver | 保持期限/退避・削除・監査ログ要件を満たす。 | 保持期限逸脱または監査証跡欠損（waiver 未記録）。 | 本書「性能合否基準（fail / waiver）」の運用を準用し、保持期限逸脱は waiver 記録必須 | [requirements: REQ-RET-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
 | <a id="req-err-001-passfail"></a>`REQ-ERR-001` | pass/fail | `NOT_FOUND`/`INVALID_ARGUMENT`/`INTERNAL` と retryable が契約通り。 | ErrorCode または retryable が契約から逸脱。 | `RUNBOOK.md` の `trace-req-err-001` と `requirements.md` 6-4 | [requirements: REQ-ERR-001](./memx_spec_v3/docs/requirements.md#主要要件id固定) |
@@ -109,7 +109,7 @@ next_review_due: 2026-06-03
 
 ## スコープ別評価ポリシー
 - MUST (v1): 合否判定対象（本ドキュメントの全受け入れ判定に使用）。
-- SHOULD (v1.x): 判定対象外。`mem.features.gc_short=true` で有効化した実験運用時のみ、参考指標として別レポート化する。
+- SHOULD (v1.x): v1 合否対象外。ただし受け入れ曖昧性防止のため `POST /v1/gc:run` は flag ON/OFF の応答確認を実施し、参考証跡として記録する。
 - FUTURE (v1.1+): 判定対象外（v1 の受け入れ結果に影響させない）。
 
 ## 明示的な判定対象外

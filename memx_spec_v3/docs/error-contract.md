@@ -32,6 +32,8 @@
 | v1.x拡張（feature/sentinel依存） | `CONFLICT` | `409 Conflict` | SHOULD | service sentinel（例: `ErrConflict`）+ `mapError` 明示マップ時のみ返却。未実装時は `INTERNAL` へフォールバック。 |
 | v1.x拡張（feature/sentinel依存） | `GATEKEEP_DENY` | `403 Forbidden` | SHOULD | gatekeeper deny sentinel（例: `ErrGatekeepDeny`）+ `mapError` 明示マップ時のみ返却。未実装時は `INTERNAL` へフォールバック。 |
 | v1.x拡張（feature flag依存） | `FEATURE_DISABLED` | `409 Conflict` | SHOULD | feature flag 無効時に返却（例: `gc_short` 無効）。 |
+| v1.x運用解釈（`/v1/gc:run`） | `NOT_FOUND` / `INTERNAL` | `404` / `500` | SHOULD | route 非公開時は `NOT_FOUND`、route 公開かつ flag OFF の現行実装は `INTERNAL`（FAILED_PRECONDITION 相当の暫定フォールバック）として扱う。 |
+
 
 ## 現行実装との差分注記
 
@@ -40,16 +42,20 @@
 - `go/api/http_server.go` の `writeErr` は `CONFLICT=409` / `GATEKEEP_DENY=403` を処理可能。
   ただし上流から当該 `Error.code` が渡された場合に限り有効で、未実装時のフォールバックは `INTERNAL=500`。
 
-## 追加ケース: GC feature disabled（`POST /v1/gc:run`）
+## 追加ケース: GC flag OFF 時の運用解釈（`POST /v1/gc:run`）
 
-`mem.features.gc_short=false` の場合は全環境共通で以下を返す。
+`POST /v1/gc:run` は SHOULD 実験機能のため、運用では「公開可否」と「実行可否」を分けて解釈する。
 
-- HTTP status: `409 Conflict`
-- body:
+- route 非公開（サーバーが `/v1/gc:run` をマウントしない）
+  - HTTP status: `404 Not Found`
+  - body: 標準 `NOT_FOUND` エラー
+- route 公開かつ flag OFF（`mem.features.gc_short=false`）
+  - HTTP status: `500 Internal Server Error`
+  - body: 標準 `INTERNAL` エラー
+  - 解釈: `FAILED_PRECONDITION` 相当の「実行前提未充足」を、現行 API 実装の都合で `INTERNAL` にフォールバックしている状態
 
-```json
-{
-  "code": "FEATURE_DISABLED",
-  "message": "gc_short feature is disabled"
-}
-```
+## 実装整合メモ（`go/api/http_server.go`）
+
+- `writeErr` は `INVALID_ARGUMENT=400` / `NOT_FOUND=404` / `CONFLICT=409` / `GATEKEEP_DENY=403` / その他 `500` を返す。
+- `FEATURE_DISABLED` は現行 `ErrorCode` に未定義のため、flag OFF を専用コードで返さない。
+- したがって `/v1/gc:run` の flag OFF は、上流が専用 sentinel を返さない限り `INTERNAL=500` と解釈する。
