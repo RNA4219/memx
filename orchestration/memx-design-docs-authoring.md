@@ -34,7 +34,7 @@ status: planned
 - [ ] `interfaces.md` の入出力契約を要件ID単位で列挙する（Task Seed 1件、<=0.5d）
 - [ ] `EVALUATION.md` の評価観点を要件IDに紐づける（Task Seed 1件、<=0.5d）
 - [ ] `RUNBOOK.md` の運用手順と契約依存箇所を抽出する（Task Seed 1件、<=0.5d）
-- [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、章候補との対応表を作る（Task Seed 1件、<=0.5d）
+- [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、`memx_spec_v3/docs/design-chapter-node-mapping-spec.md` 準拠の章対応表（chapter_id -> node_id）を更新する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
 - 情報源7ファイルの抽出結果が要件ID/契約ID/node_id単位で一覧化されている（参照仕様: `../memx_spec_v3/docs/design-source-inventory-spec.md`）
@@ -64,13 +64,14 @@ status: planned
 
 - [ ] 章ごとに `Objective`（1〜3行）を作成する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Source` を `path#Section` 形式で記述する（Task Seed 1件/章、<=0.5d）
-- [ ] 章ごとに `Node IDs` を `docs/birdseye/index.json` 参照で付与する（Task Seed 1件/章、<=0.5d）
+- [ ] 章ごとに `Node IDs` を `docs/birdseye/index.json` 参照で付与し、章対応表（chapter_id -> node_id）を更新する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Requirements` を要件ID箇条書きで記述する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Commands`（仕様整合チェック用）を記述する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Dependencies` と `Status: planned` を記述する（Task Seed 1件/章、<=0.5d）
 
 ### Done Criteria
 - 全章ドラフトが `Source/Node IDs/Objective/Requirements/Commands/Dependencies/Status` を満たし、`memx_spec_v3/docs/design-template.md` に準拠している
+- 章対応表（`memx_spec_v3/docs/design-chapter-node-mapping-spec.md`）が Phase 2 更新内容に追随している
 - 各章が HUB ノード抽出ルールでそのまま Task Seed 化できる
 - 章ごとの未解決事項が 0.5d 以内の追加タスクへ分解済みである
 

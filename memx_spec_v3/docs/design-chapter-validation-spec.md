@@ -9,7 +9,7 @@
 - `memx_spec_v3/docs/design-acceptance-report-spec.md` に基づく統合受け入れレポート。
 
 ## 3. 章別検証サマリの必須フィールド
-章別検証サマリは、1章につき 1 レコードで以下の 6 フィールドを必須で含める。
+章別検証サマリは、1章につき 1 レコードで以下の 8 フィールドを必須で含める。
 
 1. **`chapter_id`**
    - 章識別子。`path#section` 形式で記載する。
@@ -25,12 +25,22 @@
 6. **`evidence_paths`**
    - レビュー記録および受け入れレポートへの参照パス配列。
    - 最低 2 件（レビュー記録 1 件 + 受け入れレポート 1 件）を必須とする。
+7. **`mapping_spec_ref`**
+   - `chapter_id -> node_id` 対応規則の参照先。
+   - 固定値: `memx_spec_v3/docs/design-chapter-node-mapping-spec.md`。
+8. **`mapping_match_check`**
+   - 章対応表との一致確認手順の実施結果。
+   - `pass` / `fail` とし、`pass` 判定には以下を満たすこと。
+     - `chapter_id` が章対応表に存在する。
+     - 対応する `node_id` が `docs/birdseye/index.json` の最新値と一致する。
 
 ## 4. 記録ルール
 - 章別検証サマリは、章単位で追記・更新可能な Markdown テーブルまたは YAML 配列で管理する。
 - `chapter_id` は同一文書内で一意とする。
+- `chapter_id` の命名と廃止運用は `memx_spec_v3/docs/design-chapter-node-mapping-spec.md` に従う。
 - `req_coverage` は `%` 付き表記（例: `100%`）または数値（例: `100`）のいずれかに統一する。
 - `evidence_paths` は実在ファイルのみを許可し、テンプレートパスや `TBD` を禁止する。
+- `mapping_match_check` の判定ログ（比較日時/比較対象）をレビュー記録または受け入れレポートへ残す。
 
 ## 5. Phase 判定での利用ルール
 - **Phase 2**: 章別ドラフト完成時に、初期値として章別検証サマリを作成する。
@@ -47,4 +57,6 @@
   evidence_paths:
     - memx_spec_v3/docs/reviews/DESIGN-REVIEW-20260304-001.md
     - memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-20260304.md
+  mapping_spec_ref: memx_spec_v3/docs/design-chapter-node-mapping-spec.md
+  mapping_match_check: pass
 ```
