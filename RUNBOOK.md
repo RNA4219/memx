@@ -388,6 +388,7 @@ python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.j
 
 
 ## Birdseye 鮮度不足時の復旧手順
+Birdseye 初期理解ドキュメントの canonical path は `docs/birdseye/README.md`（HUB と同一）とする。
 `docs/birdseye/index.json.generated_at` が判定時刻から7日を超える場合に実施する。詳細は `./workflow-cookbook/tools/codemap/README.md`（別名パス `tools/codemap/README.md` は注記扱い）の「Birdseyeアクセス異常時の復旧手順」を正本とし、ここでは canonical path `workflow-cookbook/tools/codemap/update.py` の実行順のみ示す。
 
 運用モード（HUB と同一語彙）:

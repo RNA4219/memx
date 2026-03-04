@@ -1,5 +1,7 @@
 # Birdseye インデックス運用
 
+本書は HUB（`HUB.codex.md`）から参照する Birdseye 入口ドキュメント（canonical path: `docs/birdseye/README.md`）である。
+
 `docs/birdseye/index.json` は memx_spec_v3 の主要ドキュメント/実装ノードの依存関係を管理する HUB です。
 
 ## 構成

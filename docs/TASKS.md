@@ -56,6 +56,7 @@
 - `Source` にテンプレートID（例: `IN-<YYYYMMDD>-001`）または `TBD` を含む Task Seed は、`reviewing` を継続して差し戻す。
 
 ### Node IDs
+- Birdseye 初期理解ドキュメント参照は canonical path `docs/birdseye/README.md` に統一する。
 - `docs/birdseye/index.json` の `node_id` を記載する。
 - 依存グラフ（`depends_on`）と照合する対象タスクでは必須、照合対象外タスクでは任意とする。
 - 記載形式は箇条書きで、依存元/依存先の対応がわかるように補足行を付ける。

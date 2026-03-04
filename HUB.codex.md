@@ -60,7 +60,9 @@ next_review_due: 2026-06-03
 ## Birdseye Bootstrap
 依存関係解決へ進む前に、以下を**この順序で**参照する。
 
-1. `docs/BIRDSEYE.md`（用語/成果物理解）
+初期理解ドキュメントの canonical path は **`docs/birdseye/README.md`** に固定する。
+
+1. `docs/birdseye/README.md`（用語/成果物理解）
 2. `docs/birdseye/index.json`
 3. 必要最小限の `docs/birdseye/caps/*.json`
 4. `docs/birdseye/hot.json`（`optional`。未運用の間は欠損を許容）
