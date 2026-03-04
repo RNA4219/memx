@@ -8,13 +8,21 @@
 - `memx_spec_v3/docs/reviews/` は設計レビュー用のため、契約同期判定レポートの正本には使わない。
 - 既存で `docs/reviews/` に契約同期判定を保存している場合は、次回更新時に `docs/contracts/reports/` へ移し、旧ファイル側に移転先を追記する。
 
-## 3. ファイル命名規則
+## 3. 必須成果物（固定）
+Phase 3 の契約整合運用で作成する成果物は、次の 2 点に固定する。
+
+1. `CONTRACT-ALIGN-YYYYMMDD-###.md`（詳細レポート）
+2. `LATEST.md`（直近レポートIDと判定のポインタ）
+
+補助運用ルール（命名規則・連番採番・最新レポート探索）は `memx_spec_v3/docs/contracts/reports/README.md` を正本とする。
+
+## 4. 詳細レポート命名規則
 - ファイル名は `CONTRACT-ALIGN-YYYYMMDD-###.md` とする。
   - `YYYYMMDD`: 判定実施日（ローカル日付）
   - `###`: 同日内連番（`001` 始まり）
 - 例: `CONTRACT-ALIGN-20260304-001.md`
 
-## 4. レポート最小記載項目
+## 5. レポート最小記載項目
 差分 1 件につき、以下 5 項目を必須とする。
 
 - `diff_id`
@@ -23,15 +31,15 @@
 - `source_refs`
 - `action`
 
-### 4.1 項目定義
+### 5.1 項目定義
 - `diff_id`: 差分識別子。`CA-YYYYMMDD-###` を推奨。
 - `severity`: `low | medium | high`。
 - `affected_req`: 影響する REQ-ID（1 件以上）。
 - `source_refs`: 判定根拠（ファイル行番号 or スキーマパス）。
 - `action`: 解消方針・保留理由・移行手順。
 
-## 5. 実運用テンプレート
-以下を 1 レポートファイル内に列挙して記録する。
+## 6. 実運用テンプレート
+以下を `CONTRACT-ALIGN-YYYYMMDD-###.md` 内に記録する。
 
 ```yaml
 report_id: CONTRACT-ALIGN-YYYYMMDD-###
@@ -52,11 +60,18 @@ results:
     action: "文言統一のみ実施。互換性影響なし。"
 ```
 
-## 6. 受け入れ条件（Phase 3 完了条件）
+`LATEST.md` には最低限、次を記載する。
+- 最新 `report_id`
+- 判定日
+- `high` 件数
+- Phase 3 判定（完了 / 未完了）
+- 詳細レポートへの相対パス
+
+## 7. 受け入れ条件（Phase 3 完了条件）
 - Phase 3 を完了扱いにできる条件は **`severity: high = 0`** のみ。
 - `high` が 1 件以上ある場合、Phase 3 は未完了。
 
-## 7. `EVALUATION.md` / `docs/TASKS.md` 反映手順
+## 8. `EVALUATION.md` / `docs/TASKS.md` 反映手順
 1. レポート作成後、`EVALUATION.md` に以下を追記する。
    - 判定日
    - レポートID
@@ -69,7 +84,8 @@ results:
    - 例: `- [ ] CA-20260304-003 (REQ-API-001): openapi 必須項目復元`
 4. Phase 3 を `done` に更新する前に、`EVALUATION.md` と `docs/TASKS.md` のレポートIDが一致していることを確認する。
 
-## 8. 保存・更新ルール
+## 9. 保存・更新ルール
 - 新規判定ごとに新規ファイルを作成し、既存レポートは上書きしない。
+- `LATEST.md` は毎回更新し、常に最新レポートへのポインタを保つ。
 - 追記修正時は同一ファイル内に `Updated:` 行を残し、差分履歴を保持する。
 - 参照元は必ず実在パスを記載し、曖昧な記述（例: "関連箇所"）は禁止。
