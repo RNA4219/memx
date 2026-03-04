@@ -21,7 +21,7 @@ next_review_due: 2025-11-28
 | 実行 | [RUNBOOK.md](../RUNBOOK.md) | 環境差分と準備→実行→確認の手順を列挙。 | インシデント時に [IN-20250115-001.md](IN-20250115-001.md) を参照し、`CHECKLISTS.md` の [Release](../CHECKLISTS.md#release) を更新。 |
 | 検収 | [EVALUATION.md](../EVALUATION.md) | 受入基準・KPI・検証チェックリストを定義。 | ガバナンス CI で `governance/policy.yaml` の[禁止パス](../governance/policy.yaml)を監視。 |
 | 行動指針 | [GUARDRAILS.md](../GUARDRAILS.md) | 行動原則と Birdseye 読込手順を規定。 | 「[Birdseye / Minimal Context Intake Guardrails](../GUARDRAILS.md#birdseye--minimal-context-intake-guardrails鳥観図最小読込)」を参照し、タスク分割前に対象ノードを確定。 |
-| タスク統制 | [HUB.codex.md](../HUB.codex.md) | 仕様・運用ドキュメントを束ね、タスク化を自動分配。 | `TASK.*` シード生成時に [入力ファイル分類](../HUB.codex.md#2-入力ファイル分類)を参照。 |
+| タスク統制 | [HUB.codex.md](../HUB.codex.md) | 仕様・運用ドキュメントを束ね、タスク化を自動分配。 | `TASK.*` シード生成時に [入力ファイル分類](../HUB.codex.md#2-入力ファイル分類) と [自動タスク分割フロー](../HUB.codex.md#3-自動タスク分割フロー) を参照。 |
 | リリース判定 | [CHECKLISTS.md](../CHECKLISTS.md) | 日次・リリース・衛生のチェック項目。 | リリース前に `EVALUATION.md` の[Verification Checklist](../EVALUATION.md#verification-checklist)と突き合わせ。 |
 | フォーク統制 | [docs/FORK_NOTES.md](FORK_NOTES.md) | 派生リポの独自差分・逆輸入方針・未解決課題を一元管理。 | フォーク更新時およびリリース前に `CHECKLISTS.md` の[Hygiene](../CHECKLISTS.md#hygiene)と突合。 |
 | セキュリティ統制 | [SECURITY.md](../SECURITY.md) / [security/SAC.md](security/SAC.md) | 報告窓口と SAC 原則の適用範囲・是正判断を集約。 | セキュリティレビュー準備で [security/Security_Review_Checklist.md](security/Security_Review_Checklist.md) と `CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)を突合し、対応責務を同期。 |
