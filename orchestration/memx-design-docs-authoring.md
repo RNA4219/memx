@@ -168,6 +168,7 @@ status: planned
   - 判定根拠: `docs/birdseye/caps/EVALUATION.md.json` pass/fail ルール参照を必須化
   - 完了条件: `docs/TASKS.md` の `Release Note Draft` / `Status` / `Moved-to-CHANGES` を確認済み
 - 統合受け入れレポートが `memx_spec_v3/docs/design-acceptance-report-spec.md` と `memx_spec_v3/docs/design-acceptance-lifecycle-spec.md` に準拠している
+  - 判定手順・入力元・差戻し・再作成・責務分担は `memx_spec_v3/docs/design-acceptance-operations-spec.md` を唯一の参照先として適用する
   - DA-LC-01: テンプレートと実体ファイルの責務分離
   - DA-LC-02: 実体ファイルの新規作成（上書き・テンプレート流用禁止）
   - DA-LC-03: 実体命名規則 `DESIGN-ACCEPTANCE-<実日付>.md`
