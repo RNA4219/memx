@@ -20,7 +20,7 @@ status: planned
 - `RUNBOOK.md`
 - `docs/birdseye/index.json`
 
-- [ ] `docs/birdseye/index.json` の `nodes[].capsule` 参照先を全件確認し、caps 実体欠落を抽出する（Task Seed 1件、<=0.5d）
+- [ ] Birdseye 検証を `docs/birdseye/memx-birdseye-validation-spec.md` に従って実行し、caps 実体欠落を issue 出力する（Task Seed 1件、<=0.5d）
 - [ ] `requirements.md` から要件ID一覧を抽出し、重複・欠番を洗い出す（Task Seed 1件、<=0.5d）
 - [ ] `traceability.md` を入力成果物として主要 REQ-ID の設計/I/F/評価/契約マッピングを確認する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` の章見出しと要件IDの参照有無を対応表にする（Task Seed 1件、<=0.5d）
@@ -76,7 +76,7 @@ status: planned
 - [ ] `design.md` と `interfaces.md` の契約差分を比較し、相違を解消する（Task Seed 1件、<=0.5d）
 - [ ] `RUNBOOK.md` の手順リンクが契約記述と一致するか確認する（Task Seed 1件、<=0.5d）
 - [ ] `EVALUATION.md` の評価項目リンクが最新章へ到達するか確認する（Task Seed 1件、<=0.5d）
-- [ ] `docs/birdseye/index.json` の node_id 参照切れを修正する（Task Seed 1件、<=0.5d）
+- [ ] Birdseye 検証 issue（node_id 参照切れを含む）を `docs/birdseye/memx-birdseye-validation-spec.md` に従って修正する（Task Seed 1件、<=0.5d）
 - [ ] 章間リンクの相対パス/アンカー健全性を確認する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
