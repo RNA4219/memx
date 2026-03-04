@@ -20,6 +20,7 @@ status: planned
 - `RUNBOOK.md`
 - `docs/birdseye/index.json`
 
+- [ ] `docs/birdseye/index.json` の `nodes[].capsule` 参照先を全件確認し、caps 実体欠落を抽出する（Task Seed 1件、<=0.5d）
 - [ ] `requirements.md` から要件ID一覧を抽出し、重複・欠番を洗い出す（Task Seed 1件、<=0.5d）
 - [ ] `traceability.md` を入力成果物として主要 REQ-ID の設計/I/F/評価/契約マッピングを確認する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` の章見出しと要件IDの参照有無を対応表にする（Task Seed 1件、<=0.5d）

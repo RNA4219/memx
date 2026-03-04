@@ -21,6 +21,26 @@
 - `depends_on` は「そのノードが成立するために先に読む/参照するノード」を記述する。
 - PR 作成前に `index.json` のノード一覧と `caps/*.json` の内容整合を確認する。
 
+## index参照とcaps実体の整合チェック手順
+1. `index.json` に記載された `nodes[].capsule` を棚卸しする。
+   ```bash
+   jq -r '.nodes[].capsule' docs/birdseye/index.json | sort -u
+   ```
+2. 棚卸し結果を順に実体確認し、欠落ファイルを抽出する。
+   ```bash
+   while read -r cap; do
+     if [ -f "$cap" ]; then
+       echo "OK  $cap"
+     else
+       echo "MISSING  $cap"
+     fi
+   done < <(jq -r '.nodes[].capsule' docs/birdseye/index.json)
+   ```
+3. 欠落が 1 件でもあれば不整合として扱い、`docs/TASKS.md` の Status 運用に従って `blocked` へ遷移し、Task Seed に欠落 capsule 一覧を記録する。
+
+### 現在の棚卸し結果（`index.json` 기준）
+- `MISSING`: `docs/birdseye/caps/design.json`
+
 ## 変更内容と capsule 更新対応表
 
 | 変更ファイル | 更新する capsule |
