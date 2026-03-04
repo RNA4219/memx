@@ -47,6 +47,7 @@ status: planned
 - `EVALUATION.md`
 - `RUNBOOK.md`
 - `docs/birdseye/index.json`
+- `memx_spec_v3/docs/design-acceptance-report-spec.md`
 
 - [ ] 章ごとに `Objective`（1〜3行）を作成する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Source` を `path#Section` 形式で記述する（Task Seed 1件/章、<=0.5d）
@@ -99,6 +100,7 @@ status: planned
 - [ ] レビュー記録は [テンプレート](../memx_spec_v3/docs/reviews/TEMPLATE.md) から作成し、[保存先ルール](../memx_spec_v3/docs/reviews/README.md) に従って `memx_spec_v3/docs/reviews/` へ保存する（Task Seed 1件、<=0.5d）
 - [ ] 章ごとにレビューコメントを反映し再チェックする（Task Seed 1件/章、<=0.5d）
 - [ ] 仕様整合チェック結果（要件ID網羅率/契約同期/リンク健全性）をレビュー記録に添付する（Task Seed 1件、<=0.5d）
+- [ ] 統合受け入れレポートを `memx_spec_v3/docs/design-acceptance-report-spec.md` に従って作成する（Task Seed 1件、<=0.5d）
 - [ ] `Status` を `reviewing` から `done` へ更新する条件を確認する（Task Seed 1件、<=0.5d）
 - [ ] `Moved-to-CHANGES: YYYY-MM-DD` の追記対象を確定する（Task Seed 1件、<=0.5d）
 
@@ -118,5 +120,10 @@ status: planned
   - 必須項目: 対象章 / 関連 REQ-ID / Node IDs / 指摘一覧（重大度付き） / 再確認結果 / 判定（pass/fail/waiver）
   - 判定根拠: `EVALUATION.md` pass/fail ルール参照を必須化
   - 完了条件: `docs/TASKS.md` の `Release Note Draft` / `Status` / `Moved-to-CHANGES` を確認済み
+- 統合受け入れレポートが `memx_spec_v3/docs/design-acceptance-report-spec.md` に準拠している
+  - 保存先: `memx_spec_v3/docs/reviews/`
+  - 命名: `DESIGN-ACCEPTANCE-YYYYMMDD.md`
+  - 必須項目: 対象章 / REQ網羅率 / high差分件数 / リンク不達件数 / Birdseye issue件数 / 最終判定
+  - 判定規則: `high>0` または `REQ網羅率<100%` または `リンク不達件数>0` または `Birdseye issue件数>0` で fail
 - `lint/type/test` ではなく、仕様整合チェック（要件ID網羅率・契約同期・リンク健全性）で受け入れ判定する運用が明文化されている
 - Phase 1〜4 のチェックボックスがすべて完了している
