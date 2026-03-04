@@ -45,6 +45,7 @@
 
 ## 2. Task Seed 必須項目
 各 Task Seed には次の6項目を必須で含める。
+- Incident 由来要件の転記ルールは `memx_spec_v3/docs/incident-to-task-traceability-spec.md` を参照する。
 
 ### Source
 - 要件の出典を `path#Section` 形式で記載する。
@@ -95,6 +96,11 @@
 - 次のいずれかを検出した場合は誤参照として `fail` 扱い（レビュー差し戻し）にする。
   - `Source` / `Dependencies` に `memx_spec_v3/docs/contracts.md`（小文字）または `contracts.md#...` が残存する。
   - `Source` が `path#Section` 形式を満たしていても、`memx_spec_v3/docs/design-reference-resolution-spec.md` の正規パスマッピングへ解決されていない。
+
+### Incident Trace
+- Incident 由来の Task では、`docs/IN-<実日付>-<連番>.md#<対象章>` を記載し、`memx_spec_v3/docs/incident-to-task-traceability-spec.md` に従って `Requirements` / `Commands` / `Dependencies` へ転記する。
+- `Commands` には Incident 検証コマンドを 1 件以上記載する。
+- Incident 由来でない Task は `- none` と記載する。
 
 ### Release Note Draft
 - `CHANGELOG.md` に転記する利用者影響の要約を1〜3行で記載する。

@@ -54,7 +54,7 @@ status: planned
 
 ### Done Criteria
 - Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源7ファイル一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
-- `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定根拠は `docs/IN-*.md`・`orchestration/*.md`・`TASK.*` を対象に検索キー `Incident` / `Orchestration` / `TASK` で固定する
+- `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定根拠は `docs/IN-*.md`・`orchestration/*.md`・`TASK.*` を対象に検索キー `Incident` / `Orchestration` / `TASK` で固定する。あわせて Incident 転記完了チェック（`memx_spec_v3/docs/incident-to-task-traceability-spec.md` 準拠で `Requirements` / `Commands` / `Dependencies` への転記完了、かつ検証コマンド1件以上）を必須化する
 
 ### Phase 1 参照先追記計画（情報源（固定入力+拡張入力）の抽出結果）
 - [ ] `design-source-inventory-spec.md` の必須列（`source_type`, `source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`, `node_resolution_status`）で抽出表を作成する
