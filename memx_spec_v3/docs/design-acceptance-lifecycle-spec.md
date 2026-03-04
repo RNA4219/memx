@@ -1,7 +1,7 @@
 # Design Acceptance Lifecycle Spec
 
 ## 1. 目的
-本仕様は、設計受け入れレポートのテンプレートと実体ファイルの責務、命名、作成タイミング、差戻し条件を定義する。
+本仕様は、設計受け入れレポートのテンプレートと実体ファイルの責務、命名、差戻し条件を定義する。作成タイミング・提出期限・ステータス遷移制約のSLAは `memx_spec_v3/docs/design-review-artifact-sla-spec.md` を正本とする。
 
 ## 2. テンプレートと実体ファイルの責務分離
 ### 2.1 テンプレート（チェックID: DA-LC-01）
@@ -18,10 +18,7 @@
 - 例: `DESIGN-ACCEPTANCE-20260304.md`
 
 ## 4. 作成タイミング（チェックID: DA-LC-04）
-以下の各タイミングで、実体ファイルを新規作成する。
-1. Phase 4 entry（受け入れレビュー開始時）
-2. 再レビュー（差戻し後の再判定時）
-3. 最終判定（`Status: done` 遷移直前）
+`memx_spec_v3/docs/design-review-artifact-sla-spec.md` の `3.3 DESIGN-ACCEPTANCE 実体` に従う。
 
 ## 5. 差戻し条件（チェックID: DA-LC-05）
 以下のいずれかに該当した場合、受け入れ判定を差し戻す。
@@ -31,5 +28,6 @@
 
 ## 6. 参照
 - 入力元・判定規則: `memx_spec_v3/docs/design-acceptance-report-spec.md`
+- 作成SLA（作成トリガー/owner/提出期限/未提出時制約）: `memx_spec_v3/docs/design-review-artifact-sla-spec.md`
 - レビュー記録運用: `memx_spec_v3/docs/reviews/README.md`
 - 最終判定正本: `memx_spec_v3/docs/design-doc-dod-spec.md`

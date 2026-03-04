@@ -174,6 +174,17 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 - [ ] `memx_spec_v3/docs/EVALUATION.md` のレポートIDと、`memx_spec_v3/docs/contracts/reports/LATEST.md` の `report_id` が一致することを確認した
 - [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）が最新レポートと整合していることを確認した
 
+## 2-1-3-1. レビュー実体ファイルSLAチェック（Task Seed close 条件連動・必須）
+
+- [ ] 実体作成確認: `memx_spec_v3/docs/reviews/` 配下に対象実体（`DESIGN-REVIEW-<実日付>-<連番>.md` / `DESIGN-CHAPTER-VALIDATION-<実日付>.md` / `DESIGN-ACCEPTANCE-<実日付>.md`）が作成済みである
+- [ ] SLA期限確認: 作成・再提出が `memx_spec_v3/docs/design-review-artifact-sla-spec.md` の提出期限（Phase遷移前必須、差戻し時2営業日以内）を満たしている
+- [ ] 未提出時制約確認: 未提出時は Task Seed の `Status` を `reviewing` に維持し、`done` へ遷移していない
+- [ ] close条件連動: 上記いずれか未充足の場合、Task Seed close（`Status: done`）を禁止し、差戻し理由と再提出期限を記録する
+
+### 起票時タスク化提案（競合回避のため分離）
+- 提案1: 「レビュー実体の存在・命名チェック（3成果物）」専用 Task Seed を先行起票する。
+- 提案2: 「SLA期限/Status遷移制約チェック（close判定連動）」専用 Task Seed を後続起票する。
+
 ## 2-1-4. 受け入れレポート定型チェック（必須）
 
 - [ ] 作成済みチェック: `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-<実日付>.md` が存在する

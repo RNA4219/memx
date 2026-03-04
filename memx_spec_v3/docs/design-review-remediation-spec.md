@@ -72,5 +72,5 @@
 ## 6. 参照
 - `memx_spec_v3/docs/design-review-spec.md`
 - `memx_spec_v3/docs/design-acceptance-report-spec.md`
-- `memx_spec_v3/docs/design-acceptance-lifecycle-spec.md`
+- `memx_spec_v3/docs/design-review-artifact-sla-spec.md`
 - `memx_spec_v3/docs/design-doc-dod-spec.md`
