@@ -112,7 +112,7 @@ status: planned
 - 仕様整合チェックを満たす（契約同期: `memx_spec_v3/docs/contract-alignment-spec.md` に基づく判定で high=0 件）
 - 仕様整合チェックを満たす（リンク健全性: `memx_spec_v3/docs/link-integrity-spec.md` に基づき、章内/章間/運用リンクの不達 0 件）
 - 仕様整合チェック結果を各章 Task Seed の `Requirements` と `Commands` に反映済みである
-- 各章の検証結果を `memx_spec_v3/docs/design-chapter-validation-spec.md` 準拠の章別検証サマリとして作成済みである
+- 各章の検証結果を `memx_spec_v3/docs/design-chapter-validation-spec.md` 準拠の章別検証サマリとして作成済みである（参照: `memx_spec_v3/docs/reviews/DESIGN-CHAPTER-VALIDATION-20260304.md`）
 
 ### Phase 3 Done Criteria 追記案（本文編集は別タスク）
 - 重複する個別判定文（REQ網羅率/契約同期/link 健全性）は、`memx_spec_v3/docs/design-doc-dod-spec.md#3. 完成判定ルール（固定）` 参照へ置換する。
@@ -161,7 +161,7 @@ status: planned
   - 命名: `DESIGN-ACCEPTANCE-YYYYMMDD.md`
   - 必須項目: 対象章 / REQ網羅率 / high差分件数 / リンク不達件数 / Birdseye issue件数 / 最終判定
   - 判定規則: `high>0` または `REQ網羅率<100%` または `リンク不達件数>0` または `Birdseye issue件数>0` で fail
-- 章別検証サマリ（`memx_spec_v3/docs/design-chapter-validation-spec.md`）が作成済みで、レビュー記録・受け入れレポートの参照を添付済みである
+- 章別検証サマリ（`memx_spec_v3/docs/design-chapter-validation-spec.md`）が作成済みで、レビュー記録・受け入れレポートの参照を添付済みである（参照: `memx_spec_v3/docs/reviews/DESIGN-CHAPTER-VALIDATION-20260304.md`）
 - `lint/type/test` ではなく、仕様整合チェック（要件ID網羅率・契約同期・リンク健全性）で受け入れ判定する運用が明文化されている
 - Phase 1〜4 のチェックボックスがすべて完了している
 
