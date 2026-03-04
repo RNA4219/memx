@@ -176,6 +176,16 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 - [ ] Task A: `docs/TASKS.md` の `Requirements` 節（Phase 2〜4 ルール）に `memx_spec_v3/docs/design-doc-dod-spec.md` の正本参照必須を追加する。
 - [ ] Task B: `orchestration/memx-design-docs-authoring.md` の Phase 3/4 Done Criteria を本仕様参照へ置換する差分タスクを起票する（本文置換は別PR）。
 - [ ] Task C: `memx_spec_v3/docs/design-acceptance-report-spec.md` / `memx_spec_v3/docs/design-review-spec.md` へ「最終判定の正本」相互参照を維持する運用チェックを Task Seed の `Requirements` に追加する。
+  - Commands:
+    - `date +%Y%m%d`
+    - `test -f memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-YYYYMMDD.md`
+    - `rg -n "^## 1\. 対象章|^## 2\. REQ網羅率|^## 3\. high差分件数|^## 4\. リンク不達件数|^## 5\. Birdseye issue件数|^## 6\. 最終判定" memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-YYYYMMDD.md`
+    - `rg -n "design-doc-dod-spec\.md" memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-YYYYMMDD.md`
+    - `go test ./...`
+  - 完了条件:
+    - `DESIGN-ACCEPTANCE-YYYYMMDD.md` に必須6項目章立てが存在する。
+    - 入力元6仕様（requirements-coverage / contract-alignment / link-integrity / birdseye / design-review / chapter-validation）の参照リンクが記載されている。
+    - 判定ロジックの記述は `memx_spec_v3/docs/design-doc-dod-spec.md` 参照のみに統一され、重複ロジックを含まない。
 
 ## 5. Phase 1 抽出表の転記手順（Source/Requirements/Dependencies）
 1. `memx_spec_v3/docs/reviews/inventory/DESIGN-SOURCE-INVENTORY-YYYYMMDD.md` から `blocked=0` 行のみ抽出する。
