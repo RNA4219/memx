@@ -1,130 +1,130 @@
 {
-  "generated_at": "00026",
+  "generated_at": "2026-03-04T16:41:52Z",
   "nodes": {
     "README.md": {
       "role": "overview",
       "caps": "docs/birdseye/caps/README.md.json",
-      "mtime": "2026-03-04T08:40:59Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "HUB.codex.md": {
       "role": "navigation",
       "caps": "docs/birdseye/caps/HUB.codex.md.json",
-      "mtime": "2026-03-04T08:44:13Z"
+      "mtime": "2026-03-04T16:41:49Z"
     },
     "GUARDRAILS.md": {
       "role": "policy",
       "caps": "docs/birdseye/caps/GUARDRAILS.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "BLUEPRINT.md": {
       "role": "requirements",
       "caps": "docs/birdseye/caps/BLUEPRINT.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "RUNBOOK.md": {
       "role": "operations",
       "caps": "docs/birdseye/caps/RUNBOOK.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "EVALUATION.md": {
       "role": "quality",
       "caps": "docs/birdseye/caps/EVALUATION.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T16:40:51Z"
     },
     "TASK.codex.md": {
       "role": "template",
       "caps": "docs/birdseye/caps/TASK.codex.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "CHECKLISTS.md": {
       "role": "checklist",
       "caps": "docs/birdseye/caps/CHECKLISTS.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T16:40:51Z"
     },
     "CHANGELOG.md": {
       "role": "history",
       "caps": "docs/birdseye/caps/CHANGELOG.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/IN-20250115-001.md": {
       "role": "incident",
       "caps": "docs/birdseye/caps/docs.IN-20250115-001.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "SECURITY.md": {
       "role": "security",
       "caps": "docs/birdseye/caps/SECURITY.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "governance/policy.yaml": {
       "role": "governance",
       "caps": "docs/birdseye/caps/governance.policy.yaml.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "governance/prioritization.yaml": {
       "role": "governance",
       "caps": "docs/birdseye/caps/governance.prioritization.yaml.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/birdseye/index.json": {
       "role": "index",
       "caps": "docs/birdseye/caps/docs.birdseye.index.json.json",
-      "mtime": "2026-03-04T08:43:48Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/BIRDSEYE.md": {
       "role": "fallback",
       "caps": "docs/birdseye/caps/docs.BIRDSEYE.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/birdseye/caps/": {
       "role": "collection",
       "caps": "docs/birdseye/caps/docs.birdseye.caps.json",
-      "mtime": "2026-03-04T08:44:40Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "tools/codemap/": {
       "role": "tooling",
       "caps": "docs/birdseye/caps/tools.codemap.json",
-      "mtime": "2026-03-04T08:44:37Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "tools/codemap/README.md": {
       "role": "guide",
       "caps": "docs/birdseye/caps/tools.codemap.README.md.json",
-      "mtime": "2026-03-04T08:40:59Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "tools/codemap/update.py": {
       "role": "script",
       "caps": "docs/birdseye/caps/tools.codemap.update.py.json",
-      "mtime": "2026-03-04T08:42:35Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/INCIDENT_TEMPLATE.md": {
       "role": "template",
       "caps": "docs/birdseye/caps/docs.INCIDENT_TEMPLATE.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/IMPLEMENTATION-PLAN.md": {
       "role": "plan",
       "caps": "docs/birdseye/caps/docs.IMPLEMENTATION-PLAN.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/AUTOSAVE-DESIGN-IMPL.md": {
       "role": "design",
       "caps": "docs/birdseye/caps/docs.AUTOSAVE-DESIGN-IMPL.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/MERGE-DESIGN-IMPL.md": {
       "role": "design",
       "caps": "docs/birdseye/caps/docs.MERGE-DESIGN-IMPL.md.json",
-      "mtime": "2026-03-04T08:32:10Z"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/tasks/task-autosave-project-locks.md": {
       "role": "task",
       "caps": "docs/birdseye/caps/docs.tasks.task-autosave-project-locks.md.json",
-      "mtime": "00024"
+      "mtime": "2026-03-04T09:58:00Z"
     },
     "docs/birdseye/hot.json": {
       "role": "hotlist",
       "caps": "docs/birdseye/caps/docs.birdseye.hot.json.json",
-      "mtime": "00025"
+      "mtime": "2026-03-04T09:58:00Z"
     }
   },
   "edges": [

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-04T08:44:47Z",
+  "generated_at": "2026-03-04T16:41:52Z",
   "index_snapshot": "docs/birdseye/index.json",
   "refresh_command": "python tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/hot.json --emit index+caps",
   "curation_notes": "Workflow Cookbook の主要な起点ドキュメントと Birdseye 運用ノードを即時参照できるようにキュレーションしたホットリスト。index.json の更新時は同じターゲットで hot を再生成し、各ノードの鮮度をチェックする。",

@@ -4,8 +4,7 @@
   "public_api": [],
   "summary": "Birdseyeの優先参照ノードを集約し、indexの未解決ノードをホットリストで補完する。",
   "deps_out": [
-    "docs/birdseye/index.json",
-    "docs/birdseye/caps/"
+    "docs/birdseye/index.json"
   ],
   "deps_in": [
     "HUB.codex.md",
@@ -16,5 +15,5 @@
     "indexとの参照不整合で補完対象の逆引きに失敗する"
   ],
   "tests": [],
-  "generated_at": "00026"
+  "generated_at": "2026-03-04T16:41:52Z"
 }

@@ -12,6 +12,8 @@
     "HUB.codex.md",
     "RUNBOOK.md",
     "TASK.codex.md",
+    "docs/BIRDSEYE.md",
+    "docs/IMPLEMENTATION-PLAN.md",
     "docs/IN-20250115-001.md",
     "docs/birdseye/caps/",
     "docs/birdseye/index.json",
@@ -22,9 +24,14 @@
   "deps_in": [
     "CHANGELOG.md",
     "GUARDRAILS.md",
+    "docs/AUTOSAVE-DESIGN-IMPL.md",
+    "docs/BIRDSEYE.md",
+    "docs/MERGE-DESIGN-IMPL.md",
+    "docs/birdseye/index.json",
+    "docs/tasks/task-autosave-project-locks.md",
     "governance/prioritization.yaml"
   ],
   "risks": [],
   "tests": [],
-  "generated_at": "00003"
+  "generated_at": "2026-03-04T16:41:52Z"
 }

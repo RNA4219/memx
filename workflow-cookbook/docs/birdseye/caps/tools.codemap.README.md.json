@@ -3,8 +3,11 @@
   "role": "guide",
   "public_api": [],
   "summary": "codemap ツールの目的、使用手順、入出力制約を記載した運用向けリファレンス。",
-  "deps_in": [],
+  "deps_in": [
+    "docs/BIRDSEYE.md"
+  ],
   "deps_out": [
+    "docs/BIRDSEYE.md",
     "docs/birdseye/caps/",
     "docs/birdseye/index.json",
     "tools/codemap/update.py"
@@ -13,5 +16,5 @@
     "ドキュメント未更新だと codemap 実行手順が陳腐化し運用事故につながる"
   ],
   "tests": [],
-  "generated_at": "00017"
+  "generated_at": "2026-03-04T16:41:52Z"
 }

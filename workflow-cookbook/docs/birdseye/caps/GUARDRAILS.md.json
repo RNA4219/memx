@@ -12,6 +12,7 @@
     "README.md",
     "RUNBOOK.md",
     "TASK.codex.md",
+    "docs/BIRDSEYE.md",
     "docs/IN-20250115-001.md",
     "docs/INCIDENT_TEMPLATE.md",
     "docs/birdseye/caps/",
@@ -20,11 +21,13 @@
   ],
   "deps_in": [
     "HUB.codex.md",
-    "README.md"
+    "README.md",
+    "docs/BIRDSEYE.md",
+    "docs/birdseye/index.json"
   ],
   "risks": [
     "Birdseye更新が遅れるとガードレール遵守が困難"
   ],
   "tests": [],
-  "generated_at": "00001"
+  "generated_at": "2026-03-04T16:41:52Z"
 }

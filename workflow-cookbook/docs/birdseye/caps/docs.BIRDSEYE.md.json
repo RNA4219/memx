@@ -4,17 +4,16 @@
   "public_api": [],
   "summary": "Birdseyeのエッジ・ホットリスト・更新手順をフォールバック参照向けに集約し、JSONが取得できない状況でも運用判断を下せるようにする。",
   "deps_out": [
-    "README.md",
     "GUARDRAILS.md",
-    "docs/birdseye/index.json",
+    "README.md",
     "tools/codemap/README.md"
   ],
   "deps_in": [
-    "README.md",
     "GUARDRAILS.md",
+    "README.md",
     "tools/codemap/README.md"
   ],
   "risks": [],
   "tests": [],
-  "generated_at": "00022"
+  "generated_at": "2026-03-04T16:41:52Z"
 }

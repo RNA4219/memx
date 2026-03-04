@@ -141,6 +141,7 @@ plan:
 2. **Birdseye 専用サブステップ**:
    - **読込順固定**: Birdseye JSON を第一読者として、`docs/birdseye/index.json` → `docs/birdseye/caps/*.json` → `docs/birdseye/hot.json` の順で必ず読み込む。
    - **グラフ整合**: 依存グラフは `HUB.codex.md -> docs/birdseye/hot.json` および `docs/birdseye/index.json -> docs/birdseye/hot.json`（必要に応じて `docs/birdseye/hot.json -> docs/birdseye/index.json`）を維持し、読込順説明と実体を一致させる。
+   - **レビュー観点**: `HUB.codex.md` 本文の Birdseye Bootstrap 記述（`index.json` → `caps/*.json` → `hot.json`）と `docs/birdseye/caps/HUB.codex.md.json` の `deps_out`（`docs/birdseye/hot.json` を含む）が一致していることを確認する。
    - **対象抽出条件**: 対象ファイルの `node_id` 起点で ±2 hop を抽出し、未解決ノードは `hot.json` の hot list で補完する。
    - **埋込必須項目**: 各候補タスクに `node_id` / `role` / `source_caps` を付与し、GUARDRAILS の `plan` 出力要件（ノードID明示）を初期段階で満たす。
 3. **ノード生成**: 各ファイルから `##` レベルの節をノード化し、`Priority`
