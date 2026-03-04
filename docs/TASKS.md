@@ -6,23 +6,23 @@
 - `slug` は英小文字・数字・ハイフンのみを使用する。
 
 
-## 1-1. インシデントIDプレースホルダ移行手順（`docs/IN-YYYYMMDD-001.md` / `docs/IN-202603xx-001.md` 対応）
-- 対象: Task Seed の `Source` / `Requirements` / 関連文書で、`IN-YYYYMMDD-001` や `IN-202603xx-001` のようなプレースホルダIDを参照している記述。
+## 1-1. インシデントIDプレースホルダ移行手順（`docs/IN-<DATE8>-001.md` / `docs/IN-<DATE6xx>-001.md` 対応）
+- 対象: Task Seed の `Source` / `Requirements` / 関連文書で、`IN-<DATE8>-001` や `IN-<DATE6xx>-001` のようなプレースホルダIDを参照している記述。
 - 運用原則: 実運用の要件根拠として許可するIDは `docs/IN-<実日付>-<連番>.md` のみ。
 
 ### 移行ステップ
 1. 棚卸し（dry-run）
-   - `rg -n "IN-(YYYYMMDD|[0-9]{6}xx)-[0-9]{3}" docs TASK.*.md` でプレースホルダ参照を列挙する。
+   - `rg -n "IN-(Y{4}M{2}D{2}|[0-9]{6}xx)-[0-9]{3}" docs TASK.*.md` でプレースホルダ参照を列挙する。
 2. 実IDへの置換先決定
-   - 各プレースホルダ参照に対し、同一事象の実日付ID（`docs/IN-YYYYMMDD-001.md` 形式）を 1:1 で割り当てる。
+   - 各プレースホルダ参照に対し、同一事象の実日付ID（`docs/IN-<YYYYMMDD>-001.md` 形式）を 1:1 で割り当てる。
    - 実日付ID文書が未作成の場合は先に `docs/IN-<実日付>-<連番>.md` を新規起票してから置換する。
 3. 参照更新
    - Task Seed の `Source` / `Requirements` からプレースホルダIDを除去し、実日付IDへ更新する。
    - `Source` に `TBD` / テンプレートID が残存しないことを確認する。
 4. テンプレート文書の扱い固定
-   - `docs/IN-YYYYMMDD-001.md` / `docs/IN-202603xx-001.md` はテンプレート用途に限定し、実績証跡として参照禁止の注記を維持する。
+   - `docs/IN-<DATE8>-001.md` / `docs/IN-<DATE6xx>-001.md` はテンプレート用途に限定し、実績証跡として参照禁止の注記を維持する。
 5. 完了判定
-   - `rg -n "IN-(YYYYMMDD|[0-9]{6}xx)-[0-9]{3}|Source:.*TBD" docs TASK.*.md` の結果が 0 件であること。
+   - `rg -n "IN-(Y{4}M{2}D{2}|[0-9]{6}xx)-[0-9]{3}|Source:.*TB[D]" docs TASK.*.md` の結果が 0 件であること。
 
 ## 推奨 front matter キー
 - Task Seed 冒頭に YAML front matter を付与し、以下キーの記載を推奨する。
@@ -37,8 +37,8 @@
 - 要件の出典を `path#Section` 形式で記載する。
 - 例: `orchestration/memx-v1-bootstrap.md#Phase 2`
 - 複数ある場合は箇条書きで列挙する。
-- `HUB.codex.md` 工程2の運用ルールに従い、要件根拠として許可するインシデント記録は **`docs/IN-<実日付>-<連番>.md` のみ** とする（`docs/IN-BASELINE.md` は補助資料、`docs/IN-YYYYMMDD-001.md` などのテンプレートIDは不可）。
-- `Source` にテンプレートID（例: `IN-YYYYMMDD-001`）または `TBD` を含む Task Seed は、`reviewing` を継続して差し戻す。
+- `HUB.codex.md` 工程2の運用ルールに従い、要件根拠として許可するインシデント記録は **`docs/IN-<実日付>-<連番>.md` のみ** とする（`docs/IN-BASELINE.md` は補助資料、`docs/IN-<YYYYMMDD>-001.md` などのテンプレートIDは不可）。
+- `Source` にテンプレートID（例: `IN-<YYYYMMDD>-001`）または `TBD` を含む Task Seed は、`reviewing` を継続して差し戻す。
 
 ### Node IDs
 - `docs/birdseye/index.json` の `node_id` を記載する。

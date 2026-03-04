@@ -24,6 +24,11 @@ priority: high
 
 ### 1-2. 補助（Secondary）
 
+- `interfaces.md`
+  - 人間可読の I/O 説明と互換方針を示す補助仕様。
+- `CONTRACTS.md`
+  - 正本スキーマ（`contracts/openapi.yaml` / `contracts/cli-json.schema.json`）への索引・抜粋。
+  - 重複定義（フィールド型・required・制約の再定義）を持たない。
 - `error-contract.md`
   - エラー契約の運用要約。正本は `contracts/openapi.yaml`。
 - `quickstart.md`
@@ -58,11 +63,13 @@ priority: high
 - 正本: `requirements.md` の「11. インシデント対応要件（運用）」
 - 運用章の固定参照先: `operations-spec.md`
 
-## 3. 更新順序（契約変更時）
+## 3. 更新順序（契約変更時・固定）
 
-1. 正本（`requirements.md` または `contracts/*.yaml|json`）を更新する。
-2. 補助文書（`error-contract.md` / `quickstart.md`）へ差分要約のみ反映する。
-3. 必要に応じて `memx_spec_v3/README.md` の導線を更新する。
+1. `requirements.md` を更新する。
+2. 正本スキーマ（`contracts/openapi.yaml` / `contracts/cli-json.schema.json`）を更新する。
+3. `interfaces.md` と `CONTRACTS.md` を更新する。
+4. `EVALUATION*` / `operations-spec.md`（RUNBOOK 相当）を更新する。
+5. 必要に応じて `memx_spec_v3/README.md` の導線を更新する。
 ---
 
 # memx 仕様（spec）

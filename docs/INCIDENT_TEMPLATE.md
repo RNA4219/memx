@@ -1,7 +1,7 @@
 # INCIDENT TEMPLATE
 
-- インシデントID: `IN-YYYYMMDD-XXX`
-- Task Seed 参照ID（必須）: `IN-YYYYMMDD-XXX`（Task Seed の Source/Requirements から逆引きするため、インシデントIDと同値で記載）
+- インシデントID: `IN-<YYYYMMDD>-<連番3桁>`
+- Task Seed 参照ID（必須）: `IN-<YYYYMMDD>-<連番3桁>`（Task Seed の Source/Requirements から逆引きするため、インシデントIDと同値で記載）
 - 発生日（UTC）:
 - 起票日（UTC）:
 - 重大度: `SEV1 | SEV2 | SEV3 | SEV4`

@@ -29,6 +29,41 @@ short 固有:
 - `short_meta`: GC 判定メタ。
 - `lineage`: 蒸留/昇格/退避の系譜。
 
+## 2.1 store別設計詳細（short/chronicle/memopedia/archive）
+
+| store | Requirement ID | DB責務 | 禁止変更 | 許可変更 |
+| --- | --- | --- | --- | --- |
+| short | [`REQ-STORE-SHORT-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-SHORT-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 一次投入先として `short.notes` 保存、GC dry-run の候補抽出（非更新） | 必須保存項目の破壊、既定挙動での自動削除、`--json` 出力キー破壊 | 任意列追加、任意 CLI オプション追加、dry-run 診断項目追加 |
+| chronicle | [`REQ-STORE-CHR-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-CHR-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 時系列ログを `working_scope` 必須で保持し、期間/タグ抽出に応答 | `working_scope` 必須性撤回、既定ソート反転、既存 ID 体系変更 | 非破壊インデックス追加、任意フィルタ追加、任意メタ列追加 |
+| memopedia | [`REQ-STORE-MP-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-MP-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 用語/方針ノート保持、reflect 時の版管理保持 | 本文自動上書き、同一 ID 再利用、必須列削除 | 任意セクション追加、参照メタ追加、互換な検索キー追加 |
+| archive | [`REQ-STORE-ARC-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-ARC-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 退避ノート保持、lineage 記録後のみ short 削除、purge dry-run 候補提示 | 監査ログなし purge、retention 無視削除、lineage 未記録削除 | 保持メタ列追加、監査ログ項目追加、dry-run 出力列追加 |
+
+### Source
+- `memx_spec_v3/docs/requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive`
+
+### Dependencies
+- `memx_spec_v3/docs/interfaces.md`
+- `memx_spec_v3/docs/contracts/openapi.yaml`
+- `memx_spec_v3/docs/contracts/cli-json.schema.json`
+
+## 2.2 Security/Retention 設計
+
+| Requirement ID | 保存可否 | 監査証跡 | 保持期間 | 削除条件 |
+| --- | --- | --- | --- | --- |
+| [`REQ-SEC-001`](./requirements.md#2-7-security--retention-requirements) | `sensitivity=secret` は fail-closed で保存禁止 | 拒否時に判定理由と actor を監査ログに残す | ポリシー判定ログは運用監査期間に従う | 保存禁止のためデータ削除フロー対象外 |
+| [`REQ-RET-001`](./requirements.md#2-7-security--retention-requirements) | `archive` 退避後のみ保持継続 | 退避/削除の実行結果を `archive_move` / `archive_purge` で記録 | 期限は `retention_until` 基準で管理 | 期限超過かつ承認済み、監査項目充足時のみ削除 |
+| [`REQ-SEC-AUD-001`](./requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5) | `archive_move` 実行時のみ保存状態遷移許可 | 固定フィールド（actor/approval/evidence path など）を必須保存 | 監査証跡は改ざん不可で保持 | 必須監査キー欠落時は遷移拒否 |
+| [`REQ-SEC-AUD-002`](./requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5) | `archive_purge` は承認フロー通過時のみ許可 | purge 監査ログ固定項目を必須保存 | purge 証跡は retention 監査期間満了まで保持 | 監査コンテキスト不足時は削除禁止 |
+
+### Source
+- `memx_spec_v3/docs/requirements.md#2-7-security--retention-requirements`
+- `memx_spec_v3/docs/requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5`
+
+### Dependencies
+- `GUARDRAILS.md`
+- `docs/security/minimal_operations.md`
+- `RUNBOOK.md`
+
 ## 3. 移行戦略
 - マイグレーションは `schema/*.sql` を正本として適用する。
 - `PRAGMA user_version` を採用し、破壊的/非互換 DDL のみバージョンを進める。
@@ -134,9 +169,35 @@ short 固有:
 | `REQ-ERR-001` | [requirements.md#6-4-エラーモデル](./requirements.md#6-4-エラーモデル) |
 | `REQ-SEC-001` | [requirements.md#2-7-security--retention-requirements](./requirements.md#2-7-security--retention-requirements) |
 
-## 5. 設計→契約→検証 導線
-参照順は以下の固定順序とする。
-1. `interfaces.md`（I/F 設計の確認）
-2. `contracts/openapi.yaml`（HTTP 契約の確認）
-3. `contracts/cli-json.schema.json`（CLI `--json` 契約の確認）
-4. `RUNBOOK.md`（検証手順・トレース実行）
+## 5. 設計→契約→検証 導線（要件ID単位）
+
+| Requirement ID | Design Section | Interface ID | Evaluation項目 |
+| --- | --- | --- | --- |
+| [`REQ-CLI-001`](./requirements.md#3-cli-要件) | 4.1 / 4.2 / 4.3 | CLI `mem in short`, `mem out search`, `mem out show` | CLI `--json` と API 同型、必須項目一致 |
+| [`REQ-API-001`](./requirements.md#6-api-要件v13-追加) | 4.1 / 4.2 / 4.3 | `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}` | HTTP ステータス、レスポンス型、互換性 |
+| [`REQ-GC-001`](./requirements.md#3-5-mem-gc-shortobserver--reflector) | 4.4 | `mem gc short --dry-run`, `POST /v1/gc:run` | dry-run DB 非更新、候補件数/対象ID整合 |
+| [`REQ-ERR-001`](./requirements.md#6-4-エラーモデル) | 4.1〜4.4 | 共通 ErrorCode 契約 | `INVALID_ARGUMENT` / `POLICY_DENIED` / `INTERNAL` の retryable 整合 |
+| [`REQ-SEC-001`](./requirements.md#2-7-security--retention-requirements) | 2.2, 4.1〜4.4 | Gatekeeper 判定（ingest/search/show/gc） | fail-closed 拒否、監査ログ記録 |
+| [`REQ-NFR-001`](./requirements.md#5-1-性能目標v1必須3エンドポイント) | 5.1 | ingest/search/show | p95 閾値の達成（計測プロトコル準拠） |
+| [`REQ-NFR-002`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 5.1 | 運用復旧フロー | RTO/RPO 同時成立 |
+| [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 5.1 | short→archive 補償 | 30分以内収束または IN 起票 |
+
+## 5.1 NFR設計（性能/復旧/整合性回復）
+
+| Requirement ID | 判定入力（ログ/成果物） | 判定方法 |
+| --- | --- | --- |
+| [`REQ-NFR-001`](./requirements.md#5-1-性能目標v1必須3エンドポイント) | `RUNBOOK.md` の trace 実行ログ、性能計測結果（p95） | ingest/search/show の 3 エンドポイントのみ対象に閾値比較 |
+| [`REQ-NFR-002`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | インシデント記録（`docs/IN-*.md`）、運用タイムライン | `rto_minutes <= 30` かつ `rpo_minutes <= 5` を同時充足 |
+| [`REQ-NFR-003`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 検知時刻/暫定復旧時刻ログ | 検知〜暫定復旧が 15 分以内 |
+| [`REQ-NFR-004`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 再試行履歴、ジョブログ | 1 リクエストあたり再処理 2 回以内 |
+| [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 補償フロー実行ログ、`docs/IN-*.md` 起票有無 | 30分以内収束、未収束時は IN 起票 |
+
+### Source
+- `memx_spec_v3/docs/requirements.md#5-1-性能目標v1必須3エンドポイント`
+- `memx_spec_v3/docs/requirements.md#5-2-可用性復旧整合性回復運用nfr`
+- `memx_spec_v3/docs/requirements.md#5-3-整合性回復要件archive-補償フロー`
+
+### Dependencies
+- `RUNBOOK.md`
+- `EVALUATION.md`
+- `docs/IN-*.md`

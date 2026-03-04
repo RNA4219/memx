@@ -11,6 +11,33 @@
 - 本書に同一内容を再定義しない。必要な記載は「実装差分」「運用メモ」「移行手順」に限定する。
 - 契約変更時は schema を先に更新し、その後に本書へ差分要約を反映する。
 
+## ErrorCode追加時の必須更新対象
+
+新規 `ErrorCode` を追加する場合は、下表の更新を 1 つでも欠いた時点でレビュー不合格とする。
+
+| 更新対象 | 必須更新内容 | 目的 |
+| --- | --- | --- |
+| `go/api/errors.go` | service sentinel から API `Error.code` へのマッピングを追加し、既存コードの意味を変更しない。 | transport 応答で新規 code を返せる状態にする。 |
+| `go/service/errors.go` | service 層の sentinel/error 定義を追加し、retryable 判定の根拠を service 層で確定する。 | ドメイン由来の再試行可否を transport から分離する。 |
+| `docs/error-contract.md` | ErrorCode×HTTP×retryable マトリクスと差分注記を更新する。 | 運用解釈と実装の同期を維持する。 |
+| `docs/interfaces.md` 4章 | 外部インタフェースのエラー契約（code / status / retryable）を更新する。 | 利用者向け契約を最新版へ同期する。 |
+
+## retryable判定の責務境界
+
+- service 層（`go/service/errors.go`）
+  - `retryable=true/false` の一次判定責務を持つ。
+  - 判定基準はドメイン要因（恒久失敗/一時失敗）とし、HTTP 都合で上書きしない。
+- transport 層（`go/api/errors.go`, `go/api/http_server.go`）
+  - service 判定結果を保持したまま、`ErrorCode -> HTTP status` の写像のみを担う。
+  - transport 層で retryable の意味を再解釈・反転しない。
+
+## 破壊的変更の禁止事項（要件ID）
+
+| Requirement ID | 禁止事項 | 判定基準 |
+| --- | --- | --- |
+| `REQ-ERR-001` | 既存 `ErrorCode` の意味変更を禁止する。 | 同一 code の利用者影響（原因分類/対処方針）が変わる変更は不可。必要な場合は新規 code を追加する。 |
+| `REQ-ERR-002` | 既存 `ErrorCode` の HTTP ステータス変更を禁止する。 | 既存 code の status を別値に変更する差分は不可。移行が必要な場合は別 code を導入し段階移行する。 |
+
 ## ErrorCode × HTTP × retryable × クライアント動作（運用マトリクス）
 
 | ErrorCode | HTTP | retryable | クライアント動作 |

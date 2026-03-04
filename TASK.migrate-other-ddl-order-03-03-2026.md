@@ -21,7 +21,7 @@ status: planned
 - `memx_spec_v3/go/db/migrate_other.go` の `chronicle`/`memopedia`/`archive` DDL 適用順と `user_version` 更新運用を明確化し、再実行安全性を担保する。
 
 ## Requirements
-- インシデント再発防止: [`docs/IN-202603xx-001.md`](docs/IN-202603xx-001.md) の `TP-01/TP-02` に従い、実インシデント由来条件を要件とテストへ明示的に転記する。
+- インシデント再発防止: [`docs/IN-20260303-001.md`](docs/IN-20260303-001.md) の `TP-01/TP-02` に従い、実インシデント由来条件を要件とテストへ明示的に転記する。
 - 正常系: 初回マイグレーションで `chronicle` → `memopedia` → `archive` の順に DDL が適用され、`user_version` が期待値へ更新されることを検証する。
 - 入力エラー: 想定外 `user_version` または欠損スキーマ時に、既存例外方針に沿って中断/通知されることを検証する。
 - 境界値: 既に最新 `user_version` の DB へ再適用した場合に no-op で終了することを検証する。
