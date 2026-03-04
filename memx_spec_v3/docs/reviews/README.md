@@ -39,6 +39,12 @@
   - `requirements.md` と `traceability.md` のマッピング不整合が 1 件以上ある。
 - `waiver` を選ぶ場合は `design-review-spec.md` の waiver 条件に従い、`docs/IN-<実日付>-<連番>.md` を必須参照とする。
 
+
+## 受け入れレポート運用ルール（必須）
+- `DESIGN-ACCEPTANCE-YYYYMMDD.md` はテンプレート専用であり、受け入れ判定の実体ファイルとしては使用しない。
+- リリース判定時は毎回 `DESIGN-ACCEPTANCE-<実日付>.md` を `memx_spec_v3/docs/reviews/` に新規作成する（既存ファイル上書き・テンプレート流用禁止）。
+- 受け入れレポートでは、必須6項目（対象章/REQ網羅率/high差分件数/リンク不達件数/Birdseye issue件数/最終判定）に加え、`evidence_paths` が実在ファイルのみを指すことの検証結果を必須記載とする。
+
 ## クローズ条件
 - 記録クローズは以下を全て満たした時点とする。
   - 判定が確定し、根拠参照（`EVALUATION.md` + 証跡）が記載済み。

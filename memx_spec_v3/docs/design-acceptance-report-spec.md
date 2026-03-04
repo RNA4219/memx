@@ -19,6 +19,7 @@
 
 ## 3. 統合レポートのテンプレート定義（正本参照）
 - 統合レポート（`DESIGN-ACCEPTANCE-YYYYMMDD.md`）の必須セクション・必須キー・許可値・命名規則・保存先は `memx_spec_v3/docs/design-evidence-template-spec.md` を正本とする。
+- `DESIGN-ACCEPTANCE-YYYYMMDD.md` はテンプレート専用ファイルとして扱い、リリース判定の実体記録に流用してはならない。
 - 本仕様は Phase 4 の判定規則と入力要件のみを定義する。
 
 ## 3.1 章別検証サマリ参照（必須）
@@ -38,6 +39,7 @@
 
 - 検証対象キー: `run_id` / `generated_at` / `source_commit` / `chapter_id` / `tool` / `status` / `severity_summary` / `evidence_paths`
 - 1キーでも欠落がある入力は不受理とし、統合レポートの最終判定は `fail` とする。
+- `evidence_paths` は列挙された全パスが実在ファイルであることを必須とし、1件でも未存在パスがある入力は不受理（最終判定 `fail`）とする。
 - 受理可否は Task Seed の `Commands` に記録した検証コマンド結果で追跡可能であること。
 
 ## 3.3 変更計画（導入ステップ）
@@ -58,3 +60,4 @@
 
 ## 5. 保存場所・命名規則・テンプレート
 - `DESIGN-ACCEPTANCE-YYYYMMDD.md` の保存場所・命名規則・テンプレート本文は `memx_spec_v3/docs/design-evidence-template-spec.md` を参照する。
+- リリース判定時は必ず `DESIGN-ACCEPTANCE-<実日付>.md` を `memx_spec_v3/docs/reviews/` 配下に新規作成し、テンプレート専用ファイル（`DESIGN-ACCEPTANCE-YYYYMMDD.md`）の直接利用・改名運用を禁止する。
