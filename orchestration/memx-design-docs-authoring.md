@@ -42,15 +42,12 @@ status: planned
 - [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、`memx_spec_v3/docs/design-chapter-node-mapping-spec.md` 準拠の章対応表（chapter_id -> node_id）を更新する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
-- 情報源7ファイルの抽出結果が要件ID/契約ID/node_id単位で一覧化されている（参照仕様: `../memx_spec_v3/docs/design-source-inventory-spec.md`）
-- 抽出結果を Task Seed 化可能な粒度（1項目=1タスク、<=0.5d）で分割している
-- `docs/TASKS.md` 必須項目のうち `Source` / `Node IDs` / `Requirements` へ直接転記できる状態になっている
-- 抽出表運用が `../memx_spec_v3/docs/design-source-inventory-operations-spec.md` に準拠し、保存先/命名規則/更新粒度/承認条件（blocked 行 0 件）を満たしている
+- Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源7ファイル一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
 
 ### Phase 1 参照先追記計画（情報源7ファイルの抽出結果）
-- [ ] `design-source-inventory-spec.md` の必須列（`source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`）で抽出表を作成する
-- [ ] 抽出表で `blocked` 条件と差し戻し条件を判定し、未解決行を 0 件にする
-- [ ] Phase 1 Done Criteria の判定時に、上記仕様書への準拠確認をチェック項目として記録する
+- [ ] `design-source-inventory-spec.md` の必須列（`source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`, `node_resolution_status`）で抽出表を作成する
+- [ ] `design-source-inventory-spec.md` と `design-chapter-node-mapping-spec.md` の fail 条件（`ambiguous` / `missing` 含む）を判定し、未解決行を 0 件にする
+- [ ] Phase 1 Done Criteria 判定ログは上記2仕様への準拠確認のみを正本として記録する
 
 ## Phase 2: 章別ドラフト
 ### Priority Label Rule
