@@ -28,6 +28,8 @@ priority: high
   - エラー契約の運用要約。正本は `contracts/openapi.yaml`。
 - `quickstart.md`
   - 起動/疎通確認手順。契約定義の正本ではない。
+- `operations-spec.md`
+  - 運用章（インシデント起票・waiver・RTO/RPO・補償収束）の参照固定用サマリ。正本は `requirements.md`。
 
 ## 2. 要件別の参照導線
 
@@ -54,6 +56,7 @@ priority: high
 ### 2-5. 運用要件
 
 - 正本: `requirements.md` の「11. インシデント対応要件（運用）」
+- 運用章の固定参照先: `operations-spec.md`
 
 ## 3. 更新順序（契約変更時）
 
