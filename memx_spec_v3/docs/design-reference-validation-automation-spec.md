@@ -25,8 +25,11 @@ next_review_due: 2026-06-04
    - `memx_spec_v3/docs/design-reference-conformance-spec.md` 準拠で検査する。
 2. 参照名の正規化
    - `memx_spec_v3/docs/design-reference-resolution-spec.md` の正規パスマッピングへ解決する。
+   - alias 判定は `memx_spec_v3/docs/design-reference-alias-spec.md` の辞書（`resolution_rule` / `failure_action`）を正本として適用する。
 3. 評価・運用参照の canonical 強制
    - `EVALUATION.md` / `RUNBOOK.md` は `docs/birdseye/caps/*.json` 経由に正規化する。
+4. `docs/IN-*.md` 相対解決
+   - `docs/IN-*.md#section` 形式のみ許可し、`docs/` 配下の非 `IN-` ファイル参照は alias 辞書に従って warn/fail 判定する。
 
 ## 3. fail 条件（自動停止）
 
@@ -40,6 +43,14 @@ next_review_due: 2026-06-04
    - `IN-YYYYMMDD-001` などテンプレート識別子を実績 ID として参照している。
 4. 未解決 `contracts.md` 表記ゆれ
    - `memx_spec_v3/docs/contracts.md`（小文字）や `contracts.md` が、`memx_spec_v3/docs/CONTRACTS.md` へ解決されず残存している。
+5. 禁止パターン参照
+   - alias spec で禁止された `../`、絶対パス、`memx_spec_v3/docs/EVALUATION.md` / `RUNBOOK.md` を検出した。
+
+## 3-1. alias 辞書の自動検証観点
+
+- 入力参照文字列ごとに alias 辞書の `resolution_rule` を適用し、完全一致・相対解決・禁止パターンを分類する。
+- 分類結果に対して alias 辞書の `failure_action`（warn/fail）をそのまま判定へ反映する。
+- `warn` は issue レコードを残して継続、`fail` は即時停止とする。
 
 ## 4. `docs/birdseye/memx-birdseye-validation-spec.md` との責務境界
 

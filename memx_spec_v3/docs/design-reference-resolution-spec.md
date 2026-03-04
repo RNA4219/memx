@@ -20,6 +20,9 @@ next_review_due: 2026-06-04
 
 ## 1. 対象入力参照名と正規パスマッピング
 
+許容 alias と canonical path の正本は `memx_spec_v3/docs/design-reference-alias-spec.md` とする。
+本章は代表例の抜粋であり、差異がある場合は alias spec を優先する。
+
 | 入力参照名（非正規） | 正規パス（必須） |
 | --- | --- |
 | `requirements.md` | `memx_spec_v3/docs/requirements.md` |
@@ -31,6 +34,7 @@ next_review_due: 2026-06-04
 | `EVALUATION.md` | `docs/birdseye/caps/EVALUATION.md.json` |
 | `RUNBOOK.md` | `docs/birdseye/caps/RUNBOOK.md.json` |
 | `docs/birdseye/index.json` | `docs/birdseye/index.json` |
+| `docs/IN-*.md` | `docs/IN-*.md` |
 
 ### 1-2. EVALUATION/RUNBOOK 正本パス規約
 
@@ -54,6 +58,20 @@ next_review_due: 2026-06-04
 - `path` は 1 章の正規パスマッピングで確定したリポジトリ相対パスを使用する。
 - `section` は入力側の参照セクションを維持し、空の場合は呼び出し元で補完する。
 - 適合判定（許可/禁止形式、warn/fail、Phase 別適用）は `memx_spec_v3/docs/design-reference-conformance-spec.md` を正本とする。
+
+## 2-0. 実解決手順（順序固定）
+
+参照解決は以下の順序に固定し、順序入れ替えを禁止する。
+
+1. alias 解決
+   - `memx_spec_v3/docs/design-reference-alias-spec.md` の辞書で alias を canonical path へ変換する。
+   - 禁止パターンはこの段階で fail とする。
+2. 存在確認
+   - alias 解決済みの `path` が実在することを確認する。
+   - 非実在は fail とする（`warn` 指定 alias でも存在確認は fail）。
+3. section 解決
+   - `#section` を維持・補完し、`path#section` 形式で確定する。
+   - caps JSON は section をキー名（snake_case）で解決する。
 
 ### 2-1. `docs/birdseye/caps/*.json` 前提の `path#section` 解決
 
