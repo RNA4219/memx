@@ -1,0 +1,49 @@
+requirements:
+  - id: REQ-F-001
+    source: "docs/requirements.md#機能要件 (REQ-F-001)"
+    verification:
+      - "ドキュメントレビュー: レシピ一覧のトピック分類が Markdown で整理されていることを確認"
+      - "Release チェック: CHECKLISTS.md のリリース確認で要件証跡を確認"
+    status: covered
+
+  - id: REQ-F-002
+    source: "docs/requirements.md#機能要件 (REQ-F-002)"
+    verification:
+      - "テスト観点レビュー: EVALUATION.md#Test Outline と各レシピ記載内容を突合"
+      - "PR レビュー: 実行手順・入力・出力の 3 要素が揃っていることを確認"
+    status: covered
+
+  - id: REQ-F-003
+    source: "docs/requirements.md#機能要件 (REQ-F-003)"
+    verification:
+      - "CI: 要件・仕様・設計ドキュメント存在チェック"
+      - "受入確認: EVALUATION.md の Acceptance Criteria で導線を確認"
+    status: covered
+
+  - id: REQ-F-004
+    source: "docs/requirements.md#機能要件 (REQ-F-004)"
+    verification:
+      - "PR レビュー: 変更履歴が CHANGELOG.md に追記可能な構造を維持"
+      - "Release チェック: 後方互換性と変更履歴運用を確認"
+    status: covered
+
+  - id: REQ-NF-001
+    source: "docs/requirements.md#非機能要件 (REQ-NF-001)"
+    verification:
+      - "ドキュメントレビュー: ページ分量と構成が可読性を阻害しないことを確認"
+      - "運用確認: GitHub 上での閲覧性レビュー"
+    status: covered
+
+  - id: REQ-NF-002
+    source: "docs/requirements.md#非機能要件 (REQ-NF-002)"
+    verification:
+      - "CI: 自動チェックで欠落検知が可能であることを確認"
+      - "運用レビュー: 1PR 復旧フローを CHECKLISTS.md で確認"
+    status: covered
+
+  - id: REQ-NF-003
+    source: "docs/requirements.md#非機能要件 (REQ-NF-003)"
+    verification:
+      - "セキュリティレビュー: Security Review Checklist に沿って秘匿情報非掲載を確認"
+      - "PR レビュー: サンプルにマスキング済みデータのみ使用されていることを確認"
+    status: covered

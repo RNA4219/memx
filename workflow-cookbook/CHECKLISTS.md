@@ -59,6 +59,7 @@ next_review_due: 2025-11-14
 - 新規 ADR を含むリリースでは [docs/ADR/README.md](docs/ADR/README.md) の索引更新を完了し、レビューフローで確認する
 - [docs/qa/design_acceptance.md](docs/qa/design_acceptance.md) を最新設計差分に合わせて更新済み
 - 受け入れ基準に対するエビデンス
+- `req_coverage=100%`（[docs/qa/req_coverage_report.md](docs/qa/req_coverage_report.md)）を確認
 - 影響範囲の再確認
 - PR に `type:*` および `semver:*` ラベルを付与済み
 - [Security Review Checklist](docs/security/Security_Review_Checklist.md) に沿って準備→実装→レビューの各フェーズを完了し、リリース判定と証跡を残す
