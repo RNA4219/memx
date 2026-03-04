@@ -8,6 +8,35 @@ next_review_due: 2026-06-03
 # memx 設計（design）
 
 ## 1. レイヤ構成
+
+### Objective
+- CLI/API/Service/Infra の責務境界を固定し、設計変更時の影響範囲を限定する。
+
+### Source
+- `memx_spec_v3/docs/design.md#1. レイヤ構成`
+- `memx_spec_v3/docs/requirements.md#1-2-2-v1-スコープ境界（normative）`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+
+### Requirements
+- `REQ-CLI-001`
+- `REQ-API-001`
+- `REQ-ERR-001`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-CLI-001|REQ-API-001|REQ-ERR-001" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "mem in short|POST /v1/notes:ingest|ErrorCode" memx_spec_v3/docs/design.md memx_spec_v3/docs/contracts/openapi.yaml memx_spec_v3/docs/contracts/cli-json.schema.json`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `memx_spec_v3/docs/contracts/openapi.yaml`
+- `memx_spec_v3/docs/contracts/cli-json.schema.json`
+
+### Status
+- active
+
 ```
 CLI -> API -> Service(Usecase) -> DB / LLM / Gatekeeper
 ```
@@ -17,6 +46,41 @@ CLI -> API -> Service(Usecase) -> DB / LLM / Gatekeeper
 - DB/LLM/Gatekeeper: 副作用を持つインフラ層。
 
 ## 2. DB 責務分割
+
+### Objective
+- 4DB 分割の責務境界を明示し、保存先と更新規則を一貫させる。
+
+### Source
+- `memx_spec_v3/docs/design.md#2. DB 責務分割`
+- `docs/ADR/ADR-0001-4db-boundary.md#ADR-0001: 4DB分割と責務境界`
+- `memx_spec_v3/docs/requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+
+### Requirements
+- `REQ-STORE-SHORT-001`
+- `REQ-STORE-SHORT-002`
+- `REQ-STORE-CHR-001`
+- `REQ-STORE-CHR-002`
+- `REQ-STORE-MP-001`
+- `REQ-STORE-MP-002`
+- `REQ-STORE-ARC-001`
+- `REQ-STORE-ARC-002`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-STORE-(SHORT|CHR|MP|ARC)-00[12]" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "short|chronicle|memopedia|archive" memx_spec_v3/docs/design.md memx_spec_v3/docs/interfaces.md`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `docs/ADR/ADR-0001-4db-boundary.md`
+- `memx_spec_v3/docs/interfaces.md`
+
+### Status
+- active
+
 - ADR: [ADR-0001: 4DB分割と責務境界](../../docs/ADR/ADR-0001-4db-boundary.md)
 - `short.db`: 一次投入先。短期メモ、GC 対象の起点。
 - `chronicle.db`: 時系列ログ（出来事・進捗）。
@@ -32,6 +96,40 @@ short 固有:
 
 ## 2.1 store別設計詳細（short/chronicle/memopedia/archive）
 
+### Objective
+- store ごとの必須要件・禁止変更・許可変更を固定し、後方互換を維持する。
+
+### Source
+- `memx_spec_v3/docs/design.md#2.1 store別設計詳細（short/chronicle/memopedia/archive）`
+- `memx_spec_v3/docs/requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+
+### Requirements
+- `REQ-STORE-SHORT-001`
+- `REQ-STORE-SHORT-002`
+- `REQ-STORE-CHR-001`
+- `REQ-STORE-CHR-002`
+- `REQ-STORE-MP-001`
+- `REQ-STORE-MP-002`
+- `REQ-STORE-ARC-001`
+- `REQ-STORE-ARC-002`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-STORE-(SHORT|CHR|MP|ARC)-00[12]" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "short.notes|chronicle.notes|memopedia.notes|archive.notes" memx_spec_v3/docs/design.md memx_spec_v3/docs/interfaces.md`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `memx_spec_v3/docs/interfaces.md`
+- `memx_spec_v3/docs/contracts/openapi.yaml`
+- `memx_spec_v3/docs/contracts/cli-json.schema.json`
+
+### Status
+- active
+
 | store | Requirement ID | DB責務 | 禁止変更 | 許可変更 |
 | --- | --- | --- | --- | --- |
 | short | [`REQ-STORE-SHORT-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-SHORT-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 一次投入先として `short.notes` 保存、GC dry-run の候補抽出（非更新） | 必須保存項目の破壊、既定挙動での自動削除、`--json` 出力キー破壊 | 任意列追加、任意 CLI オプション追加、dry-run 診断項目追加 |
@@ -39,15 +137,42 @@ short 固有:
 | memopedia | [`REQ-STORE-MP-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-MP-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 用語/方針ノート保持、reflect 時の版管理保持 | 本文自動上書き、同一 ID 再利用、必須列削除 | 任意セクション追加、参照メタ追加、互換な検索キー追加 |
 | archive | [`REQ-STORE-ARC-001`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive), [`REQ-STORE-ARC-002`](./requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive) | 退避ノート保持、lineage 記録後のみ short 削除、purge dry-run 候補提示 | 監査ログなし purge、retention 無視削除、lineage 未記録削除 | 保持メタ列追加、監査ログ項目追加、dry-run 出力列追加 |
 
+## 2.2 Security/Retention 設計
+
+### Objective
+- fail-closed 判定、監査証跡、retention 削除条件を要件準拠で固定する。
+
 ### Source
-- `memx_spec_v3/docs/requirements.md#1-2-3-store-別要求short--chronicle--memopedia--archive`
+- `memx_spec_v3/docs/design.md#2.2 Security/Retention 設計`
+- `memx_spec_v3/docs/requirements.md#2-7-security--retention-requirements`
+- `memx_spec_v3/docs/requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5`
+- `memx_spec_v3/docs/requirements.md#2-7-5-guardrails-fail-closed-との整合チェック要件`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+- `guardrails`
+  - depends_on: `requirements`, `governance_policy`
+
+### Requirements
+- `REQ-SEC-001`
+- `REQ-RET-001`
+- `REQ-SEC-AUD-001`
+- `REQ-SEC-AUD-002`
+- `REQ-SEC-GRD-001`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-(SEC-001|RET-001|SEC-AUD-001|SEC-AUD-002|SEC-GRD-001)" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "POLICY_DENIED|archive_move|archive_purge" memx_spec_v3/docs/design.md memx_spec_v3/docs/contracts/openapi.yaml GUARDRAILS.md`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
 
 ### Dependencies
-- `memx_spec_v3/docs/interfaces.md`
-- `memx_spec_v3/docs/contracts/openapi.yaml`
-- `memx_spec_v3/docs/contracts/cli-json.schema.json`
+- `GUARDRAILS.md`
+- `docs/security/minimal_operations.md`
+- `RUNBOOK.md`
 
-## 2.2 Security/Retention 設計
+### Status
+- active
 
 | Requirement ID | 保存可否 | 監査証跡 | 保持期間 | 削除条件 |
 | --- | --- | --- | --- | --- |
@@ -56,22 +181,76 @@ short 固有:
 | [`REQ-SEC-AUD-001`](./requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5) | `archive_move` 実行時のみ保存状態遷移許可 | 固定フィールド（actor/approval/evidence path など）を必須保存 | 監査証跡は改ざん不可で保持 | 必須監査キー欠落時は遷移拒否 |
 | [`REQ-SEC-AUD-002`](./requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5) | `archive_purge` は承認フロー通過時のみ許可 | purge 監査ログ固定項目を必須保存 | purge 証跡は retention 監査期間満了まで保持 | 監査コンテキスト不足時は削除禁止 |
 
+## 3. 移行戦略
+
+### Objective
+- スキーマ移行の後方互換方針と feature flag 導入境界を固定する。
+
 ### Source
-- `memx_spec_v3/docs/requirements.md#2-7-security--retention-requirements`
-- `memx_spec_v3/docs/requirements.md#2-7-2-actor--approval--audit-責任分界表2-7-12-7-5`
+- `memx_spec_v3/docs/design.md#3. 移行戦略`
+- `memx_spec_v3/docs/requirements.md#6-2-v1-互換性方針`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+
+### Requirements
+- `REQ-API-001`
+- `REQ-ERR-001`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-API-001|REQ-ERR-001" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "user_version|feature flag|後方互換" memx_spec_v3/docs/design.md memx_spec_v3/docs/contracts/openapi.yaml`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
 
 ### Dependencies
-- `GUARDRAILS.md`
-- `docs/security/minimal_operations.md`
-- `RUNBOOK.md`
+- `schema/*.sql`
+- `memx_spec_v3/docs/contracts/openapi.yaml`
 
-## 3. 移行戦略
+### Status
+- active
+
 - マイグレーションは `schema/*.sql` を正本として適用する。
 - `PRAGMA user_version` を採用し、破壊的/非互換 DDL のみバージョンを進める。
 - v1 では後方互換を最優先し、破壊変更は v2+（`FUTURE`）へ隔離する。
 - 実験機能は feature flag 既定 OFF で段階導入する。
 
 ## 4. ユースケース設計
+
+### Objective
+- v1 必須ユースケース（ingest/search/show/gc dry-run）のI/O契約と失敗分岐を固定する。
+
+### Source
+- `memx_spec_v3/docs/design.md#4. ユースケース設計`
+- `memx_spec_v3/docs/requirements.md#3-cli-要件`
+- `memx_spec_v3/docs/requirements.md#6-api-要件v13-追加`
+- `memx_spec_v3/docs/requirements.md#6-4-エラーモデル`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+- `api`
+  - depends_on: `service`, `quickstart`
+
+### Requirements
+- `REQ-CLI-001`
+- `REQ-API-001`
+- `REQ-GC-001`
+- `REQ-ERR-001`
+- `REQ-SEC-001`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-(CLI-001|API-001|GC-001|ERR-001|SEC-001)" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "POST /v1/notes:ingest|POST /v1/notes:search|GET /v1/notes/\{id\}|POST /v1/gc:run" memx_spec_v3/docs/design.md memx_spec_v3/docs/contracts/openapi.yaml`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `memx_spec_v3/docs/contracts/openapi.yaml`
+- `memx_spec_v3/docs/contracts/cli-json.schema.json`
+- `memx_spec_v3/docs/interfaces.md`
+
+### Status
+- active
 
 ### 4.1 Ingest
 - 入力/出力
@@ -88,15 +267,6 @@ short 固有:
   - `POLICY_DENIED`: `false`
   - `INTERNAL`: `true`
 
-**REQ 対応表**
-
-| REQ ID | リンク |
-| --- | --- |
-| `REQ-CLI-001` | [requirements.md#3-cli-要件](./requirements.md#3-cli-要件) |
-| `REQ-API-001` | [requirements.md#6-api-要件v13-追加](./requirements.md#6-api-要件v13-追加) |
-| `REQ-ERR-001` | [requirements.md#6-4-エラーモデル](./requirements.md#6-4-エラーモデル) |
-| `REQ-SEC-001` | [requirements.md#2-7-security--retention-requirements](./requirements.md#2-7-security--retention-requirements) |
-
 ### 4.2 Search
 - 入力/出力
   - 入力: CLI `mem out search --query <text> [--json]` / API `POST /v1/notes:search`
@@ -112,15 +282,6 @@ short 固有:
   - `POLICY_DENIED`: `false`
   - `INTERNAL`: `true`
 
-**REQ 対応表**
-
-| REQ ID | リンク |
-| --- | --- |
-| `REQ-CLI-001` | [requirements.md#3-cli-要件](./requirements.md#3-cli-要件) |
-| `REQ-API-001` | [requirements.md#6-api-要件v13-追加](./requirements.md#6-api-要件v13-追加) |
-| `REQ-ERR-001` | [requirements.md#6-4-エラーモデル](./requirements.md#6-4-エラーモデル) |
-| `REQ-SEC-001` | [requirements.md#2-7-security--retention-requirements](./requirements.md#2-7-security--retention-requirements) |
-
 ### 4.3 Show
 - 入力/出力
   - 入力: CLI `mem out show --id <note_id> [--json]` / API `GET /v1/notes/{id}`
@@ -135,15 +296,6 @@ short 固有:
   - `INVALID_ARGUMENT`: `false`
   - `POLICY_DENIED`: `false`
   - `INTERNAL`: `true`
-
-**REQ 対応表**
-
-| REQ ID | リンク |
-| --- | --- |
-| `REQ-CLI-001` | [requirements.md#3-cli-要件](./requirements.md#3-cli-要件) |
-| `REQ-API-001` | [requirements.md#6-api-要件v13-追加](./requirements.md#6-api-要件v13-追加) |
-| `REQ-ERR-001` | [requirements.md#6-4-エラーモデル](./requirements.md#6-4-エラーモデル) |
-| `REQ-SEC-001` | [requirements.md#2-7-security--retention-requirements](./requirements.md#2-7-security--retention-requirements) |
 
 ### 4.4 GC dry-run
 - 入力/出力
@@ -172,17 +324,79 @@ short 固有:
 
 ## 5. ADR参照運用ルール
 
+### Objective
+- 設計判断の固定を ADR 起点で管理し、requirements/design の同時更新を徹底する。
+
+### Source
+- `memx_spec_v3/docs/design.md#5. ADR参照運用ルール`
+- `docs/ADR/ADR-0002-v1-required-endpoints.md#ADR-0002: v1必須3エンドポイント`
+- `docs/ADR/ADR-0003-errorcode-retryable-boundary.md#ADR-0003: ErrorCode/retryable 境界`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+
+### Requirements
+- `REQ-API-001`
+- `REQ-ERR-001`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-API-001|REQ-ERR-001" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "ADR-0002|ADR-0003|ErrorCode|retryable" memx_spec_v3/docs/design.md docs/ADR/ADR-0002-v1-required-endpoints.md docs/ADR/ADR-0003-errorcode-retryable-boundary.md`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `docs/ADR/ADR-0002-v1-required-endpoints.md`
+- `docs/ADR/ADR-0003-errorcode-retryable-boundary.md`
+
+### Status
+- active
+
 - 本書で設計判断を追加/変更する場合は、該当節に ADR リンクを追記する。
 - ADR 未作成で判断を固定しない。最小でも `Context / Decision / Consequences / Status / Date` を満たす ADR を先に作成する。
 - 本書の該当節リンクと `requirements.md` の対応節リンクは同一PRで更新する。
-- v1必須3エンドポイント関連は  
-  [ADR-0002](../../docs/ADR/ADR-0002-v1-required-endpoints.md) を参照する。
-- ErrorCode / retryable 境界は  
-  [ADR-0003](../../docs/ADR/ADR-0003-errorcode-retryable-boundary.md) を参照する。
-
----
+- v1必須3エンドポイント関連は [ADR-0002](../../docs/ADR/ADR-0002-v1-required-endpoints.md) を参照する。
+- ErrorCode / retryable 境界は [ADR-0003](../../docs/ADR/ADR-0003-errorcode-retryable-boundary.md) を参照する。
 
 ## 6. 設計→契約→検証 導線（要件ID単位）
+
+### Objective
+- 要件IDごとに design / contracts / evaluation の導線を固定し、追跡可能性を維持する。
+
+### Source
+- `memx_spec_v3/docs/design.md#6. 設計→契約→検証 導線（要件ID単位）`
+- `memx_spec_v3/docs/requirements.md#1-2-4-要件トレーサビリティ（normative）`
+- `RUNBOOK.md#traceability`
+- `EVALUATION.md#req-gates`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+- `evaluation`
+  - depends_on: `runbook`, `checklists`
+
+### Requirements
+- `REQ-CLI-001`
+- `REQ-API-001`
+- `REQ-GC-001`
+- `REQ-ERR-001`
+- `REQ-SEC-001`
+- `REQ-NFR-001`
+- `REQ-NFR-002`
+- `REQ-NFR-005`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-(CLI-001|API-001|GC-001|ERR-001|SEC-001|NFR-001|NFR-002|NFR-005)" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "POST /v1/notes:ingest|POST /v1/notes:search|GET /v1/notes/\{id\}|POST /v1/gc:run|ErrorCode" memx_spec_v3/docs/design.md memx_spec_v3/docs/contracts/openapi.yaml`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `RUNBOOK.md`
+- `EVALUATION.md`
+- `memx_spec_v3/docs/contracts/openapi.yaml`
+
+### Status
+- active
 
 | Requirement ID | Design Section | Interface ID | Evaluation項目 |
 | --- | --- | --- | --- |
@@ -191,13 +405,48 @@ short 固有:
 | [`REQ-GC-001`](./requirements.md#3-5-mem-gc-shortobserver--reflector) | 4.4 | `mem gc short --dry-run`, `POST /v1/gc:run` | dry-run DB 非更新、候補件数/対象ID整合 |
 | [`REQ-ERR-001`](./requirements.md#6-4-エラーモデル) | 4.1〜4.4 | 共通 ErrorCode 契約 | `INVALID_ARGUMENT` / `POLICY_DENIED` / `INTERNAL` の retryable 整合 |
 | [`REQ-SEC-001`](./requirements.md#2-7-security--retention-requirements) | 2.2, 4.1〜4.4 | Gatekeeper 判定（ingest/search/show/gc） | fail-closed 拒否、監査ログ記録 |
-| [`REQ-NFR-001`](./requirements.md#5-1-性能目標v1必須3エンドポイント) | 5.1 | ingest/search/show | p95 閾値の達成（計測プロトコル準拠） |
-| [`REQ-NFR-002`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 5.1 | 運用復旧フロー | RTO/RPO 同時成立 |
-| [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 5.1 | short→archive 補償 | 30分以内収束または IN 起票 |
-
----
+| [`REQ-NFR-001`](./requirements.md#5-1-性能目標v1必須3エンドポイント) | 6.1 | ingest/search/show | p95 閾値の達成（計測プロトコル準拠） |
+| [`REQ-NFR-002`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 6.1 | 運用復旧フロー | RTO/RPO 同時成立 |
+| [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 6.1 | short→archive 補償 | 30分以内収束または IN 起票 |
 
 ## 6.1 NFR設計（性能 / 復旧 / 整合性回復）
+
+### Objective
+- NFR の計測入力・判定方法・失敗時運用を要件ID単位で明確化する。
+
+### Source
+- `memx_spec_v3/docs/design.md#6.1 NFR設計（性能 / 復旧 / 整合性回復）`
+- `memx_spec_v3/docs/requirements.md#5-1-性能目標v1必須3エンドポイント`
+- `memx_spec_v3/docs/requirements.md#5-2-可用性復旧整合性回復運用nfr`
+- `memx_spec_v3/docs/requirements.md#5-3-整合性回復要件archive-補償フロー`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`
+- `runbook`
+  - depends_on: `requirements`, `guardrails`, `governance_prioritization`
+- `evaluation`
+  - depends_on: `runbook`, `checklists`
+
+### Requirements
+- `REQ-NFR-001`
+- `REQ-NFR-002`
+- `REQ-NFR-003`
+- `REQ-NFR-004`
+- `REQ-NFR-005`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-NFR-00[1-5]" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 契約同期: `rg -n "p95|RTO|RPO|30分以内|15分以内|再処理" memx_spec_v3/docs/design.md RUNBOOK.md EVALUATION.md`
+- リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
+
+### Dependencies
+- `RUNBOOK.md`
+- `EVALUATION.md`
+- `docs/IN-*.md`
+
+### Status
+- active
 
 | Requirement ID | 判定入力（ログ/成果物） | 判定方法 |
 | --- | --- | --- |
@@ -207,30 +456,14 @@ short 固有:
 | [`REQ-NFR-004`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 再試行履歴、ジョブログ | 1 リクエストあたり再処理 2 回以内 |
 | [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 補償フロー実行ログ、`docs/IN-*.md` 起票有無 | 30分以内収束、未収束時は IN 起票 |
 
----
-
-### Source
-
-- `memx_spec_v3/docs/requirements.md#5-1-性能目標v1必須3エンドポイント`
-- `memx_spec_v3/docs/requirements.md#5-2-可用性復旧整合性回復運用nfr`
-- `memx_spec_v3/docs/requirements.md#5-3-整合性回復要件archive-補償フロー`
-
-### Dependencies
-
-- `RUNBOOK.md`
-- `EVALUATION.md`
-- `docs/IN-*.md`
-
----
-
 ## 7. design-template 段階移行チェックリスト（章単位）
 
-- [ ] 1. レイヤ構成 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 2. DB 責務分割 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 2.1 store別設計詳細（short/chronicle/memopedia/archive） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 2.2 Security/Retention 設計 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 3. 移行戦略 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 4. ユースケース設計 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 5. ADR参照運用ルール を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 6. 設計→契約→検証 導線（要件ID単位） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
-- [ ] 6.1 NFR設計（性能 / 復旧 / 整合性回復） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 1. レイヤ構成 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 2. DB 責務分割 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 2.1 store別設計詳細（short/chronicle/memopedia/archive） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 2.2 Security/Retention 設計 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 3. 移行戦略 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 4. ユースケース設計 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 5. ADR参照運用ルール を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 6. 設計→契約→検証 導線（要件ID単位） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [x] 6.1 NFR設計（性能 / 復旧 / 整合性回復） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
