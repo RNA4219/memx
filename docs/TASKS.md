@@ -234,6 +234,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 
 - [ ] `memx_spec_v3/go/go.mod` を変更した場合は、`memx_spec_v3/go/go.sum` を同一コミットで同時更新している
 - [ ] 差分に `memx_spec_v3/go/go.mod` または `memx_spec_v3/go/go.sum` が含まれる場合、`git diff --name-only` で両方が差分に含まれていることを確認している
+- [ ] `go.mod` / `go.sum` の更新がある場合、`memx_spec_v3/docs/reviews/GO-LOCK-AUDIT-YYYYMMDD.md` を更新し、`git ls-files memx_spec_v3/go/go.sum` の出力記録を追記している
 
 
 ## 2-3. 変更タイプ別チェックリスト（requirements 0-0-4 整合）

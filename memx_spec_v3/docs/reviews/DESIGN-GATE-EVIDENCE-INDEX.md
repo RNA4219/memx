@@ -16,3 +16,4 @@
 
 ## go.sum tracked
 - 判定値: `tracked` | 根拠ファイル: `memx_spec_v3/go/go.sum` | 根拠箇所（見出し名）: `N/A（ファイル実体）` | 運用確認コマンド: `git ls-files memx_spec_v3/go/go.sum`（出力: `memx_spec_v3/go/go.sum`）
+- 補足（継続確認）: 単発確認ではなく、監査ログ `memx_spec_v3/docs/reviews/GO-LOCK-AUDIT-20260304.md` を更新し継続記録する。
