@@ -29,6 +29,7 @@ next_review_due: 2025-11-14
   [`GUARDRAILS.md`](GUARDRAILS.md) を再確認
 - ラベル運用・テンプレ遵守は `HUB.codex.md` と `TASK.codex.md` のタスク分割フローに合わせる
 - Birdseye 欠損時は `HUB.codex.md`「Birdseyeアクセス異常時ハンドリング」のケース判定と `notes` 必須4項目（欠損ファイル/影響ノードID/暫定判断/再生成依頼先）を PR 説明に記載
+- `docs/qa/contract_align_report.md` の更新有無を確認し、契約変更がある場合は aligned / mismatch と是正タスクが反映されていることをレビューする
 
 ## Ops / Incident
 
@@ -56,11 +57,14 @@ next_review_due: 2025-11-14
 - [docs/UPSTREAM_WEEKLY_LOG.md](docs/UPSTREAM_WEEKLY_LOG.md) に未反映の検証ログ・
   フォローアップが残っていないか確認する
 - 新規 ADR を含むリリースでは [docs/ADR/README.md](docs/ADR/README.md) の索引更新を完了し、レビューフローで確認する
+- [docs/qa/design_acceptance.md](docs/qa/design_acceptance.md) を最新設計差分に合わせて更新済み
 - 受け入れ基準に対するエビデンス
+- `req_coverage=100%`（[docs/qa/req_coverage_report.md](docs/qa/req_coverage_report.md)）を確認
 - 影響範囲の再確認
 - PR に `type:*` および `semver:*` ラベルを付与済み
 - [Security Review Checklist](docs/security/Security_Review_Checklist.md) に沿って準備→実装→レビューの各フェーズを完了し、リリース判定と証跡を残す
 - 配布物へ `LICENSE` / `NOTICE` を同梱済み
+- `memx_spec_v3/go/go.sum` が tracked（`git ls-files` に含まれる）であることを確認
 
 ## Hygiene
 
@@ -68,3 +72,4 @@ next_review_due: 2025-11-14
 - ドキュメント差分反映
 - フォーク差分記録の最新化（[`docs/FORK_NOTES.md`](docs/FORK_NOTES.md) をリリース前レビューと突合）
 - 旧呼称の混入チェック（例: `rg "<旧ブランド名>"` など抽象化したキーワードで固有表現を検索し、現行ブランド以外の名称が残存していないか確認）
+- `memx_spec_v3/go/go.sum` が tracked（`git ls-files` に含まれる）であることを確認

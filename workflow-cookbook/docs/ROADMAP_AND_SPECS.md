@@ -30,6 +30,7 @@ next_review_due: 2025-11-28
 | 設計判断 | [docs/ADR/README.md](ADR/README.md) | ADR 一覧と作成手順、判断変更時のレビュー連携を統括。 | 設計変更 PR で更新・新規 ADR を提出し、レビューテンプレに添付して承認後にマージ。 |
 | 仕様 | [docs/spec.md](spec.md) | レシピ仕様の原則と更新手続きを集約。 | テンプレ更新時に `TASK.codex.md` の[Task Seed Template](../TASK.codex.md#task-seed-template)と整合性を確認。 |
 | 設計 | [docs/design.md](design.md) | ディレクトリ構成とアーキテクチャ意図を整理。 | 設計レビューで `CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)項目と照合。 |
+| 設計受入 | [docs/qa/design_acceptance.md](qa/design_acceptance.md) | 設計レイヤの公式受入観点（責務境界・互換性・例外方針・非機能影響）を判定付きで管理。 | 設計レビューとリリース判定で `docs/design.md`・`docs/interfaces.md`・`EVALUATION.md` の根拠リンクを突合。 |
 | 要件 | [docs/requirements.md](requirements.md) | 要件トレーサビリティと受入観点を提示。 | ガバナンス確認で `EVALUATION.md` の[Acceptance Criteria](../EVALUATION.md#acceptance-criteria)とリンクを確認。 |
 | I/O 契約 | [docs/CONTRACTS.md](CONTRACTS.md) | 外部連携の I/O 契約と feature detection の扱いを定義。 | 拡張実装時に `RUNBOOK.md` の[Execute](../RUNBOOK.md#execute)手順と突き合わせ。 |
 | 境界定義 | [docs/interfaces.md](interfaces.md) | 機能境界・受け渡し契約をテーブル形式で管理。 | 並行開発時に責務衝突を避けるため、機能追加ごとに更新してレビューへ添付。 |
@@ -86,11 +87,13 @@ next_review_due: 2025-11-28
 - [docs/INCIDENT_TEMPLATE.md](INCIDENT_TEMPLATE.md)：インシデント報告テンプレートとエスカレーション導線を定義。**利用シーン**：インシデント対応の初動で `RUNBOOK.md` の[Confirm](../RUNBOOK.md#confirm)を基点にメトリクス照合・記録更新・運用チャネル報告を完了し、`CHECKLISTS.md` の[Hygiene](../CHECKLISTS.md#hygiene)で未完了項目を洗い出す。
 - [docs/ADR/README.md](ADR/README.md)：設計判断の記録・改訂フローを統括。**利用シーン**：設計変更 PR に更新・新規 ADR を添付し、レビューテンプレと連携。
 - [docs/security/Security_Review_Checklist.md](security/Security_Review_Checklist.md)：セキュリティ審査項目と証跡収集ポイントを整理。**利用シーン**：リリース前審査で `SECURITY.md`・`docs/security/SAC.md`・`CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)を同期。
+- [docs/qa/dependency_lock_audit.md](qa/dependency_lock_audit.md)：`go.mod`/`go.sum` の整合確認ログを記録。**利用シーン**：依存更新時やリリース前に lockfile 監査を実施し、`CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)・[Hygiene](../CHECKLISTS.md#hygiene)と監査結果を同期。
 - [SECURITY.md](../SECURITY.md) / [docs/security/SAC.md](security/SAC.md)：報告窓口の連絡経路と SAC 拘束事項を統合し、対応判断の前提条件を提示。**利用シーン**：セキュリティ審査で通知窓口と拘束条件を共有し、インシデント初動前の前提確認で運用責務の充足を判定。
 - [CHANGELOG.md](../CHANGELOG.md)：リリース差分と意思決定の履歴を集約し、更新ルールを一元管理。**利用シーン**：`CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)完了後に `README.md` の[使い方（最短）](../README.md#使い方最短)手順と照合してガバナンス記録を反映。
 - [LICENSE](../LICENSE) / [CHECKLISTS.md#release](../CHECKLISTS.md#release) / [CHANGELOG.md](../CHANGELOG.md)：Workflow Cookbook 公開版と同様に配布物へ必須ライセンス・変更履歴・監査観点を束ねる。**利用シーン**：リリース成果物へ `LICENSE` を同梱し、`CHECKLISTS.md#release` の配布物チェックを踏まえて `CHANGELOG.md` の公開内容と突合する。
 - [README.md](../README.md#変更履歴の更新ルール)：`CHANGELOG.md` の更新トリガー・書式・`CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)を用いた突合フローを整理。**利用シーン**：リリース確定後にチェックリスト→変更履歴→再確認の流れを短時間でなぞり、記録漏れを防ぐ。
 - [EVALUATION.md#Test Outline](../EVALUATION.md#test-outline) / [tests/](../tests/)：評価指標とテストケース集を束ねた TDD 前提の検証ハブ。**利用シーン**：テスト追加前のチェックで指標・ケース網羅を見直し、Birdseye カプセル同期の要否を判断して TDD フローを開始。
+- [docs/qa/mapping_match_check.md](qa/mapping_match_check.md) / [docs/qa/mapping_matrix.yaml](qa/mapping_matrix.yaml)：REQ ごとの design/contract/test 接続状況と判定結果を記録する QA マッピング。**利用シーン**：仕様レビュー時に未接続 REQ の有無を即時確認し、gap が 0 件であることをリリース判定に反映。
 
 Guardrails 連動資料は行動原則と更新判断の基準を担い、本節は運用ドキュメントの即時参照に特化するため、改訂時は前述の整合チェック先と `GUARDRAILS.md` の[実装原則](../GUARDRAILS.md#実装原則)の適用範囲を併せて確認する。
 
@@ -103,5 +106,9 @@ Guardrails 連動資料は行動原則と更新判断の基準を担い、本節
    - `GUARDRAILS.md` の[鮮度管理](../GUARDRAILS.md#鮮度管理staleness-handling)に沿って再生成条件を判定。
    - `tools/codemap/README.md` の[実行手順](../tools/codemap/README.md#実行手順)通り `python tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/hot.json --emit index+caps` を実行し、`docs/birdseye/index.json`・`docs/birdseye/hot.json`・`caps/*` を更新。
    - ツール未整備時は `GUARDRAILS.md` の[codemap 未実装時の暫定手順](../GUARDRAILS.md#codemap-未実装時の暫定手順)に従って手動更新を依頼し、結果を `HUB.codex.md` の[Output Contract](../HUB.codex.md#output-contract)へ反映。
+
+3. **lockfile 監査**
+   - [docs/qa/dependency_lock_audit.md](qa/dependency_lock_audit.md) を起点に `go.mod`/`go.sum` の整合を確認し、監査記録テーブルへ結果を追記。
+   - `CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)・[Hygiene](../CHECKLISTS.md#hygiene)項目と突合し、`memx_spec_v3/go/go.sum` の tracked 状態を確認。
 
 <!-- markdownlint-enable MD013 -->

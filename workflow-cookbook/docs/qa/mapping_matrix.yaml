@@ -1,0 +1,42 @@
+version: 1
+source:
+  req_ids_ref: docs/TASKS.md#2-記入テンプレート
+  design_doc: docs/design.md
+  contract_doc: docs/CONTRACTS.md
+  test_doc: EVALUATION.md#test-outline
+
+mappings:
+  - req_id: REQ-SEC-001
+    design_ref: docs/design.md#フロー
+    contract_ref: docs/CONTRACTS.md#conventions
+    test_ref:
+      - tests/security/test_security_headers.py
+      - tests/tools/security/test_allowlist_guard.py
+
+  - req_id: REQ-RET-001
+    design_ref: docs/design.md#影響
+    contract_ref: docs/CONTRACTS.md#artifacts
+    test_ref:
+      - EVALUATION.md#test-outline
+      - docs/addenda/I_Test_Cases.md#i-01-チェックリスト突合
+
+  - req_id: REQ-SEC-AUD-001
+    design_ref: docs/design.md#影響
+    contract_ref: docs/CONTRACTS.md#artifacts
+    test_ref:
+      - EVALUATION.md#test-outline
+      - docs/addenda/I_Test_Cases.md#i-01-チェックリスト突合
+
+  - req_id: REQ-SEC-AUD-002
+    design_ref: docs/design.md#影響
+    contract_ref: docs/CONTRACTS.md#artifacts
+    test_ref:
+      - EVALUATION.md#test-outline
+      - docs/addenda/I_Test_Cases.md#i-02-birdseye-再生成確認
+
+  - req_id: REQ-SEC-GRD-001
+    design_ref: docs/design.md#構成
+    contract_ref: docs/CONTRACTS.md#config
+    test_ref:
+      - tests/tools/security/test_allowlist_guard.py
+      - EVALUATION.md#test-outline
