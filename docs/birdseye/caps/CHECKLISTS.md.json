@@ -1,11 +1,11 @@
 {
-  "node_id": "checklists",
-  "role": "operations_checklist",
-  "depends_on": [
-    "guardrails",
-    "runbook"
-  ],
-  "generated_at": "2026-03-03T08:48:22Z",
-  "source": "CHECKLISTS.md",
-  "summary": "仕様反映・DB移行・互換性・安全性・品質の実装チェック項目を定義。"
+  "id": "checklists",
+  "role": "doc",
+  "public_api": [],
+  "summary": "checklists",
+  "deps_out": [],
+  "deps_in": [],
+  "risks": [],
+  "tests": [],
+  "generated_at": "2026-03-04T09:20:45Z"
 }

@@ -633,19 +633,31 @@ class BirdseyeRootBuilder:
         available_caps: dict[str, Path] = {}
         raw_nodes = index_data.get("nodes", {})
         if isinstance(raw_nodes, Mapping):
-            for node_id, node_payload in raw_nodes.items():
-                if not isinstance(node_id, str) or not isinstance(node_payload, Mapping):
-                    continue
-                caps_ref = node_payload.get("caps")
-                if not isinstance(caps_ref, str) or not caps_ref:
-                    continue
-                candidate_path = Path(caps_ref)
-                if candidate_path.is_absolute():
-                    resolved_candidate = candidate_path.resolve()
-                else:
-                    resolved_candidate = (_REPO_ROOT / candidate_path).resolve()
-                available_caps.setdefault(node_id, resolved_candidate)
-                cap_path_lookup.setdefault(resolved_candidate, node_id)
+            iterable_nodes = raw_nodes.items()
+        elif isinstance(raw_nodes, Sequence):
+            iterable_nodes = (
+                (node_payload.get("node_id"), node_payload)
+                for node_payload in raw_nodes
+                if isinstance(node_payload, Mapping)
+            )
+        else:
+            iterable_nodes = ()
+
+        for node_id, node_payload in iterable_nodes:
+            if not isinstance(node_id, str) or not isinstance(node_payload, Mapping):
+                continue
+            caps_ref = node_payload.get("caps")
+            if not isinstance(caps_ref, str) or not caps_ref:
+                caps_ref = node_payload.get("capsule")
+            if not isinstance(caps_ref, str) or not caps_ref:
+                continue
+            candidate_path = Path(caps_ref)
+            if candidate_path.is_absolute():
+                resolved_candidate = candidate_path.resolve()
+            else:
+                resolved_candidate = (_REPO_ROOT / candidate_path).resolve()
+            available_caps.setdefault(node_id, resolved_candidate)
+            cap_path_lookup.setdefault(resolved_candidate, node_id)
         for cap_path in sorted(self.caps_dir.glob("*.json")):
             if not cap_path.is_file():
                 continue
@@ -674,14 +686,24 @@ class BirdseyeRootBuilder:
 
         nodes = index_data.get("nodes")
         if isinstance(nodes, dict):
-            for node_id, payload in nodes.items():
-                if not isinstance(node_id, str) or not isinstance(payload, dict):
-                    continue
-                mtime = _resolve_node_mtime(node_id)
-                if mtime is None:
-                    continue
-                if payload.get("mtime") != mtime:
-                    payload["mtime"] = mtime
+            iterable_nodes = nodes.items()
+        elif isinstance(nodes, Sequence):
+            iterable_nodes = (
+                (payload.get("node_id"), payload)
+                for payload in nodes
+                if isinstance(payload, dict)
+            )
+        else:
+            iterable_nodes = ()
+
+        for node_id, payload in iterable_nodes:
+            if not isinstance(node_id, str) or not isinstance(payload, dict):
+                continue
+            mtime = _resolve_node_mtime(node_id)
+            if mtime is None:
+                continue
+            if payload.get("mtime") != mtime:
+                payload["mtime"] = mtime
 
         serialized = _dump_json(index_data)
         if serialized != index_original:
@@ -798,10 +820,19 @@ def _group_targets(targets: Iterable[Path]) -> dict[Path, list[Path]]:
 
 def _build_graph(index_data: Mapping[str, Any]) -> tuple[Graph, Graph]:
     raw_nodes = index_data.get("nodes", {})
-    if not isinstance(raw_nodes, Mapping):
-        raw_nodes = {}
-    graph_out: Graph = {node: [] for node in raw_nodes if isinstance(node, str)}
-    graph_in: Graph = {node: [] for node in raw_nodes if isinstance(node, str)}
+    if isinstance(raw_nodes, Mapping):
+        node_ids = [node for node in raw_nodes if isinstance(node, str)]
+    elif isinstance(raw_nodes, Sequence):
+        node_ids = [
+            node_payload.get("node_id")
+            for node_payload in raw_nodes
+            if isinstance(node_payload, Mapping)
+            and isinstance(node_payload.get("node_id"), str)
+        ]
+    else:
+        node_ids = []
+    graph_out: Graph = {node: [] for node in node_ids}
+    graph_in: Graph = {node: [] for node in node_ids}
     for raw_edge in index_data.get("edges", []):
         if not isinstance(raw_edge, Sequence) or len(raw_edge) != 2:
             continue

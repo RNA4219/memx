@@ -1,11 +1,11 @@
 {
-  "node_id": "api",
-  "role": "http_api",
-  "depends_on": [
-    "service",
-    "quickstart"
-  ],
-  "generated_at": "2026-03-03T00:00:00Z",
-  "source": "memx_spec_v3/go/api/http_server.go",
-  "summary": "HTTP エンドポイントを定義し、InProc 経由でサービス層を呼び出す API 層。"
+  "id": "api",
+  "role": "doc",
+  "public_api": [],
+  "summary": "api",
+  "deps_out": [],
+  "deps_in": [],
+  "risks": [],
+  "tests": [],
+  "generated_at": "2026-03-04T09:20:45Z"
 }

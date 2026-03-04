@@ -1,12 +1,11 @@
 {
-  "node_id": "runbook",
-  "role": "operations_runbook",
-  "depends_on": [
-    "requirements",
-    "guardrails",
-    "governance_prioritization"
-  ],
-  "generated_at": "2026-03-03T08:48:22Z",
-  "source": "RUNBOOK.md",
-  "summary": "ingest/search/show/recall/gc の実運用フローと性能再計測手順を定義。"
+  "id": "runbook",
+  "role": "doc",
+  "public_api": [],
+  "summary": "runbook",
+  "deps_out": [],
+  "deps_in": [],
+  "risks": [],
+  "tests": [],
+  "generated_at": "2026-03-04T09:20:45Z"
 }

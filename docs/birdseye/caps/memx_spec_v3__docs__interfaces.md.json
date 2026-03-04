@@ -1,25 +1,11 @@
 {
-  "node_id": "memx_spec_v3/docs/interfaces.md",
-  "role": "spec_interface",
-  "depends_on": [
-    "memx_spec_v3/docs/requirements.md",
-    "memx_spec_v3/docs/design.md"
-  ],
-  "generated_at": "2026-03-04T08:40:55Z",
-  "summary": "memx v1.3 のCLI/API契約・互換ルール・エラー面・運用I/Fを定義。",
-  "hops": {
-    "plus_1": [
-      "memx_spec_v3/docs/contracts/cli-json.schema.json",
-      "memx_spec_v3/docs/contracts/openapi.yaml"
-    ],
-    "plus_2": [
-      "memx_spec_v3/docs/traceability.md"
-    ],
-    "minus_1": [
-      "memx_spec_v3/docs/design.md"
-    ],
-    "minus_2": [
-      "memx_spec_v3/docs/requirements.md"
-    ]
-  }
+  "id": "interfaces",
+  "role": "doc",
+  "public_api": [],
+  "summary": "interfaces",
+  "deps_out": [],
+  "deps_in": [],
+  "risks": [],
+  "tests": [],
+  "generated_at": "2026-03-04T09:20:45Z"
 }

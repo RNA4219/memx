@@ -412,6 +412,8 @@ python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.j
 python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/hot.json --emit hot
 ```
 
+再発時（`nodes[].capsule` 欠損が再検知された場合）は、Task Seed を `Status: blocked` へ遷移し、運用語彙と必須 notes は [`HUB.codex.md` の「Birdseye Readiness Check」](HUB.codex.md#birdseye-readiness-check) と [`docs/TASKS.md` の Birdseye整合ルール](docs/TASKS.md#birdseye-readiness-check) に従う。
+
 鮮度更新時に `memx_spec_v3/docs/requirements.md` の節構成・Requirement ID（例: `REQ-CLI-001`）を変更した場合は、`docs/birdseye/index.json` の `nodes[].node_id=requirements` と `docs/birdseye/caps/requirements.json`（必要に応じて `docs/birdseye/caps/memx_spec_v3__docs__requirements.md.json`）の `summary`/`depends_on` を同一コミットで更新し、`python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps` を再実行して要件ノード紐付けを鮮度管理フローへ組み込む。
 
 ## Observability / 確認手順

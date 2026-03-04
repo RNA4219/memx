@@ -1126,6 +1126,54 @@ def test_run_update_recovers_non_serial_generated_at(tmp_path, monkeypatch):
     assert updated_alpha["generated_at"] == expected_timestamp
 
 
+def test_run_update_creates_missing_capsule_for_array_nodes(tmp_path, monkeypatch):
+    root = tmp_path / "docs" / "birdseye"
+    caps_dir = root / "caps"
+    caps_dir.mkdir(parents=True)
+    index_path = root / "index.json"
+    hot_path = root / "hot.json"
+
+    _write_json(
+        index_path,
+        {
+            "generated_at": "2026-03-03T08:48:22Z",
+            "nodes": [
+                {
+                    "node_id": "requirements",
+                    "capsule": "docs/birdseye/caps/requirements.json",
+                    "depends_on": [],
+                },
+                {
+                    "node_id": "design",
+                    "capsule": "docs/birdseye/caps/design.json",
+                    "depends_on": ["requirements"],
+                },
+            ],
+            "edges": [["requirements", "design"]],
+        },
+    )
+    _write_json(
+        hot_path,
+        {
+            "generated_at": "2026-03-03T08:48:22Z",
+            **_HOT_HOTLIST_METADATA,
+            "nodes": [],
+        },
+    )
+    _write_json(caps_dir / "requirements.json", _caps_payload("requirements"))
+
+    monkeypatch.setattr(update, "_REPO_ROOT", tmp_path)
+
+    update.run_update(
+        update.UpdateOptions(targets=(index_path,), emit="index+caps", dry_run=False)
+    )
+
+    generated_capsule = caps_dir / "design.json"
+    assert generated_capsule.exists()
+    generated_payload = json.loads(generated_capsule.read_text(encoding="utf-8"))
+    assert generated_payload["id"] == "design"
+
+
 def test_run_update_accepts_caps_directory_target(tmp_path, monkeypatch):
     caps_payloads = {
         cap_id: _caps_payload(cap_id)

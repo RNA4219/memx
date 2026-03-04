@@ -45,7 +45,7 @@
 3. 欠落が 1 件でもあれば不整合として扱い、`docs/TASKS.md` の Status 運用に従って `blocked` へ遷移し、Task Seed に欠落 capsule 一覧を記録する。
 
 ### 現在の棚卸し結果（`index.json` 기준）
-- `MISSING`: `docs/birdseye/caps/design.json`
+- 欠損 0 件（`MISSING` なし）
 
 ## 変更内容と capsule 更新対応表
 

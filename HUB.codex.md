@@ -180,6 +180,7 @@ Birdseye 入力の健全性を事前判定し、`ready | degraded | blocked` の
 - ケースB: `caps` 部分欠損
   - 判定: `degraded`
   - 処置: 既知ノードのみ処理継続し、欠損 `caps` 依存ノードは Task Seed の `Status: blocked` で分離管理する。
+  - 再発時の復旧順序は [`RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」](RUNBOOK.md#birdseye-鮮度不足時の復旧手順) を実行し、ステータス遷移条件は [`docs/TASKS.md` の Birdseye整合ルール](docs/TASKS.md#birdseye-readiness-check) を参照する。
 - ケースC: `hot.json` 欠損
   - 判定: `ready`（警告付き）
   - 処置: 継続実行可。`notes.missing_files` に欠損を記録する。

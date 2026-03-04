@@ -1,8 +1,8 @@
 {
-  "id": "governance_prioritization",
+  "id": "design",
   "role": "doc",
   "public_api": [],
-  "summary": "governance_prioritization",
+  "summary": "design",
   "deps_out": [],
   "deps_in": [],
   "risks": [],
