@@ -120,9 +120,11 @@ plan:
 
 0. **Birdseye Readiness Check**:
    - **`index.json` 検証**: `docs/birdseye/index.json` の存在確認と JSON 妥当性検証を行う。
-   - **`caps` 参照検証**: `index.json.nodes[*].caps` に含まれる参照先ファイルの存在確認を行う。
+   - **`nodes` 形式検証**: `index.json.nodes` が map/object であることを確認する。
+   - **`caps` パス検証**: `index.json.nodes` の各要素に対して `caps` パスの存在確認を行う。
+   - **互換注意**: 将来 `nodes` が配列形式へ変更される可能性を考慮し、object/array の両対応判定を実装する。
    - **鮮度検証**: `index.json.generated_at` と対象ドキュメント更新時刻の鮮度条件を確認し、判定基準は [`GUARDRAILS.md` の「鮮度管理（Staleness Handling）」](GUARDRAILS.md#鮮度管理staleness-handling) を正とする。
-   - **判定値**: 結果は `ready | degraded | blocked` の3値で扱う。`degraded` は既知ノード限定の分割継続、`blocked` は新規分割停止を意味する。
+   - **判定値**: 結果は `ready | degraded | blocked` の3値で扱う。`degraded` は既知ノード限定の分割継続、`blocked` は新規分割停止を意味する。失敗時（`degraded` / `blocked`）は `notes.readiness_status` へ判定結果を必ず記録する。
 1. **スキャン**: ルートと `orchestration/` 配下を再帰探索し、Markdown front matter
    (`---`) を含むファイルを優先取得。
    
