@@ -108,6 +108,42 @@ components:
                 properties:
                   code:
                     const: NOT_FOUND
+    ConflictError:
+      description: Request conflict.
+      x-requirement-id: REQ-ERR-001
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  code:
+                    const: CONFLICT
+    GatekeepDenyError:
+      description: Request denied by gatekeeper policy.
+      x-requirement-id: REQ-ERR-001
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  code:
+                    const: GATEKEEP_DENY
+    FeatureDisabledError:
+      description: Feature is disabled by configuration.
+      x-requirement-id: REQ-ERR-001
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  code:
+                    const: FEATURE_DISABLED
     InternalError:
       description: Internal error.
       x-requirement-id: REQ-ERR-001
@@ -128,6 +164,7 @@ components:
         - NOT_FOUND
         - CONFLICT
         - GATEKEEP_DENY
+        - FEATURE_DISABLED
         - INTERNAL
       x-requirement-id: REQ-ERR-001
     Error:

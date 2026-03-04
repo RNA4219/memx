@@ -107,6 +107,15 @@ next_review_due: 2026-06-03
 
 ## 要件トレーサビリティ用 検証コマンド（正本）
 
+### trace-req-* と I/F 項目ID 対応
+| trace anchor | requirement | 対応コマンド | I/F 項目ID |
+| --- | --- | --- | --- |
+| `trace-req-cli-001` | `REQ-CLI-001` | `mem out search` | `IF-CLI-SEARCH-REQ`, `IF-CLI-SEARCH-RES` |
+| `trace-req-api-001` | `REQ-API-001` | `mem in short` | `IF-CLI-INGEST-REQ`, `IF-API-INGEST-REQ`, `IF-API-INGEST-RES` |
+| `trace-req-gc-001` | `REQ-GC-001` | `mem gc short` | `IF-GC-SHORT-REQ`, `IF-GC-SHORT-RES` |
+| `trace-req-sec-001` | `REQ-SEC-001` | `mem in short` | `IF-CLI-INGEST-REQ`, `IF-API-INGEST-REQ` |
+| `trace-req-err-001` | `REQ-ERR-001` | `mem out show 999999` | `IF-CLI-SHOW-REQ`, `IF-ERR-MATRIX` |
+
 <a id="trace-lint"></a>
 
 ### lint（ruff）
@@ -154,35 +163,35 @@ go run ./memx_spec_v3/go/cmd/mem gc short --dry-run --api-url http://127.0.0.1:7
 
 <a id="trace-req-cli-001"></a>
 
-### REQ-CLI-001 検証コマンド
+### REQ-CLI-001 検証コマンド（IF: IF-CLI-SEARCH-REQ / IF-CLI-SEARCH-RES）
 ```bash
 go run ./memx_spec_v3/go/cmd/mem out search 'traceability' --api-url http://127.0.0.1:7766
 ```
 
 <a id="trace-req-api-001"></a>
 
-### REQ-API-001 検証コマンド
+### REQ-API-001 検証コマンド（IF: IF-CLI-INGEST-REQ / IF-API-INGEST-REQ / IF-API-INGEST-RES）
 ```bash
 go run ./memx_spec_v3/go/cmd/mem in short --stdin --title traceability --api-url http://127.0.0.1:7766
 ```
 
 <a id="trace-req-gc-001"></a>
 
-### REQ-GC-001 検証コマンド
+### REQ-GC-001 検証コマンド（IF: IF-GC-SHORT-REQ / IF-GC-SHORT-RES）
 ```bash
 go run ./memx_spec_v3/go/cmd/mem gc short --dry-run --api-url http://127.0.0.1:7766
 ```
 
 <a id="trace-req-sec-001"></a>
 
-### REQ-SEC-001 検証コマンド
+### REQ-SEC-001 検証コマンド（IF: IF-CLI-INGEST-REQ / IF-API-INGEST-REQ）
 ```bash
 printf '%s' 'secret-token-for-trace' | go run ./memx_spec_v3/go/cmd/mem in short --stdin --title trace-sec --api-url http://127.0.0.1:7766
 ```
 
 <a id="trace-req-err-001"></a>
 
-### REQ-ERR-001 検証コマンド
+### REQ-ERR-001 検証コマンド（IF: IF-CLI-SHOW-REQ / IF-ERR-MATRIX）
 ```bash
 go run ./memx_spec_v3/go/cmd/mem out show 999999 --api-url http://127.0.0.1:7766
 ```
