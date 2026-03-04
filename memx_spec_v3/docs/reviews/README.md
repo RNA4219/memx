@@ -20,8 +20,9 @@
   - `memx_spec_v3/docs/requirements.md`
   - `memx_spec_v3/docs/design.md`
   - `memx_spec_v3/docs/interfaces.md`
-  - `memx_spec_v3/docs/contracts.md`
+  - `memx_spec_v3/docs/CONTRACTS.md`
 - 上記に該当しない差分でも、`REQ-*` の追加/更新、設計判断、外部 I/F 契約変更を含む場合は起票する。
+- 上記トリガー差分に `memx_spec_v3/docs/contracts.md`（小文字）が含まれる場合は、正規パスへ未修正の誤参照として `fail` 扱いで差し戻す（正: `memx_spec_v3/docs/CONTRACTS.md`）。
 
 ## レビュー単位と必須添付
 - レビュー単位は **章単位** を標準とし、必要に応じて **PR 単位** で集約してよい。
