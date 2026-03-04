@@ -45,6 +45,17 @@
 3. **Moved-to-CHANGES**
    - 変更移送後、Task Seed に `Moved-to-CHANGES: YYYY-MM-DD` が追記済みであること。
 
+## 5.1 章別検証サマリ参照（必須）
+- 各レビュー記録は、対象章に対応する章別検証サマリ（`memx_spec_v3/docs/design-chapter-validation-spec.md`）の参照を必須で含める。
+- 参照時は、少なくとも以下を記録する。
+  - `chapter_id`
+  - `req_coverage`
+  - `contract_alignment_high_count`
+  - `link_broken_count`
+  - `birdseye_issue_count`
+  - `evidence_paths`
+- 章別検証サマリ参照が欠けるレビュー記録は `fail` 扱いとする。
+
 ## 6. 差分レビュー時の未マッピングREQ検出手順（必須）
 - 目的: `requirements.md` で追加・変更された `REQ-*` が `traceability.md` に未反映のままマージされることを防止する。
 - 参照仕様: `memx_spec_v3/docs/req-id-lifecycle-spec.md` 5章「`traceability.md` 同時更新必須ルール（未マッピング時は fail）」。

@@ -4,13 +4,14 @@
 本仕様は、設計受け入れレビューの統合レポートの入力元・必須項目・判定規則・保存規約を固定し、Phase 4 の完了判定を一意化する。
 
 ## 2. 入力元（必須）
-統合レポートは、以下 5 仕様の結果を入力として集約する。
+統合レポートは、以下 6 仕様の結果を入力として集約する。
 
 1. `memx_spec_v3/docs/requirements-coverage-spec.md`
 2. `memx_spec_v3/docs/contract-alignment-spec.md`
 3. `memx_spec_v3/docs/link-integrity-spec.md`
 4. `docs/birdseye/memx-birdseye-validation-spec.md`
 5. `memx_spec_v3/docs/design-review-spec.md`
+6. `memx_spec_v3/docs/design-chapter-validation-spec.md`
 
 ## 3. 統合レポート必須項目
 統合レポート（`DESIGN-ACCEPTANCE-YYYYMMDD.md`）には以下 6 項目を必須で含める。
@@ -27,6 +28,18 @@
    - `memx-birdseye-validation-spec.md` に基づく未解決 issue 件数
 6. **最終判定**
    - `pass` または `fail`
+
+
+## 3.1 章別検証サマリ参照（必須）
+- 統合レポートは、対象章ごとに `memx_spec_v3/docs/design-chapter-validation-spec.md` の章別検証サマリ参照を必須で含める。
+- 各章参照には次のフィールドを最低限含める。
+  - `chapter_id`
+  - `req_coverage`
+  - `contract_alignment_high_count`
+  - `link_broken_count`
+  - `birdseye_issue_count`
+  - `evidence_paths`
+- 章別検証サマリ参照が欠落している章が 1 件でもある場合、最終判定は `fail` とする。
 
 ## 4. 判定規則（固定）
 最終判定は以下の固定ルールで算出する。
@@ -64,4 +77,5 @@
   - link-integrity: <artifact/path>
   - birdseye-validation: <artifact/path>
   - design-review: <artifact/path>
+  - chapter-validation: <artifact/path>
 ```
