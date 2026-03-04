@@ -2,6 +2,7 @@
 
 - Report ID: DESIGN-ACCEPTANCE-20260304
 - 入力サマリ: `memx_spec_v3/docs/reviews/DESIGN-CHAPTER-VALIDATION-20260304-003.md`
+- contract align: `memx_spec_v3/docs/reviews/CONTRACT-ALIGN-20260304.md`
 - 判定ロジック正本: `memx_spec_v3/docs/design-doc-dod-spec.md`
 - 更新方針: `DESIGN-CHAPTER-VALIDATION-20260304-003.md` を最新実体として参照（旧集計値は正本として扱わない）
 
@@ -31,6 +32,7 @@
 
 ## 3. high差分件数
 - `contract_alignment_high_count`: `0`
+- 根拠: `memx_spec_v3/docs/reviews/CONTRACT-ALIGN-20260304.md`
 
 ## 4. リンク不達件数
 - `link_unreachable_count`: `0`

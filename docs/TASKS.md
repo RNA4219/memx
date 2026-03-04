@@ -175,6 +175,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 ## 2-1-3. Phase 3（契約整合）チェック（必須）
 
 - [ ] `memx_spec_v3/docs/contracts/reports/` 配下に `CONTRACT-ALIGN-YYYYMMDD-###.md` と `LATEST.md` が存在することを確認した
+- [ ] レビュー証跡として `memx_spec_v3/docs/reviews/CONTRACT-ALIGN-<実日付>.md`（例: `CONTRACT-ALIGN-20260304.md`）の命名規則で実体を作成し、受け入れレポートから1ホップ参照できることを確認した
 - [ ] 更新順序を `CONTRACT-ALIGN作成 -> LATEST更新 -> EVALUATION照合` で実施し、逆順更新がないことを確認した
 - [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）を schema 固定として全件記載されていることを確認した（1件でも欠落なら fail）
 - [ ] `LATEST.md` は当該判定のたびに毎回更新し、`report_id/report_path/decision_date/high_count/phase3_status` の5キーを前回値のまま残置していないことを確認した
