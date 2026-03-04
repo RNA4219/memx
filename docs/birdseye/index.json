@@ -6,6 +6,7 @@
     "role": "HUB",
     "depends_on": [
       "requirements",
+      "design",
       "quickstart",
       "service",
       "api"
@@ -20,6 +21,16 @@
       "generated_at": "2026-03-03T08:48:22Z",
       "source": "memx_spec_v3/docs/requirements.md",
       "capsule": "docs/birdseye/caps/requirements.json"
+    },
+    {
+      "node_id": "design",
+      "role": "spec_design",
+      "depends_on": [
+        "requirements"
+      ],
+      "generated_at": "2026-03-03T08:48:22Z",
+      "source": "memx_spec_v3/docs/design.md",
+      "capsule": "docs/birdseye/caps/design.json"
     },
     {
       "node_id": "quickstart",
