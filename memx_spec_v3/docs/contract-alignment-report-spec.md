@@ -71,19 +71,29 @@ results:
 - Phase 3 を完了扱いにできる条件は **`severity: high = 0`** のみ。
 - `high` が 1 件以上ある場合、Phase 3 は未完了。
 
-## 8. `EVALUATION.md` / `docs/TASKS.md` 反映手順
-1. レポート作成後、`EVALUATION.md` に以下を追記する。
-   - 判定日
-   - レポートID
-   - `high` 件数
-   - Phase 3 判定（完了 / 未完了）
-2. `docs/TASKS.md` の Phase 3 関連タスクを更新する。
-   - `high = 0`: 状態を `done` に更新
-   - `high > 0`: 状態を `blocked` もしくは `reviewing` に更新し、未解消 `diff_id` を列挙
-3. `docs/TASKS.md` には、対応タスクのチェックリストを差分単位で記載する。
+## 8. 統合運用手順（`CONTRACT-ALIGN` / `LATEST` / `EVALUATION`）
+生成・更新は以下の順序で固定し、1つの手順として実施する。
+
+1. **`CONTRACT-ALIGN-YYYYMMDD-###.md` を作成する**
+   - 当日初回は `CONTRACT-ALIGN-<実日付>-001.md` を作成する。
+   - `report_id` と `summary.high` を確定する。
+2. **`LATEST.md` を更新する**
+   - 必須キー `report_id/report_path/decision_date/high_count/phase3_status` を全て記録する。
+   - 1キーでも未記載なら `fail`。
+3. **`EVALUATION.md` を照合・更新する**
+   - `EVALUATION.md` のレポートID参照と `LATEST.md.report_id` の一致を確認する。
+   - ID 不一致時は Phase 3 ステータス遷移を `reviewing` 固定とし、`done` / `blocked` へ遷移しない。
+4. **`docs/TASKS.md` の Phase 3 関連タスクを更新する**
+   - `high = 0` かつ ID一致: 状態を `done` に更新。
+   - `high > 0`: 状態を `blocked` または `reviewing` に更新し、未解消 `diff_id` を列挙。
+   - ID不一致: 状態を `reviewing` に固定。
+5. **差分チェックリストを記録する**
+   - `docs/TASKS.md` に差分単位のチェックリストを記載する。
    - 例: `- [ ] CA-20260304-003 (REQ-API-001): openapi 必須項目復元`
-4. Phase 3 を `done` に更新する前に、`EVALUATION.md` と `docs/TASKS.md` のレポートIDが一致していることを確認する。
-5. `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）が更新済みで、最新詳細レポートと整合していることを確認する。
+
+### 8.1 逆順更新の禁止
+- 更新順序は **`CONTRACT-ALIGN作成 -> LATEST更新 -> EVALUATION照合`** のみを許可する。
+- 逆順（`LATEST` 先行、`EVALUATION` 先行）の更新は運用違反として `fail`。
 
 ## 9. 保存・更新ルール
 - 新規判定ごとに新規ファイルを作成し、既存レポートは上書きしない。

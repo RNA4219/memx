@@ -171,8 +171,11 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 ## 2-1-3. Phase 3（契約整合）チェック（必須）
 
 - [ ] `memx_spec_v3/docs/contracts/reports/` 配下に `CONTRACT-ALIGN-YYYYMMDD-###.md` と `LATEST.md` が存在することを確認した
-- [ ] `memx_spec_v3/docs/EVALUATION.md` のレポートIDと、`memx_spec_v3/docs/contracts/reports/LATEST.md` の `report_id` が一致することを確認した
-- [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）が最新レポートと整合していることを確認した
+- [ ] 更新順序を `CONTRACT-ALIGN作成 -> LATEST更新 -> EVALUATION照合` で実施し、逆順更新がないことを確認した
+- [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）を schema 固定として全件記載されていることを確認した（1件でも欠落なら fail）
+- [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー値が最新レポートと整合していることを確認した
+- [ ] `EVALUATION.md` のレポートID参照と、`memx_spec_v3/docs/contracts/reports/LATEST.md` の `report_id` が一致することを確認した
+- [ ] レポートID不一致時は Phase 3 の `Status` を `reviewing` 固定にし、`done` / `blocked` へ遷移していないことを確認した
 
 ## 2-1-3-1. レビュー実体ファイルSLAチェック（Task Seed close 条件連動・必須）
 
