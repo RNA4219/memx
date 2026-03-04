@@ -57,6 +57,8 @@ plan:
 
 ## HUB.codex.md
 
+`HUB_SCOPE_DECLARATION`: 本ファイルの適用範囲は `workflow-cookbook/` ツリー。
+
 リポジトリ内の仕様・運用MDを集約し、エージェントがタスクを自動分割できるようにするハブ定義。
 `BLUEPRINT.md` など既存ファイルに加えて、オーケストレーション専用のMD（例: `orchestration/*.md`）も取り込む。
 

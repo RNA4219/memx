@@ -6,6 +6,7 @@ last_reviewed_at: 2025-10-14
 next_review_due: 2025-11-14
 ---
 
+- HUB優先順: ルート [`../HUB.codex.md`](../HUB.codex.md) を基準とし、`workflow-cookbook/` 配下では [`HUB.codex.md`](HUB.codex.md)（`HUB_SCOPE_DECLARATION`）を優先。
 # Workflow Cookbook / Codex Task Kit
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)

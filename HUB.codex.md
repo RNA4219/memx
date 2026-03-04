@@ -8,6 +8,8 @@ next_review_due: 2026-06-03
 
 # HUB.codex.md
 
+`HUB_SCOPE_DECLARATION`: 本ファイルの適用範囲はリポジトリルート配下全体。ただし `workflow-cookbook/` 配下の作業では `workflow-cookbook/HUB.codex.md` を優先する。
+
 ## 目的
 エージェント応答の契約を統一し、実行環境差異（tools 可用性差）に依存しない最小互換出力を保証する。
 
