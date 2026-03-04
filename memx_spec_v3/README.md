@@ -34,6 +34,7 @@
   - Go モジュール定義（依存は最小）。
 - 運用ルール
   - `go.mod` を変更した場合は `go.sum` を同時更新し、同一コミットで管理する。
+  - 依存ロック監査ログ: [`docs/reviews/GO-LOCK-AUDIT-20260304.md`](./docs/reviews/GO-LOCK-AUDIT-20260304.md)
 - `go/db/*`
   - DB 接続・マイグレーション・LLM/Gatekeeper の注入口（インフラ層）。
 - `go/service/*`
