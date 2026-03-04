@@ -2,7 +2,7 @@
 priority: high
 owner: memx-core
 deadline: 2026-03-08
-status: planned
+status: reviewing
 ---
 
 # TASK.replace-incident-placeholder-ids-03-03-2026
@@ -15,18 +15,18 @@ status: planned
 | `memx_spec_v3/docs/requirements.md#task-seed-source-fixed` | REQ-* の直接参照固定表 |
 
 ## Objective
-- 既存 Task Seed（`TASK.memx-bootstrap-03-03-2026.md` ほか）に残る `docs/IN-202603xx-001.md` 参照を、実在するインシデントIDへ置換する。
-- テンプレートID/TBD を参照したままレビュー通過しないよう、差し戻し基準に沿って是正を完了する。
+- 既存 Task Seed（`TASK.memx-bootstrap-03-03-2026.md` ほか）に残る `docs/IN-20260304-001.md` 参照へ統一する。
+- 差し戻し基準に沿って Task Seed 根拠からテンプレート記法と未確定値を除去し、レビュー可能状態にする。
 
 ## Requirements
-- 対象 Task Seed を棚卸しし、`docs/IN-202603xx-001.md` 参照箇所を一覧化する。
+- 対象 Task Seed を棚卸しし、旧インシデント参照箇所を一覧化する。
 - 実在する `docs/IN-<実日付>-<連番>.md` を特定し、各 Task Seed の `Requirements`/`Source` を置換する。
-- 置換後に `Source` にテンプレートID（`IN-YYYYMMDD-001` など）や `TBD` が残存しないことを確認する。
+- 置換後に `Source`/`Requirements` にテンプレートIDや未確定値が残存しないことを確認する。
 - 変更は Task Seed のトレーサビリティ修正のみに限定し、Objective/実装要件は改変しない。
 
 ## Commands
+- `rg -n "IN-20260304-001" TASK.*-03-03-2026.md`
 - `rg -n "IN-202603xx-001|IN-YYYYMMDD-001|TBD" TASK.*-03-03-2026.md`
-- `rg -n "^## Source|IN-" TASK.*-03-03-2026.md`
 - `git status --short`
 
 ## Dependencies
@@ -37,4 +37,4 @@ status: planned
 - Task Seed のインシデント参照を実在IDへ統一し、再発防止要件のトレーサビリティを改善する。
 
 ## Status
-- planned
+- reviewing
