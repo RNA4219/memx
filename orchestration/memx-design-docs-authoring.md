@@ -34,6 +34,9 @@ status: planned
 - `docs/birdseye/caps/EVALUATION.md.json`
 - `docs/birdseye/caps/RUNBOOK.md.json`
 - `docs/birdseye/index.json`
+- `docs/IN-*.md`（実績インシデントのみ。テンプレート除外）
+- `orchestration/*.md`
+- `docs/INCIDENT_TEMPLATE.md`（必要時の参照のみ。実績証跡扱い不可）
 
 > 注記: Dependencies では非正規名の記載を許可するが、Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録へ転記する時点で `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い正規パスへ正規化すること。
 
@@ -45,12 +48,14 @@ status: planned
 - [ ] `docs/birdseye/caps/EVALUATION.md.json` の評価観点を要件IDに紐づける（Task Seed 1件、<=0.5d）
 - [ ] `docs/birdseye/caps/RUNBOOK.md.json` の運用手順と契約依存箇所を抽出する（Task Seed 1件、<=0.5d）
 - [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、`memx_spec_v3/docs/design-chapter-node-mapping-spec.md` 準拠の章対応表（chapter_id -> node_id）を更新する（Task Seed 1件、<=0.5d）
+- [ ] `docs/IN-*.md`（実績インシデント）から再発防止要件・運用証跡を抽出し、テンプレート（`docs/INCIDENT_TEMPLATE.md`）混入を除外する（Task Seed 1件、<=0.5d）
+- [ ] `orchestration/*.md` の依存関係（depends_on 相当）を抽出し、未解決依存を `blocked` 条件として明示する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
-- Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源7ファイル一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
+- Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源（固定入力+拡張入力）一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
 
-### Phase 1 参照先追記計画（情報源7ファイルの抽出結果）
-- [ ] `design-source-inventory-spec.md` の必須列（`source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`, `node_resolution_status`）で抽出表を作成する
+### Phase 1 参照先追記計画（情報源（固定入力+拡張入力）の抽出結果）
+- [ ] `design-source-inventory-spec.md` の必須列（`source_type`, `source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`, `node_resolution_status`）で抽出表を作成する
 - [ ] `design-source-inventory-spec.md` と `design-chapter-node-mapping-spec.md` の fail 条件（`ambiguous` / `missing` 含む）を判定し、未解決行を 0 件にする
 - [ ] Phase 1 Done Criteria 判定ログは上記2仕様への準拠確認のみを正本として記録する
 
