@@ -40,6 +40,21 @@ next_review_due: 2025-11-14
 
 `plan`/`patch`/`tests`/`commands`/`notes`
 
+- `plan` は各タスクに `node_id` / `role` / `source_caps` を必須で埋め込む。
+- `source_caps` は `docs/birdseye/caps/*.json` のファイル名（例: `caps/core.json`）を保持する。
+- JSON/YAML の最小フィールドセットは下記を満たす。
+
+```yaml
+plan:
+  - task_id: string
+    source: string
+    objective: string
+    node_id: string
+    role: string
+    source_caps:
+      - string
+```
+
 ## HUB.codex.md
 
 リポジトリ内の仕様・運用MDを集約し、エージェントがタスクを自動分割できるようにするハブ定義。
@@ -103,9 +118,10 @@ next_review_due: 2025-11-14
 
 1. **スキャン**: ルートと `orchestration/` 配下を再帰探索し、Markdown front matter
    (`---`) を含むファイルを優先取得。
-2. **Birdseye 同期**: `docs/birdseye/index.json` から対象ファイル±2 hop のノードIDと役割を取得。
-   必要な `docs/birdseye/caps/*.json` を取り込み、各節に `node_id` と `role` を差し込む。
-   これにより GUARDRAILS の `plan` 出力要件（ノードID明示）を満たす初期データを確保。
+2. **Birdseye 専用サブステップ**:
+   - **読込順固定**: Birdseye JSON を第一読者として、`docs/birdseye/index.json` → `docs/birdseye/caps/*.json` → `docs/birdseye/hot.json` の順で必ず読み込む。
+   - **対象抽出条件**: 対象ファイルの `node_id` 起点で ±2 hop を抽出し、未解決ノードは `hot.json` の hot list で補完する。
+   - **埋込必須項目**: 各候補タスクに `node_id` / `role` / `source_caps` を付与し、GUARDRAILS の `plan` 出力要件（ノードID明示）を初期段階で満たす。
 3. **ノード生成**: 各ファイルから `##` レベルの節をノード化し、`Priority`
    `Dependencies` などのキーワードを抽出。
 4. **依存解決**: Orchestrationノードに含まれる依存パスを解析し、該当セクションを子ノードとして連結。
