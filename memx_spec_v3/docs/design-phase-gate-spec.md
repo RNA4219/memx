@@ -107,6 +107,8 @@
 
 ### 出力成果物
 - 章別検証サマリ（`chapter_id/req_coverage/contract_alignment_high_count/link_broken_count/birdseye_issue_count/evidence_paths`）
+- `memx_spec_v3/docs/contracts/reports/CONTRACT-ALIGN-YYYYMMDD-###.md`
+- `memx_spec_v3/docs/contracts/reports/LATEST.md`
 - 契約整合の修正差分
 
 ### 次Phase遷移条件
