@@ -4,7 +4,7 @@
 - 本書は、Design Docs オーサリングの **Phase 1〜4 の gate 判定正本** である。
 - 各 Phase の gate 判定は、本書で定義する entry/exit criteria・fail 条件・遷移条件に従う。
 - `orchestration/memx-design-docs-authoring.md` は実施手順の正本とし、判定ロジックを重複定義しない。
-- 優先度評価の4軸（Blocker / REQ網羅率 / 契約差分 high 件数 / Birdseye issue）は、各 gate の判定列として必須入力とする（`docs/design-docs-prioritization-spec.md` 準拠）。
+- 優先度評価の4軸（Blocker / REQ網羅率 / 契約差分 high 件数 / Birdseye issue）に `HUB入力カバレッジ` を加えた5列を、各 gate の判定列として必須入力とする（`docs/design-docs-prioritization-spec.md` 準拠）。
 
 ## 2. Gate 判定列（全Phase共通）
 
@@ -14,11 +14,18 @@
 | `gate_req_coverage` | `high/medium/low` | REQ網羅率100%未達確定なら `high`、低下可能性なら `medium`、影響なしは `low` |
 | `gate_contract_high` | `high/medium/low` | 契約差分 `high` が1件以上なら `high`、`medium/low` 差分のみは `medium`、差分なしは `low` |
 | `gate_birdseye_issue` | `high/medium/low` | node_id参照切れ/caps欠落は `high`、軽微issueは `medium`、issueなしは `low` |
+| `gate_hub_source_coverage` | `high/medium/low` | HUB必須入力（検索キー/対象パス）で Incident または Orchestration の欠落があれば `high`、欠落はあるが Incident/Orchestration 欠落はない場合は `medium`、欠落なしは `low` |
 
-### 2.1 総合判定ルール
-1. 4列のいずれかが `high` の場合は gate `fail`。
+### 2.1 HUB入力カバレッジ判定の固定ルール
+- `gate_hub_source_coverage` の判定根拠は以下の検索キー・対象パスに固定する。
+  - 検索キー: `Incident`, `Orchestration`, `TASK`
+  - 対象パス: `docs/IN-*.md`, `orchestration/*.md`, `TASK.*`
+- 判定時は上記3系統をすべて確認し、レビュー時に別解釈（任意キーワード/任意パス追加）を持ち込まない。
+
+### 2.2 総合判定ルール
+1. 5列のいずれかが `high` の場合は gate `fail`。
 2. `high` がなく `medium` が1つ以上ある場合は gate `hold`（差し戻し解消後に再判定）。
-3. 4列すべて `low` の場合のみ gate `pass`。
+3. 5列すべて `low` の場合のみ gate `pass`。
 
 ## 3. Phase Gate 定義
 
@@ -39,7 +46,7 @@
 ### 必須チェック
 - Design Source Inventory を `memx_spec_v3/docs/design-source-inventory-spec.md` の必須列で作成する。
 - `source_path#section` は `memx_spec_v3/docs/design-reference-resolution-spec.md` に従って正規化する。
-- gate 判定列（4軸）を記録する。
+- gate 判定列（5軸）を記録する。
 
 ### fail条件
 - 入力成果物の未取得が1件以上。
@@ -66,7 +73,7 @@
 
 ### 必須チェック
 - 各章に `Source/Node IDs/Objective/Requirements/Commands/Dependencies/Status` を記載する。
-- 各章で gate 判定列（4軸）を更新する。
+- 各章で gate 判定列（5軸）を更新する。
 - `docs/TASKS.md` の語彙（planned/active/in_progress/reviewing/blocked/done）を使用する。
 
 ### fail条件
@@ -96,7 +103,7 @@
 
 ### 必須チェック
 - REQ網羅率、契約差分 high 件数、リンク不達件数、Birdseye issue 件数を章別に算出する。
-- 算出結果を gate 判定列（4軸）へ反映する。
+- 算出結果を gate 判定列（5軸）へ反映する。
 - 判定結果は `memx_spec_v3/docs/design-doc-dod-spec.md` と矛盾しない。
 
 ### fail条件
@@ -128,7 +135,7 @@
 
 ### 必須チェック
 - 受け入れレポートに必須6項目（対象章/REQ網羅率/high差分件数/リンク不達件数/Birdseye issue件数/最終判定）を記載する。
-- 最終判定前に gate 判定列（4軸）を再計算する。
+- 最終判定前に gate 判定列（5軸）を再計算する。
 - `CHANGELOG.md` / `memx_spec_v3/CHANGES.md` への反映要否を確定する。
 
 ### fail条件

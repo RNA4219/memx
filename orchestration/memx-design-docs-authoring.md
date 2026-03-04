@@ -13,7 +13,7 @@ status: planned
 ## 判定責務の分離
 - 本書は Phase 1〜4 の実施手順（チェック実行順・タスク分解・証跡作成）を定義する。
 - gate の entry/exit criteria・fail 条件・次Phase遷移条件の正本は `memx_spec_v3/docs/design-phase-gate-spec.md` とする。
-- gate 判定に用いる4軸（Blocker / REQ網羅率 / 契約差分 high / Birdseye issue）は `docs/design-docs-prioritization-spec.md` と整合させる。
+- gate 判定に用いる5軸（Blocker / REQ網羅率 / 契約差分 high / Birdseye issue / HUB入力カバレッジ）は `docs/design-docs-prioritization-spec.md` と整合させる。
 
 ## Phase 1: 情報収集
 ### Preprocessing: トリガー判定
@@ -52,7 +52,8 @@ status: planned
 - [ ] `orchestration/*.md` の依存関係（depends_on 相当）を抽出し、未解決依存を `blocked` 条件として明示する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
-- Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源（固定入力+拡張入力）一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
+- Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源7ファイル一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
+- `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定根拠は `docs/IN-*.md`・`orchestration/*.md`・`TASK.*` を対象に検索キー `Incident` / `Orchestration` / `TASK` で固定する
 
 ### Phase 1 参照先追記計画（情報源（固定入力+拡張入力）の抽出結果）
 - [ ] `design-source-inventory-spec.md` の必須列（`source_type`, `source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`, `node_resolution_status`）で抽出表を作成する
@@ -149,6 +150,7 @@ status: planned
 
 ### Done Criteria
 - 全章が `docs/TASKS.md` 必須項目フォーマットへマッピング済みである
+- 最終 gate 再計算時に `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定根拠は `docs/IN-*.md`・`orchestration/*.md`・`TASK.*` を対象に検索キー `Incident` / `Orchestration` / `TASK` で固定する
   - `Source`: `path#Section`
   - `Node IDs`: `docs/birdseye/index.json` の node_id
   - `Objective`: 1〜3行
