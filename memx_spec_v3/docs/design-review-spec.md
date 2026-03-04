@@ -46,12 +46,13 @@
 
 ## 6. 差分レビュー時の未マッピングREQ検出手順（必須）
 - 目的: `requirements.md` で追加・変更された `REQ-*` が `traceability.md` に未反映のままマージされることを防止する。
+- 参照仕様: `memx_spec_v3/docs/req-id-lifecycle-spec.md` 5章「`traceability.md` 同時更新必須ルール（未マッピング時は fail）」。
 - 確認対象差分:
   1. `git diff --name-only <base>...HEAD` で `memx_spec_v3/docs/requirements.md` が含まれるか確認する。
   2. 含まれる場合、`requirements.md` 差分で追加/変更された `REQ-*` を列挙する。
   3. `traceability.md` の表（主要REQ + 主要REQ以外）に同一 ID が 1 行ずつ存在することを確認する。
 - 判定観点（レビューコメントに残す）:
-  - `Source / Design Mapping / Interface Mapping / Evaluation Mapping / Contract Mapping` の 5 列が埋まっている。
+  - `memx_spec_v3/docs/req-id-lifecycle-spec.md` 5章に従い、`Source / Design Mapping / Interface Mapping / Evaluation Mapping / Contract Mapping` の 5 列が埋まっている。
   - `Design Mapping` が必ず `memx_spec_v3/docs/design.md#...` を指している。
   - 同一 PR で `requirements.md` と `traceability.md` の更新が同時に入っている。
 - 未マッピングが 1 件でもある場合は `fail` とし、解消後に再レビューする。
