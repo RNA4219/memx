@@ -61,6 +61,7 @@ next_review_due: 2025-11-14
 - PR に `type:*` および `semver:*` ラベルを付与済み
 - [Security Review Checklist](docs/security/Security_Review_Checklist.md) に沿って準備→実装→レビューの各フェーズを完了し、リリース判定と証跡を残す
 - 配布物へ `LICENSE` / `NOTICE` を同梱済み
+- `memx_spec_v3/go/go.sum` が tracked（`git ls-files` に含まれる）であることを確認
 
 ## Hygiene
 
@@ -68,3 +69,4 @@ next_review_due: 2025-11-14
 - ドキュメント差分反映
 - フォーク差分記録の最新化（[`docs/FORK_NOTES.md`](docs/FORK_NOTES.md) をリリース前レビューと突合）
 - 旧呼称の混入チェック（例: `rg "<旧ブランド名>"` など抽象化したキーワードで固有表現を検索し、現行ブランド以外の名称が残存していないか確認）
+- `memx_spec_v3/go/go.sum` が tracked（`git ls-files` に含まれる）であることを確認
