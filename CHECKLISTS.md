@@ -41,3 +41,4 @@ next_review_due: 2026-06-03
 - [ ] インシデント記録をテンプレート要件に沿って作成できる。
 - [ ] 性能SLO達成確認（EVALUATION.md の計測条件で ingest/search/show の P50/P95 が閾値内）を完了している。
 - [ ] `governance/metrics.yaml` と `EVALUATION.md` の必須指標定義が同期している。
+- [ ] 設定ファイル不在時は `docs/QUALITY_GATES.md` に基づき対象外判定し、対象外言語の lint/type/test は必須扱いにしない（例: `pyproject.toml` / `pytest.ini` / `package.json` 不在）。

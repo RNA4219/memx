@@ -57,6 +57,9 @@
 ### Commands
 - 実行・検証コマンドを列挙する。
 - 実行順を持つ場合は上から順に並べる。
+- 必須例として記載するのは、リポジトリ内で実在し運用対象のコマンドのみとする。
+  - lint/type/test の基準は `docs/QUALITY_GATES.md` に従う。
+  - 現行の必須最小構成は `go test ./...`（Go）で、Python/Node は対象外として扱う。
 
 ### Dependencies
 - 前提タスク、依存PR、外部条件を列挙する。
@@ -95,7 +98,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 
 ### 互換維持変更
 - [ ] `Requirements` に後方互換維持（CLI/API/`--json` 同型）を明記する
-- [ ] `Commands` に最低 1 つの `lint` / `type` / `test` を記載する
+- [ ] `Commands` に `docs/QUALITY_GATES.md` で運用対象の lint/type/test を記載する（対象外言語は除外）
 - [ ] `Release Note Draft` を記載する
 
 ### 破壊変更
