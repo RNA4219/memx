@@ -5,6 +5,12 @@
 ## 構成
 - `index.json`: HUB とノード一覧（`node_id`, `role`, `depends_on`, `generated_at` を保持）
 - `caps/*.json`: 主要文書ごとの capsule（要点・依存ノードを保持）
+- `hot.json`: `optional`（現行は未運用。導入時のみ生成/参照対象）
+
+## `hot.json` の運用前提（HUB/RUNBOOK 整合）
+- 現行運用（既定）: `docs/birdseye/hot.json` は `optional`（未運用）で、欠損していても処理継続可能。
+- 欠損時の記録: `notes.readiness_status=ready` を維持しつつ、`notes.missing_files` に `docs/birdseye/hot.json` を記録する。
+- 移行運用: `hot.json` を運用開始する場合のみ、再生成手順に `--emit hot` を追加する。
 
 ## 更新タイミング
 以下の変更が入るたびに `index.json` と関連 `caps/*.json` を同時更新してください。

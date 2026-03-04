@@ -390,6 +390,11 @@ python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.j
 ## Birdseye 鮮度不足時の復旧手順
 `docs/birdseye/index.json.generated_at` が判定時刻から7日を超える場合に実施する。詳細は `workflow-cookbook/tools/codemap/README.md`（`tools/codemap/README.md`）の「Birdseyeアクセス異常時の復旧手順」を正本とし、ここでは実行順のみ示す。
 
+運用モード（HUB と同一語彙）:
+- 現行運用（既定）: `docs/birdseye/hot.json` は `optional`（未運用）。再生成対象に含めない。
+- 移行運用（`hot.json` 導入時のみ）: `docs/birdseye/hot.json` を生成対象に含める。
+- `hot.json` 欠損時は `notes.readiness_status=ready` のまま継続し、`notes.missing_files` に `docs/birdseye/hot.json` を記録する。
+
 1. index を更新する。
 ```bash
 python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json --emit index
@@ -398,9 +403,13 @@ python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.j
 ```bash
 python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/caps --emit caps
 ```
-3. index/caps を再生成して再実行状態をそろえる。
+3. index/caps を再生成して再実行状態をそろえる（現行運用）。
 ```bash
 python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps
+```
+4. `hot.json` 導入時のみ、hot を追加生成する（移行運用）。
+```bash
+python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/hot.json --emit hot
 ```
 
 鮮度更新時に `memx_spec_v3/docs/requirements.md` の節構成・Requirement ID（例: `REQ-CLI-001`）を変更した場合は、`docs/birdseye/index.json` の `nodes[].node_id=requirements` と `docs/birdseye/caps/requirements.json`（必要に応じて `docs/birdseye/caps/memx_spec_v3__docs__requirements.md.json`）の `summary`/`depends_on` を同一コミットで更新し、`python workflow-cookbook/tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/caps --emit index+caps` を再実行して要件ノード紐付けを鮮度管理フローへ組み込む。
