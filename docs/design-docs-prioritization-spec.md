@@ -39,3 +39,13 @@
   - risk: Birdseye issue の有無 + 契約差分 high 件数
   - recovery_cost: 修正対象章数・再レビュー工数（Task Seed の工数見積で補足）
 - 本仕様はTask Seed用の簡易判定であり、詳細スコアリングが必要な場合は `governance/prioritization.yaml` を正本として併用する。
+
+## 6. Phase Gate 判定列への取り込み
+- `memx_spec_v3/docs/design-phase-gate-spec.md` の gate 判定では、本書4軸を次の列名で必ず記録する。
+  - `gate_blocker`（Blocker有無）
+  - `gate_req_coverage`（REQ網羅率への影響）
+  - `gate_contract_high`（契約差分 high 件数）
+  - `gate_birdseye_issue`（Birdseye issue の有無）
+- 各列の値は `high/medium/low` の3値のみ許可する。
+- gate の総合判定は「high が1つでもあれば fail、high なしで medium があれば hold、全列 low のみ pass」とする。
+- Task Seed の `priority` は gate 判定列の値を流用して再計算し、Phase 境界で差分が出た場合は更新する。

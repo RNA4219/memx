@@ -112,6 +112,23 @@
 - `Status: done` へ遷移する条件として、移送後に `Moved-to-CHANGES: YYYY-MM-DD` を追記済みであること。
 - `docs/birdseye/index.json` と `nodes[].capsule` 実体の不整合を検知した場合は、対象 Task Seed の `Status` を `blocked` へ遷移し、欠落 capsule のパス・検知コマンド・暫定対処を Task Seed に記録する。
 
+
+#### Phase Gate 判定との対応表
+| Status | gate判定 | 使用条件 | 差し戻し時の更新 |
+| --- | --- | --- | --- |
+| planned | 未評価 | 起票直後で gate 列未記入 | gate 列初期化後に `active` へ更新 |
+| active | hold/pass | 着手済み、実作業待ち | hold 要因を `Requirements`/`Commands` に追記 |
+| in_progress | hold/pass | 実装・文書更新を進行中 | fail 検知時は即 `blocked` へ更新 |
+| reviewing | hold | レビューで再判定中 | 指摘反映後に gate 列を再計算し `active` へ戻す |
+| blocked | fail | gate 列に `high` が1つ以上 | fail 原因・再開条件・再検証コマンドを追記 |
+| done | pass | gate 列が全て `low` かつ完了条件充足 | 差し戻し時は `reviewing` に戻し `Moved-to-CHANGES` を見直す |
+
+#### 差し戻し時の更新手順（必須）
+1. 差し戻しを検知した時点で `Status` を `reviewing` または `blocked` へ更新する（gate=hold は `reviewing`、gate=fail は `blocked`）。
+2. `memx_spec_v3/docs/design-phase-gate-spec.md` の4列（`gate_blocker`/`gate_req_coverage`/`gate_contract_high`/`gate_birdseye_issue`）を再評価し、変更前後を Task Seed に追記する。
+3. fail/hold の原因を `Requirements` と `Commands` に反映し、再実行コマンドを先頭に追記する。
+4. 修正後に gate 再判定を実施し、`pass` になった場合のみ `active` → `in_progress` → `reviewing` → `done` の順で復帰する。
+
 ## 2-1. 破壊変更時の追記チェックリスト（追加必須）
 CLI/API の既存必須フィールド削除、型変更、意味変更、既存コマンド/エンドポイント/エラーコード削除、`--json` 既定出力の非同型化を含む場合、Task Seed に次のチェックリストを追記する。
 

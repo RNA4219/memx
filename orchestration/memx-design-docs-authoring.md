@@ -10,6 +10,11 @@ status: planned
 
 # memx Design Docs Authoring Orchestration
 
+## 判定責務の分離
+- 本書は Phase 1〜4 の実施手順（チェック実行順・タスク分解・証跡作成）を定義する。
+- gate の entry/exit criteria・fail 条件・次Phase遷移条件の正本は `memx_spec_v3/docs/design-phase-gate-spec.md` とする。
+- gate 判定に用いる4軸（Blocker / REQ網羅率 / 契約差分 high / Birdseye issue）は `docs/design-docs-prioritization-spec.md` と整合させる。
+
 ## Phase 1: 情報収集
 ### Preprocessing: トリガー判定
 - [ ] `memx_spec_v3/docs/design-update-trigger-spec.md` を参照し、今回変更の Trigger IDs（TRG-REQ / TRG-OAS / TRG-CLI-SCHEMA / TRG-RUNBOOK / TRG-IN-PREVENTIVE）を先に確定する（Task Seed 1件、<=0.5d）
