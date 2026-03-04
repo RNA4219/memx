@@ -75,3 +75,7 @@
 - 保存場所・命名規則・作成タイミング・差戻し条件は `memx_spec_v3/docs/design-acceptance-lifecycle-spec.md` を正本とする。
 - テンプレート本文（章構成・必須キー）は `memx_spec_v3/docs/design-evidence-template-spec.md` を参照する。
 - 本仕様では受け入れレポートのライフサイクル運用を重複定義せず、`memx_spec_v3/docs/design-acceptance-lifecycle-spec.md` のチェックID（DA-LC-01〜05）へ参照集約する。
+
+## 5.1 存在判定の正本ルール（必須）
+- 受け入れレポートの `exist` 判定は、正本命名規約 `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-<YYYYMMDD>.md` に合致した**実体ファイル**の実在確認のみを有効とする。
+- `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-YYYYMMDD.md`（テンプレート専用）は `exist` 判定の対象外とする。

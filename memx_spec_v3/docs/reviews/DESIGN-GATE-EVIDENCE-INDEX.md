@@ -13,6 +13,7 @@
 
 ## design_acceptance
 - 判定値: `pass` | 根拠ファイル: `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-20260304.md` | 根拠箇所（見出し名）: `## 6. 最終判定`
+- 命名規約: `exist` 判定は `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-<YYYYMMDD>.md` に準拠した実体ファイルのみを有効とし、`DESIGN-ACCEPTANCE-YYYYMMDD.md`（テンプレート専用）は対象外とする
 
 ## go.sum tracked
 - 判定値: `tracked` | 根拠ファイル: `memx_spec_v3/go/go.sum` | 根拠箇所（見出し名）: `N/A（ファイル実体）` | 運用確認コマンド: `git ls-files memx_spec_v3/go/go.sum`（出力: `memx_spec_v3/go/go.sum`）

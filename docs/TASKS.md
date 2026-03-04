@@ -213,6 +213,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 
 ### 2-1-4-1. design-doc-dod-spec 判定一致チェック手順（完了条件）
 - [ ] `memx_spec_v3/docs/reviews/DESIGN-GATE-EVIDENCE-INDEX.md` を一次参照として使用し、5条件（`req_coverage` / `mapping_match_check` / `contract_align_report` / `design_acceptance` / `go.sum tracked`）の判定値・根拠ファイル・根拠見出しを確認した
+- [ ] 5条件チェックの `exist` 判定は、正本命名規約 `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-<YYYYMMDD>.md` に合致した実体ファイルの実在のみを確認した（`DESIGN-ACCEPTANCE-YYYYMMDD.md` は対象外）
 - [ ] `memx_spec_v3/docs/design-doc-dod-spec.md` の 6 条件（REQ網羅率/high差分/リンク不達/Birdseye issue/レビュー記録完備/参照解決適合率）を入力証跡で照合した
 - [ ] `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-<実日付>.md` の「6. 最終判定」が上記照合結果と一致することを記録した
 - [ ] 不一致時は `Status: reviewing` を維持し、差戻し理由を Task Seed に追記した
