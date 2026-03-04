@@ -166,6 +166,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 
 - [ ] `memx_spec_v3/docs/contracts/reports/` 配下に `CONTRACT-ALIGN-YYYYMMDD-###.md` と `LATEST.md` が存在することを確認した
 - [ ] `memx_spec_v3/docs/EVALUATION.md` のレポートIDと、`memx_spec_v3/docs/contracts/reports/LATEST.md` の `report_id` が一致することを確認した
+- [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）が最新レポートと整合していることを確認した
 
 ## 2-1-4. 受け入れレポート定型チェック（必須）
 

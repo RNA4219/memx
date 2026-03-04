@@ -83,6 +83,7 @@ results:
 3. `docs/TASKS.md` には、対応タスクのチェックリストを差分単位で記載する。
    - 例: `- [ ] CA-20260304-003 (REQ-API-001): openapi 必須項目復元`
 4. Phase 3 を `done` に更新する前に、`EVALUATION.md` と `docs/TASKS.md` のレポートIDが一致していることを確認する。
+5. `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）が更新済みで、最新詳細レポートと整合していることを確認する。
 
 ## 9. 保存・更新ルール
 - 新規判定ごとに新規ファイルを作成し、既存レポートは上書きしない。
