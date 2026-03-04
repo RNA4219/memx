@@ -47,12 +47,54 @@
 
 ## 5. `docs/birdseye/index.json` 更新時の追随ルール
 
+### 5.0 `source_path#section` から `chapter_id`・`node_id` を解決する標準手順
+`source_path#section` からの解決は、以下の手順を**順番固定**で実施する。
+
+1. `source_path` 正規化
+   - `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い、相対パスへ正規化する。
+2. `chapter_id` 候補抽出
+   - 章対応表の `chapter_id` 先頭（`path` 部分）が、正規化後 `source_path` と一致する行を候補とする。
+3. `chapter_id` 確定
+   - `source_path#section` の `section` が既存 `chapter_id` の `anchor_slug` に対応する場合は当該行を採用する。
+   - 同一 `source_path` 配下で複数候補になる場合は、`display_title` が `section` と最も一致する行を採用する。
+   - なお単一候補のみの場合は、その候補を採用する。
+4. `node_id` 解決（`docs/birdseye/index.json`）
+   - `chapter_id` 確定後、`index.json` から `node_id` を探索する。
+   - 利用フィールドと優先順位は **5.1.1** を正本とする。
+5. 結果判定
+   - 一意に解決できた場合のみ `resolved`。
+   - 複数候補が残る場合は `ambiguous`。
+   - 候補ゼロ、または `index.json` に該当 `node_id` が存在しない場合は `missing`。
+   - `ambiguous` / `missing` は Phase 1 exit 不可（`design-source-inventory-spec.md` 参照）。
+
 ### 5.1 差分検知
 - 更新時は旧版/新版の `node_id` と `depends_on` を比較し、以下を区分する。
   - 追加: 新規 `node_id`
   - 変更: 既存 `node_id` の `depends_on` 変更
   - 削除: 旧版にのみ存在する `node_id`
 - 差分検知結果は対応表の `review_note` に要約を残す。
+
+### 5.1.1 `docs/birdseye/index.json` の node 解決フィールド優先順位
+`chapter_id` に対応する `node_id` 解決時は、`index.json` のノード情報に対して以下の順で照合する。
+
+1. `source_path` 完全一致
+   - ノード側 `source_path` が `chapter_id` の `path` と完全一致するものを最優先候補にする。
+2. `section` / `anchor` 一致
+   - 1 の候補内で、ノード側 `section` または `anchor` が `chapter_id` の `anchor_slug` に一致するものを優先する。
+3. `title` 近似一致
+   - 2 で一意化できない場合、ノード側 `title` と章対応表 `display_title` の一致度で順位付けする。
+4. `node_id` 安定継承
+   - 3 でも同率の場合、既存章対応表の `node_id` と一致する候補を優先する。
+
+上記で一意化できない場合は `ambiguous`、候補ゼロの場合は `missing` とする。
+
+### 5.1.2 fail 条件（未解決時）
+以下のいずれかに該当した場合、node 解決は fail とし、Phase 1 の完了判定を通してはならない。
+
+- `chapter_id` が確定できず `ambiguous` または `missing` になる。
+- `chapter_id` は確定したが `index.json` の候補が複数で一意化できず `ambiguous` になる。
+- `chapter_id` は確定したが `index.json` に該当ノードがなく `missing` になる。
+- fail 行を残したまま `docs/TASKS.md` の `Node IDs` へ転記しようとする。
 
 ### 5.2 互換維持
 - 既存 `chapter_id` は維持し、`node_id` 変更時も `chapter_id` を再採番しない。
