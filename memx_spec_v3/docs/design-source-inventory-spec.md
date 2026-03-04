@@ -27,6 +27,7 @@
 | `depends_on` | 必須 | 先行 node_id または前提要件。無ければ `none` |
 | `owner` | 必須 | 抽出結果の責任者（GitHub ID またはチーム名） |
 | `reviewed_at` | 必須 | 最終レビュー日（`YYYY-MM-DD`） |
+| `node_resolution_status` | 必須 | `source_path#section` から node を解決した結果（`resolved` / `ambiguous` / `missing`） |
 
 ## 欠損時の扱い
 以下のいずれかに該当した行は `Status: blocked` とする。
@@ -35,10 +36,12 @@
 - `req_id` が未記入、または `memx_spec_v3/docs/requirements.md` に存在しない
 - `contract_ref` が未記入で契約整合の追跡不能
 - `node_id` が `docs/birdseye/index.json` に存在しない
+- `node_resolution_status` が `ambiguous` または `missing`
 - `owner` / `reviewed_at` が未設定
 
 差し戻し条件（Phase 1 Done 不可）は以下。
 
 - `blocked` 行が 1 件でも残っている
+- `node_resolution_status` が `ambiguous` または `missing` の行が 1 件でもある（Phase 1 exit 不可）
 - `depends_on` が未解決で Task Seed 化（<=0.5d）できない行がある
 - 必須列が欠けた行を含む状態で `docs/TASKS.md` へ転記しようとしている
