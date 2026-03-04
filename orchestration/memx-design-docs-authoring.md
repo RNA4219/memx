@@ -20,6 +20,8 @@ status: planned
 - `RUNBOOK.md`
 - `docs/birdseye/index.json`
 
+> 注記: Dependencies では非正規名の記載を許可するが、Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録へ転記する時点で `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い正規パスへ正規化すること。
+
 - [ ] Birdseye 検証を `docs/birdseye/memx-birdseye-validation-spec.md` に従って実行し、caps 実体欠落を issue 出力する（Task Seed 1件、<=0.5d）
 - [ ] `requirements.md` から要件ID一覧を抽出し、重複・欠番を洗い出す（Task Seed 1件、<=0.5d）
 - [ ] `traceability.md` を入力成果物として主要 REQ-ID の設計/I/F/評価/契約マッピングを確認する（Task Seed 1件、<=0.5d）
@@ -70,6 +72,8 @@ status: planned
 - `EVALUATION.md`
 - `RUNBOOK.md`
 - `docs/birdseye/index.json`
+
+> 注記: Dependencies では非正規名の記載を許可するが、Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録へ転記する時点で `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い正規パスへ正規化すること。
 
 - [ ] 要件ID網羅率を算出し、章別ドラフトの欠落IDを補完する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` と `interfaces.md` の契約差分を比較し、相違を解消する（`memx_spec_v3/docs/contract-alignment-spec.md` に従う）（Task Seed 1件、<=0.5d）

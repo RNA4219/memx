@@ -102,6 +102,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 - [ ] `Source` の全行が `path#Section` 形式で、`#Section` が空でない
 - [ ] `requirements.md` / `design.md` / `interfaces.md` / `traceability.md` / `EVALUATION.md` / `RUNBOOK.md` / `docs/birdseye/index.json` を参照する場合、`memx_spec_v3/docs/design-reference-resolution-spec.md` の正規パスへ解決済み
 - [ ] 相対名・曖昧名・複数候補解決が 0 件（1件でもあれば fail し、`reviewing` で差し戻し）
+- [ ] Phase 1 抽出表（Design Source Inventory）の `source_path#section` にも、上記 3 チェックを同一条件で適用済み
 
 
 ## 2-2. 変更タイプ別チェックリスト（requirements 0-0-4 整合）

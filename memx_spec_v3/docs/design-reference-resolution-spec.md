@@ -9,6 +9,15 @@ next_review_due: 2026-06-04
 
 `orchestration/memx-design-docs-authoring.md` で使う入力参照名を、Task Seed 作成時に一意な正規パスへ解決するための仕様。
 
+## 0. 適用スコープ
+
+本仕様の参照解決ルールは、以下の成果物すべてに適用する。
+
+- Task Seed
+- Phase 1 抽出表（Design Source Inventory）
+- 章ドラフト
+- レビュー記録の `Source` 欄
+
 ## 1. 対象入力参照名と正規パスマッピング
 
 | 入力参照名（非正規） | 正規パス（必須） |
