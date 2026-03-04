@@ -1185,4 +1185,6 @@ CLI 出力との互換責任範囲：
 - 実運用インシデントの受入対象は `docs/IN-<実日付>-<連番>.md` 形式のみとする。
 - `docs/IN-YYYYMMDD-001.md` / `docs/IN-202603xx-001.md` はテンプレートであり、要件根拠・実績証跡としては扱わない。
 - 初動時点で「検知」「影響」「5 Whys」「再発防止」「タイムライン」を最低限記載する。
-- テンプレート: [`docs/IN-YYYYMMDD-001.md`](../../docs/IN-YYYYMMDD-001.md), [`docs/IN-202603xx-001.md`](../../docs/IN-202603xx-001.md)
+- テンプレート: [`docs/IN-YYYYMMDD-001.md`](../../docs/IN-YYYYMMDD-001.md)
+- 実在インシデント参照例: [`docs/IN-20260303-002.md`](../../docs/IN-20260303-002.md)
+- 注記: `Source` にはテンプレートID（`IN-YYYYMMDD-001` / `IN-202603xx-001`）を記載せず、`docs/IN-<実日付>-<連番>.md` のみを記載する。
