@@ -177,9 +177,16 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 - [ ] `memx_spec_v3/docs/contracts/reports/` 配下に `CONTRACT-ALIGN-YYYYMMDD-###.md` と `LATEST.md` が存在することを確認した
 - [ ] 更新順序を `CONTRACT-ALIGN作成 -> LATEST更新 -> EVALUATION照合` で実施し、逆順更新がないことを確認した
 - [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）を schema 固定として全件記載されていることを確認した（1件でも欠落なら fail）
+- [ ] `LATEST.md` は当該判定のたびに毎回更新し、`report_id/report_path/decision_date/high_count/phase3_status` の5キーを前回値のまま残置していないことを確認した
 - [ ] `memx_spec_v3/docs/contracts/reports/LATEST.md` の必須キー値が最新レポートと整合していることを確認した
-- [ ] `EVALUATION.md` のレポートID参照と、`memx_spec_v3/docs/contracts/reports/LATEST.md` の `report_id` が一致することを確認した
-- [ ] レポートID不一致時は Phase 3 の `Status` を `reviewing` 固定にし、`done` / `blocked` へ遷移していないことを確認した
+- [ ] `EVALUATION.md` の `report_id/report_path` 参照と、`memx_spec_v3/docs/contracts/reports/LATEST.md` の `report_id/report_path` が一致することを確認した
+- [ ] `high_count > 0` またはレポートID不一致時は Phase 3 の `Status` を `reviewing/blocked` に固定し、`done` へ遷移していないことを確認した
+
+### 2-1-3-0. Task Seed 分岐ルール（Phase 3 固定）
+
+- `high_count = 0` かつ `LATEST.md` と `EVALUATION.md` の `report_id/report_path` 一致時のみ `Status: done` へ遷移可能。
+- `high_count > 0` の場合は `Status: blocked` を基本とし、レビュー再判定中のみ `Status: reviewing` を許可する。
+- `report_id` または `report_path` が不一致の場合は `Status: reviewing` 固定とし、`done` / `blocked` へ遷移しない。
 
 ## 2-1-3-1. レビュー実体ファイルSLAチェック（Task Seed close 条件連動・必須）
 

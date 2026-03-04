@@ -35,8 +35,8 @@
 2. `LATEST.md` が欠落または不整合の場合、`CONTRACT-ALIGN-*.md` を日付降順・連番降順で探索し、先頭を暫定最新とする。
 3. 暫定最新を採用した場合は `LATEST.md` を即時再生成し、整合状態へ戻す。
 
-## 5. `LATEST.md` 推奨項目
-最低限、以下の項目を記載する。
+## 5. `LATEST.md` 必須項目
+`LATEST.md` は契約整合レポート作成のたびに毎回更新し、以下 5 キーを必須で記載する。
 
 ```md
 report_id: CONTRACT-ALIGN-YYYYMMDD-###
@@ -47,3 +47,4 @@ phase3_status: done | blocked | reviewing
 ```
 
 `phase3_status` は `docs/TASKS.md` と同一語彙（`done/blocked/reviewing`）に合わせる。
+1 キーでも未更新・欠落がある場合は運用違反として `fail` とする。

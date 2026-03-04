@@ -67,6 +67,8 @@ results:
 - Phase 3 判定（完了 / 未完了）
 - 詳細レポートへの相対パス
 
+上記は必須キー（`report_id/report_path/decision_date/high_count/phase3_status`）として固定し、契約整合レポート更新のたびに毎回更新する。
+
 ## 7. 受け入れ条件（Phase 3 完了条件）
 - Phase 3 を完了扱いにできる条件は **`severity: high = 0`** のみ。
 - `high` が 1 件以上ある場合、Phase 3 は未完了。
@@ -82,11 +84,13 @@ results:
    - 1キーでも未記載なら `fail`。
 3. **`EVALUATION.md` を照合・更新する**
    - `EVALUATION.md` のレポートID参照と `LATEST.md.report_id` の一致を確認する。
+   - `EVALUATION.md` のレポートパス参照と `LATEST.md.report_path` の一致を確認する。
    - ID 不一致時は Phase 3 ステータス遷移を `reviewing` 固定とし、`done` / `blocked` へ遷移しない。
 4. **`docs/TASKS.md` の Phase 3 関連タスクを更新する**
-   - `high = 0` かつ ID一致: 状態を `done` に更新。
-   - `high > 0`: 状態を `blocked` または `reviewing` に更新し、未解消 `diff_id` を列挙。
-   - ID不一致: 状態を `reviewing` に固定。
+   - `docs/TASKS.md` の「2-1-3. Phase 3（契約整合）チェック（必須）」をチェックリストとして実行する。
+   - `high = 0` かつ `report_id/report_path` 一致: 状態を `done` に更新。
+   - `high > 0`: 状態を `reviewing/blocked` に固定し、未解消 `diff_id` を列挙。
+   - `report_id` または `report_path` 不一致: 状態を `reviewing` に固定。
 5. **差分チェックリストを記録する**
    - `docs/TASKS.md` に差分単位のチェックリストを記載する。
    - 例: `- [ ] CA-20260304-003 (REQ-API-001): openapi 必須項目復元`
