@@ -32,6 +32,7 @@
   - 対応 `REQ-ID`
   - `EVALUATION.md` 内の該当節またはアンカー（例: `#req-cli-001-passfail`）
   - 判定に使用した証跡（コマンド結果、計測結果、レビューコメント ID など）
+- 要件マッピング充足率の判定根拠は `memx_spec_v3/docs/requirements-coverage-spec.md` に従い、coverage 証跡（YAML または Markdown テーブル）参照を必須とする。
 - `waiver` の場合は、`EVALUATION.md` の waiver 条件に従い `docs/IN-<実日付>-<連番>.md` 参照を必須とする。
 
 ## 5. `docs/TASKS.md` 連携（レビュー完了条件）
