@@ -56,6 +56,7 @@ next_review_due: 2025-11-14
 - [docs/UPSTREAM_WEEKLY_LOG.md](docs/UPSTREAM_WEEKLY_LOG.md) に未反映の検証ログ・
   フォローアップが残っていないか確認する
 - 新規 ADR を含むリリースでは [docs/ADR/README.md](docs/ADR/README.md) の索引更新を完了し、レビューフローで確認する
+- [docs/qa/design_acceptance.md](docs/qa/design_acceptance.md) を最新設計差分に合わせて更新済み
 - 受け入れ基準に対するエビデンス
 - 影響範囲の再確認
 - PR に `type:*` および `semver:*` ラベルを付与済み

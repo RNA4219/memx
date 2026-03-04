@@ -30,6 +30,7 @@ next_review_due: 2025-11-28
 | 設計判断 | [docs/ADR/README.md](ADR/README.md) | ADR 一覧と作成手順、判断変更時のレビュー連携を統括。 | 設計変更 PR で更新・新規 ADR を提出し、レビューテンプレに添付して承認後にマージ。 |
 | 仕様 | [docs/spec.md](spec.md) | レシピ仕様の原則と更新手続きを集約。 | テンプレ更新時に `TASK.codex.md` の[Task Seed Template](../TASK.codex.md#task-seed-template)と整合性を確認。 |
 | 設計 | [docs/design.md](design.md) | ディレクトリ構成とアーキテクチャ意図を整理。 | 設計レビューで `CHECKLISTS.md` の[Release](../CHECKLISTS.md#release)項目と照合。 |
+| 設計受入 | [docs/qa/design_acceptance.md](qa/design_acceptance.md) | 設計レイヤの公式受入観点（責務境界・互換性・例外方針・非機能影響）を判定付きで管理。 | 設計レビューとリリース判定で `docs/design.md`・`docs/interfaces.md`・`EVALUATION.md` の根拠リンクを突合。 |
 | 要件 | [docs/requirements.md](requirements.md) | 要件トレーサビリティと受入観点を提示。 | ガバナンス確認で `EVALUATION.md` の[Acceptance Criteria](../EVALUATION.md#acceptance-criteria)とリンクを確認。 |
 | I/O 契約 | [docs/CONTRACTS.md](CONTRACTS.md) | 外部連携の I/O 契約と feature detection の扱いを定義。 | 拡張実装時に `RUNBOOK.md` の[Execute](../RUNBOOK.md#execute)手順と突き合わせ。 |
 | 境界定義 | [docs/interfaces.md](interfaces.md) | 機能境界・受け渡し契約をテーブル形式で管理。 | 並行開発時に責務衝突を避けるため、機能追加ごとに更新してレビューへ添付。 |
