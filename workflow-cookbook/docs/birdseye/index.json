@@ -1,5 +1,5 @@
 {
-  "generated_at": "00005",
+  "generated_at": "00026",
   "nodes": {
     "README.md": {
       "role": "overview",
@@ -120,6 +120,11 @@
       "role": "task",
       "caps": "docs/birdseye/caps/docs.tasks.task-autosave-project-locks.md.json",
       "mtime": "00024"
+    },
+    "docs/birdseye/hot.json": {
+      "role": "hotlist",
+      "caps": "docs/birdseye/caps/docs.birdseye.hot.json.json",
+      "mtime": "00025"
     }
   },
   "edges": [
@@ -506,6 +511,18 @@
     [
       "docs/MERGE-DESIGN-IMPL.md",
       "HUB.codex.md"
+    ],
+    [
+      "HUB.codex.md",
+      "docs/birdseye/hot.json"
+    ],
+    [
+      "docs/birdseye/index.json",
+      "docs/birdseye/hot.json"
+    ],
+    [
+      "docs/birdseye/hot.json",
+      "docs/birdseye/index.json"
     ]
   ]
 }

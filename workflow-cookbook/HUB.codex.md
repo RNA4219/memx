@@ -133,12 +133,14 @@ plan:
 1. `workflow-cookbook/docs/BIRDSEYE.md` を参照して用語と成果物を理解
 2. `workflow-cookbook/docs/birdseye/index.json` を読み込みノード存在を確認
 3. 必要な `workflow-cookbook/docs/birdseye/caps/*.json` を最小読込
-4. 不足時のみ `workflow-cookbook/tools/codemap/update.py` へ遷移
+4. `workflow-cookbook/docs/birdseye/hot.json` を読み込み未解決ノードを補完
+5. 不足時のみ `workflow-cookbook/tools/codemap/update.py` へ遷移
 
 この順序を満たさない場合はタスク化を開始しない。
 
 2. **Birdseye 専用サブステップ**:
    - **読込順固定**: Birdseye JSON を第一読者として、`docs/birdseye/index.json` → `docs/birdseye/caps/*.json` → `docs/birdseye/hot.json` の順で必ず読み込む。
+   - **グラフ整合**: 依存グラフは `HUB.codex.md -> docs/birdseye/hot.json` および `docs/birdseye/index.json -> docs/birdseye/hot.json`（必要に応じて `docs/birdseye/hot.json -> docs/birdseye/index.json`）を維持し、読込順説明と実体を一致させる。
    - **対象抽出条件**: 対象ファイルの `node_id` 起点で ±2 hop を抽出し、未解決ノードは `hot.json` の hot list で補完する。
    - **埋込必須項目**: 各候補タスクに `node_id` / `role` / `source_caps` を付与し、GUARDRAILS の `plan` 出力要件（ノードID明示）を初期段階で満たす。
 3. **ノード生成**: 各ファイルから `##` レベルの節をノード化し、`Priority`

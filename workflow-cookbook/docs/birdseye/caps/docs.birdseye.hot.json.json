@@ -1,0 +1,20 @@
+{
+  "id": "docs/birdseye/hot.json",
+  "role": "hotlist",
+  "public_api": [],
+  "summary": "Birdseyeの優先参照ノードを集約し、indexの未解決ノードをホットリストで補完する。",
+  "deps_out": [
+    "docs/birdseye/index.json",
+    "docs/birdseye/caps/"
+  ],
+  "deps_in": [
+    "HUB.codex.md",
+    "docs/birdseye/index.json"
+  ],
+  "risks": [
+    "hotlistが古いと優先参照の誘導が不正確になる",
+    "indexとの参照不整合で補完対象の逆引きに失敗する"
+  ],
+  "tests": [],
+  "generated_at": "00026"
+}
