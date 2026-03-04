@@ -40,6 +40,7 @@
 - 検証対象キー: `run_id` / `generated_at` / `source_commit` / `chapter_id` / `tool` / `status` / `severity_summary` / `evidence_paths`
 - 1キーでも欠落がある入力は不受理とし、統合レポートの最終判定は `fail` とする。
 - `evidence_paths` は列挙された全パスが実在ファイルであることを必須とし、1件でも未存在パスがある入力は不受理（最終判定 `fail`）とする。
+- lint/type/test/link/contract/birdseye/coverage の保存先・命名規則・最小記録粒度は `memx_spec_v3/docs/design-gate-evidence-spec.md` を正本として参照し、本仕様で重複定義しない。
 - 受理可否は Task Seed の `Commands` に記録した検証コマンド結果で追跡可能であること。
 
 ## 3.3 変更計画（導入ステップ）

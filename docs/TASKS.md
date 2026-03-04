@@ -173,6 +173,7 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 - [ ] 作成済みチェック: `memx_spec_v3/docs/reviews/DESIGN-ACCEPTANCE-<実日付>.md` が存在する
 - [ ] 命名正当性チェック: 実体ファイル名が `DESIGN-ACCEPTANCE-<実日付>.md` に一致する（テンプレート `DESIGN-ACCEPTANCE-YYYYMMDD.md` を実体として利用していない）
 - [ ] 最終判定一致チェック: 受け入れレポートの最終判定が `memx_spec_v3/docs/design-doc-dod-spec.md` の判定結果と一致する
+- [ ] 証跡仕様準拠確認: Phase 対象の証跡（lint/type/test/link/contract/birdseye/coverage）が `memx_spec_v3/docs/design-gate-evidence-spec.md` の保存先・命名規則・最小記録粒度（実行日時・コマンド・結果・判定）に準拠している
 
 ### 起票時タスク化提案（競合回避のため分離）
 - 提案1: 「受け入れレポート作成/命名検証」を行う Task Seed を先行起票し、DA-LC-03/04 を固定する。

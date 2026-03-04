@@ -7,12 +7,11 @@
 - 最終判定の正本は `memx_spec_v3/docs/design-doc-dod-spec.md` とする。
 - レビュー記録の `pass` / `fail` / `waiver` 判定は、本仕様および `memx_spec_v3/docs/design-acceptance-report-spec.md` と相互参照しつつ、最終受け入れ判定時は正本仕様を優先する。
 
-## 2. 保存先と命名規則（必須）
-- 保存先は **`memx_spec_v3/docs/reviews/`** に固定する。
-- ファイル名は **`DESIGN-REVIEW-YYYYMMDD-###.md`** とする。
-  - `YYYYMMDD`: レビュー実施日（ローカル日付）
-  - `###`: 同日内の 001 始まり連番
-- 例: `memx_spec_v3/docs/reviews/DESIGN-REVIEW-20260304-001.md`
+## 2. 保存先・命名・証跡粒度（必須）
+- レビュー記録本体の保存先・命名は従来どおり以下に固定する。
+  - 保存先: **`memx_spec_v3/docs/reviews/`**
+  - ファイル名: **`DESIGN-REVIEW-YYYYMMDD-###.md`**
+- Phase 1〜4 の判定根拠として添付する証跡（lint/type/test/link/contract/birdseye/coverage）の保存先・命名規則・最小記録粒度は、`memx_spec_v3/docs/design-gate-evidence-spec.md` を正本として参照する。
 
 ## 3. レビュー記録の必須フィールド
 各レビュー記録は、以下 6 項目を必須で含む。
