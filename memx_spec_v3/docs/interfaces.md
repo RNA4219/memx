@@ -7,6 +7,11 @@ next_review_due: 2026-06-03
 
 # memx インターフェース仕様（interfaces）
 
+## 0. 文書の位置づけ
+- 本書は人間可読の I/O 説明と互換方針を扱う。
+- 契約正本は `docs/contracts/openapi.yaml` と `docs/contracts/cli-json.schema.json`。
+- `CONTRACTS.md` は正本スキーマへの索引・抜粋のみを扱う。
+
 ## 1. CLI I/O（v1 必須）
 
 ### 1.1 `mem in short`（IF-CLI-INGEST-REQ/RES）
@@ -159,11 +164,11 @@ next_review_due: 2026-06-03
 - API 契約正本は `docs/contracts/openapi.yaml`。
 
 ## 5. 契約変更手順（更新順序固定）
-1. `memx_spec_v3/docs/interfaces.md` を更新し、I/F 項目ID（`IF-*`）を付与・更新する。
-2. 同一 PR で `memx_spec_v3/docs/contracts/openapi.yaml` を確認・反映する。
-3. 同一 PR で `memx_spec_v3/docs/contracts/cli-json.schema.json` を確認・反映する。
-4. 同一 PR で `memx_spec_v3/docs/CONTRACTS.md` を確認・反映する。
-5. `RUNBOOK.md` の `trace-req-*` と I/F 項目ID対応を更新し、受け入れ差分レビュー可能状態にする。
+1. `memx_spec_v3/docs/requirements.md` を更新する。
+2. 正本スキーマ（`memx_spec_v3/docs/contracts/openapi.yaml` / `memx_spec_v3/docs/contracts/cli-json.schema.json`）を更新する。
+3. `memx_spec_v3/docs/interfaces.md` と `memx_spec_v3/docs/CONTRACTS.md` を更新する。
+4. `EVALUATION*` / `memx_spec_v3/docs/operations-spec.md`（RUNBOOK 相当）を更新する。
+5. 契約差分チェック手順（`operations-spec.md`）を実施し、レビュー可能状態にする。
 
 
 ## 6. 付録: RUNBOOK連携 I/F ID（v1運用）
