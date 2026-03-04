@@ -120,9 +120,11 @@ plan:
 
 0. **Birdseye Readiness Check**:
    - **`index.json` 検証**: `docs/birdseye/index.json` の存在確認と JSON 妥当性検証を行う。
-   - **`caps` 参照検証**: `index.json.nodes[*].caps` に含まれる参照先ファイルの存在確認を行う。
+   - **`nodes` 形式検証**: `index.json.nodes` が map/object であることを確認する。
+   - **`caps` パス検証**: `index.json.nodes` の各要素に対して `caps` パスの存在確認を行う。
+   - **互換注意**: 将来 `nodes` が配列形式へ変更される可能性を考慮し、object/array の両対応判定を実装する。
    - **鮮度検証**: `index.json.generated_at` と対象ドキュメント更新時刻の鮮度条件を確認し、判定基準は [`GUARDRAILS.md` の「鮮度管理（Staleness Handling）」](GUARDRAILS.md#鮮度管理staleness-handling) を正とする。
-   - **判定値**: 結果は `ready | degraded | blocked` の3値で扱う。`degraded` は既知ノード限定の分割継続、`blocked` は新規分割停止を意味する。
+   - **判定値**: 結果は `ready | degraded | blocked` の3値で扱う。`degraded` は既知ノード限定の分割継続、`blocked` は新規分割停止を意味する。失敗時（`degraded` / `blocked`）は `notes.readiness_status` へ判定結果を必ず記録する。
 1. **スキャン**: ルートと `orchestration/` 配下を再帰探索し、Markdown front matter
    (`---`) を含むファイルを優先取得。
    
@@ -131,12 +133,14 @@ plan:
 1. `workflow-cookbook/docs/BIRDSEYE.md` を参照して用語と成果物を理解
 2. `workflow-cookbook/docs/birdseye/index.json` を読み込みノード存在を確認
 3. 必要な `workflow-cookbook/docs/birdseye/caps/*.json` を最小読込
-4. 不足時のみ `workflow-cookbook/tools/codemap/update.py` へ遷移
+4. `workflow-cookbook/docs/birdseye/hot.json` を読み込み未解決ノードを補完
+5. 不足時のみ `workflow-cookbook/tools/codemap/update.py` へ遷移
 
 この順序を満たさない場合はタスク化を開始しない。
 
 2. **Birdseye 専用サブステップ**:
    - **読込順固定**: Birdseye JSON を第一読者として、`docs/birdseye/index.json` → `docs/birdseye/caps/*.json` → `docs/birdseye/hot.json` の順で必ず読み込む。
+   - **グラフ整合**: 依存グラフは `HUB.codex.md -> docs/birdseye/hot.json` および `docs/birdseye/index.json -> docs/birdseye/hot.json`（必要に応じて `docs/birdseye/hot.json -> docs/birdseye/index.json`）を維持し、読込順説明と実体を一致させる。
    - **対象抽出条件**: 対象ファイルの `node_id` 起点で ±2 hop を抽出し、未解決ノードは `hot.json` の hot list で補完する。
    - **埋込必須項目**: 各候補タスクに `node_id` / `role` / `source_caps` を付与し、GUARDRAILS の `plan` 出力要件（ノードID明示）を初期段階で満たす。
 3. **ノード生成**: 各ファイルから `##` レベルの節をノード化し、`Priority`
