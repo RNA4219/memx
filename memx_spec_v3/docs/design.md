@@ -220,3 +220,17 @@ short 固有:
 - `RUNBOOK.md`
 - `EVALUATION.md`
 - `docs/IN-*.md`
+
+---
+
+## 7. design-template 段階移行チェックリスト（章単位）
+
+- [ ] 1. レイヤ構成 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 2. DB 責務分割 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 2.1 store別設計詳細（short/chronicle/memopedia/archive） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 2.2 Security/Retention 設計 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 3. 移行戦略 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 4. ユースケース設計 を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 5. ADR参照運用ルール を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 6. 設計→契約→検証 導線（要件ID単位） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+- [ ] 6.1 NFR設計（性能 / 復旧 / 整合性回復） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）

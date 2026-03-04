@@ -21,6 +21,8 @@ priority: high
   - HTTP API 契約とエラー応答スキーマの正本。
 - `contracts/cli-json.schema.json`
   - CLI `--json` 出力契約の正本。
+- `traceability.md`
+  - 主要 REQ-ID の要件→設計→I/F→評価→契約の対応正本。
 
 ### 1-2. 補助（Secondary）
 
@@ -66,10 +68,11 @@ priority: high
 ## 3. 更新順序（契約変更時・固定）
 
 1. `requirements.md` を更新する。
-2. 正本スキーマ（`contracts/openapi.yaml` / `contracts/cli-json.schema.json`）を更新する。
-3. `interfaces.md` と `CONTRACTS.md` を更新する。
-4. `EVALUATION*` / `operations-spec.md`（RUNBOOK 相当）を更新する。
-5. 必要に応じて `memx_spec_v3/README.md` の導線を更新する。
+2. `traceability.md` を更新する。
+3. 正本スキーマ（`contracts/openapi.yaml` / `contracts/cli-json.schema.json`）を更新する。
+4. `interfaces.md` と `CONTRACTS.md` を更新する。
+5. `EVALUATION*` / `operations-spec.md`（RUNBOOK 相当）を更新する。
+6. 必要に応じて `memx_spec_v3/README.md` の導線を更新する。
 ---
 
 # memx 仕様（spec）
