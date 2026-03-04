@@ -99,5 +99,11 @@ status: planned
   - `Dependencies`: 前提タスク/外部条件
   - `Release Note Draft`: 利用者影響の要約
   - `Status`: 許可語彙（planned/active/in_progress/reviewing/blocked/done）
+- 全章のレビュー記録が `memx_spec_v3/docs/design-review-spec.md` に準拠している
+  - 保存先: `memx_spec_v3/docs/reviews/`
+  - 命名: `DESIGN-REVIEW-YYYYMMDD-###.md`
+  - 必須項目: 対象章 / 関連 REQ-ID / Node IDs / 指摘一覧（重大度付き） / 再確認結果 / 判定（pass/fail/waiver）
+  - 判定根拠: `EVALUATION.md` pass/fail ルール参照を必須化
+  - 完了条件: `docs/TASKS.md` の `Release Note Draft` / `Status` / `Moved-to-CHANGES` を確認済み
 - `lint/type/test` ではなく、仕様整合チェック（要件ID網羅率・契約同期・リンク健全性）で受け入れ判定する運用が明文化されている
 - Phase 1〜4 のチェックボックスがすべて完了している
