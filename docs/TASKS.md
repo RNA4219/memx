@@ -95,7 +95,9 @@
 - `Source` / `Dependencies` で `contracts.md` / `CONTRACTS.md` を参照する場合は、正規パス **`memx_spec_v3/docs/CONTRACTS.md`** のみを許可する。
 - 次のいずれかを検出した場合は誤参照として `fail` 扱い（レビュー差し戻し）にする。
   - `Source` / `Dependencies` に `memx_spec_v3/docs/contracts.md`（小文字）または `contracts.md#...` が残存する。
-  - `Source` が `path#Section` 形式を満たしていても、`memx_spec_v3/docs/design-reference-resolution-spec.md` の正規パスマッピングへ解決されていない。
+  - `Source` / `Dependencies` に `docs/*.md`（root `docs/IN-*.md` を除く）を正本として扱う参照が残存する。
+  - `Source` / `Dependencies` が `path#Section` 形式を満たしていても、`memx_spec_v3/docs/design-reference-resolution-spec.md` の正規パスマッピングへ解決されていない。
+  - `Source` / `Dependencies` に `requirements.md` / `design.md` / `interfaces.md` / `traceability.md` / `CONTRACTS.md` / `EVALUATION.md` / `RUNBOOK.md` の曖昧名（相対名のみ）が残存する。
 
 ### Incident Trace
 - Incident 由来の Task では、`docs/IN-<実日付>-<連番>.md#<対象章>` を記載し、`memx_spec_v3/docs/incident-to-task-traceability-spec.md` に従って `Requirements` / `Commands` / `Dependencies` へ転記する。

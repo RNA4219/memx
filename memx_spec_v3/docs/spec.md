@@ -12,6 +12,22 @@ priority: high
 
 ## 1. 文書の役割分担（正本/補助）
 
+### 1-0. 設計書作成時の正本パス一覧（1ページ集約）
+
+設計書作成（Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録）で参照する正本は次に固定する。
+
+| 区分 | 正本パス（canonical） |
+| --- | --- |
+| requirements | `memx_spec_v3/docs/requirements.md` |
+| design | `memx_spec_v3/docs/design.md` |
+| interfaces | `memx_spec_v3/docs/interfaces.md` |
+| traceability | `memx_spec_v3/docs/traceability.md` |
+| CONTRACTS | `memx_spec_v3/docs/CONTRACTS.md` |
+| EVALUATION | `docs/birdseye/caps/EVALUATION.md.json` |
+| RUNBOOK | `docs/birdseye/caps/RUNBOOK.md.json` |
+
+`memx_spec_v3/docs/design-reference-resolution-spec.md` の正規パスマッピングと一致しない参照は誤参照として扱う。
+
 ### 1-1. 正本（Normative）
 
 - `requirements.md`

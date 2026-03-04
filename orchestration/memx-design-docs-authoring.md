@@ -40,6 +40,8 @@ status: planned
 - `docs/incident-record-operations-spec.md`（Incident source evidence 採用可否条件の正本）
 
 > 注記: Dependencies では非正規名の記載を許可するが、Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録へ転記する時点で `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い正規パスへ正規化すること。
+> 正規化例（Task Seed転記時）: `requirements.md` → `memx_spec_v3/docs/requirements.md#<section>`、`CONTRACTS.md` → `memx_spec_v3/docs/CONTRACTS.md#<section>`、`EVALUATION.md` → `docs/birdseye/caps/EVALUATION.md.json#<section_key>`。
+> 曖昧名（例: `requirements.md` / `contracts.md` / `EVALUATION.md` のみ）を残したまま Task Seed を起票してはならない。
 
 - [ ] Birdseye 検証を `docs/birdseye/memx-birdseye-validation-spec.md` に従って実行し、caps 実体欠落を issue 出力する（Task Seed 1件、<=0.5d）
 - [ ] `requirements.md` から要件ID一覧を抽出し、重複・欠番を洗い出す（Task Seed 1件、<=0.5d）
@@ -110,6 +112,8 @@ status: planned
 - `docs/birdseye/index.json`
 
 > 注記: Dependencies では非正規名の記載を許可するが、Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録へ転記する時点で `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い正規パスへ正規化すること。
+> 正規化例（Task Seed転記時）: `requirements.md` → `memx_spec_v3/docs/requirements.md#<section>`、`CONTRACTS.md` → `memx_spec_v3/docs/CONTRACTS.md#<section>`、`EVALUATION.md` → `docs/birdseye/caps/EVALUATION.md.json#<section_key>`。
+> 曖昧名（例: `requirements.md` / `contracts.md` / `EVALUATION.md` のみ）を残したまま Task Seed を起票してはならない。
 
 - [ ] 要件ID網羅率を算出し、章別ドラフトの欠落IDを補完する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` と `interfaces.md` の契約差分を比較し、相違を解消する（`memx_spec_v3/docs/contract-alignment-spec.md` に従う）（Task Seed 1件、<=0.5d）

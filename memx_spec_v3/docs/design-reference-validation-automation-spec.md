@@ -30,6 +30,7 @@ next_review_due: 2026-06-04
    - `EVALUATION.md` / `RUNBOOK.md` は `docs/birdseye/caps/*.json` 経由に正規化する。
 4. `docs/IN-*.md` 相対解決
    - `docs/IN-*.md#section` 形式のみ許可し、`docs/` 配下の非 `IN-` ファイル参照は alias 辞書に従って warn/fail 判定する。
+   - あわせて root `docs/*.md`（`docs/IN-*.md` を除く）を正本として扱う参照を非正本参照として検出対象に含める。
 
 ## 3. fail 条件（自動停止）
 
@@ -45,6 +46,8 @@ next_review_due: 2026-06-04
    - `memx_spec_v3/docs/contracts.md`（小文字）や `contracts.md` が、`memx_spec_v3/docs/CONTRACTS.md` へ解決されず残存している。
 5. 禁止パターン参照
    - alias spec で禁止された `../`、絶対パス、`memx_spec_v3/docs/EVALUATION.md` / `RUNBOOK.md` を検出した。
+6. 非正本参照の残存
+   - `Source` / `Dependencies` / 入力成果物記述に、`memx_spec_v3/docs/design-reference-resolution-spec.md` の canonical 以外（例: `requirements.md` などの曖昧名、root `docs/*.md` の非 `IN-*.md`）が残存している。
 
 ## 3-1. alias 辞書の自動検証観点
 
