@@ -118,6 +118,16 @@ plan:
 
 1. **スキャン**: ルートと `orchestration/` 配下を再帰探索し、Markdown front matter
    (`---`) を含むファイルを優先取得。
+   
+### Birdseye Bootstrap
+
+1. `workflow-cookbook/docs/BIRDSEYE.md` を参照して用語と成果物を理解
+2. `workflow-cookbook/docs/birdseye/index.json` を読み込みノード存在を確認
+3. 必要な `workflow-cookbook/docs/birdseye/caps/*.json` を最小読込
+4. 不足時のみ `workflow-cookbook/tools/codemap/update.py` へ遷移
+
+この順序を満たさない場合はタスク化を開始しない。
+
 2. **Birdseye 専用サブステップ**:
    - **読込順固定**: Birdseye JSON を第一読者として、`docs/birdseye/index.json` → `docs/birdseye/caps/*.json` → `docs/birdseye/hot.json` の順で必ず読み込む。
    - **対象抽出条件**: 対象ファイルの `node_id` 起点で ±2 hop を抽出し、未解決ノードは `hot.json` の hot list で補完する。
