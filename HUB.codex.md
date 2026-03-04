@@ -55,6 +55,18 @@ next_review_due: 2026-06-03
 
 - オーケストレーション入力ソースとして `orchestration/*.md` を参照する。
 
+## Birdseye Bootstrap
+依存関係解決へ進む前に、以下を**必ずこの順序で**参照する。
+
+1. `docs/BIRDSEYE.md`（用語/成果物理解）
+2. `docs/birdseye/index.json`
+3. 必要最小限の `docs/birdseye/caps/*.json`
+4. `docs/birdseye/hot.json`
+5. 不足時のみ `tools/codemap/update.py`
+
+この順序を満たさない場合はタスク化を開始しない。
+Birdseye 復旧が必要な場合の遷移先は [`RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」](RUNBOOK.md#birdseye-鮮度不足時の復旧手順) のみとする。
+
 ## 自動タスク分割フロー
 以下を入力として順序どおり処理し、Task Seed（`TASK.<slug>-MM-DD-YYYY.md`）へ写像する。
 
@@ -70,7 +82,8 @@ next_review_due: 2026-06-03
    - 出力（Task Seed への写像）: Requirements を確定し、Commands 候補を生成する。
 
 3. 工程3: 依存関係グラフ解決
-   - 入力: `docs/birdseye/index.json`
+   - 前提条件: 「Birdseye Bootstrap」の参照順完了。
+   - 入力: `docs/birdseye/index.json`（必要最小限の `docs/birdseye/caps/*.json` と `docs/birdseye/hot.json` を含む）
    - 処理: 参照リンクと依存順を解決し、着手順とブロッカーを特定する。
    - 出力（Task Seed への写像）: Dependencies を確定し、Status 初期値（planned）を設定する。
 
@@ -129,7 +142,7 @@ status: planned
 ## 運用メモ（Birdseye 鮮度判定）
 - `docs/birdseye/index.json.generated_at` は UTC RFC3339 であること。
 - 判定時刻から **7日以内** なら鮮度 OK、**7日超** は鮮度不足として扱う。
-- 鮮度不足時は `RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」を実施する。
+- 鮮度不足時は [`RUNBOOK.md` の「Birdseye 鮮度不足時の復旧手順」](RUNBOOK.md#birdseye-鮮度不足時の復旧手順) を実施する（遷移先は本リンクに統一）。
 
 ## ノード抽出ルール
 - ノード抽出単位は `##` 見出しとし、`###` 以下は同一ノード内の補足情報として扱う。
