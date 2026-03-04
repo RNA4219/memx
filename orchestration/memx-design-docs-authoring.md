@@ -57,6 +57,7 @@ status: planned
 ### Done Criteria
 - Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源7ファイル一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
 - `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定ロジック・写像規則・証跡要件は `memx_spec_v3/docs/design-hub-source-coverage-spec.md` を正本として適用する。あわせて Incident 転記完了チェック（`memx_spec_v3/docs/incident-to-task-traceability-spec.md` 準拠で `Requirements` / `Commands` / `Dependencies` への転記完了、かつ検証コマンド1件以上）を必須化する
+- 必須成果物の対象範囲と更新タイミングは `memx_spec_v3/docs/design-deliverables-package-spec.md` を正本として適用する
 
 ### Phase 1 参照先追記計画（情報源（固定入力+拡張入力）の抽出結果）
 - [ ] `design-source-inventory-spec.md` の必須列（`source_type`, `source_path#section`, `req_id`, `contract_ref`, `node_id`, `depends_on`, `owner`, `reviewed_at`, `node_resolution_status`）で抽出表を作成する
@@ -91,6 +92,7 @@ status: planned
 - 章対応表（`memx_spec_v3/docs/design-chapter-node-mapping-spec.md`）が Phase 2 更新内容に追随している
 - 各章が HUB ノード抽出ルールでそのまま Task Seed 化できる
 - 章ごとの未解決事項が 0.5d 以内の追加タスクへ分解済みである
+- 必須成果物の対象範囲と更新タイミングは `memx_spec_v3/docs/design-deliverables-package-spec.md` を正本として適用する
 
 ## Phase 3: 契約整合
 ### Priority Label Rule
@@ -120,11 +122,10 @@ status: planned
 - [ ] Phase 3 Done Criteria 判定時に `memx_spec_v3/docs/link-integrity-spec.md` を参照する運用タスクを登録し、章別 Task Seed へ反映する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
-- 仕様整合チェックを満たす（要件ID網羅率 100%）
-- 仕様整合チェックを満たす（契約同期: `memx_spec_v3/docs/contract-alignment-spec.md` に基づく判定で high=0 件）
-- 仕様整合チェックを満たす（リンク健全性: `memx_spec_v3/docs/link-integrity-spec.md` に基づき、章内/章間/運用リンクの不達 0 件）
+- 仕様整合チェックの完成判定は `memx_spec_v3/docs/design-doc-dod-spec.md` を正本として実施する
 - 仕様整合チェック結果を各章 Task Seed の `Requirements` と `Commands` に反映済みである
 - 各章の検証結果を `memx_spec_v3/docs/design-chapter-validation-spec.md` 準拠の章別検証サマリとして作成済みである（参照: `memx_spec_v3/docs/reviews/DESIGN-CHAPTER-VALIDATION-20260304.md`）
+- 必須成果物の対象範囲と更新タイミングは `memx_spec_v3/docs/design-deliverables-package-spec.md` を正本として適用する
 
 ### Phase 3 Done Criteria 追記案（本文編集は別タスク）
 - 重複する個別判定文（REQ網羅率/契約同期/link 健全性）は、`memx_spec_v3/docs/design-doc-dod-spec.md#3. 完成判定ルール（固定）` 参照へ置換する。
@@ -154,23 +155,14 @@ status: planned
 - [ ] `Moved-to-CHANGES: YYYY-MM-DD` の追記対象を確定する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
-- 全章が `docs/TASKS.md` 必須項目フォーマットへマッピング済みである
+- 全章が `docs/TASKS.md` 必須項目フォーマットへマッピング済みである（`Release Note Draft` / `Status` / `Moved-to-CHANGES` を含む）
 - 最終 gate 再計算時に `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定根拠は `docs/IN-*.md`・`orchestration/*.md`・`TASK.*` を対象に検索キー `Incident` / `Orchestration` / `TASK` で固定する
 - Incident を source evidence として採用する場合、`docs/incident-record-operations-spec.md` 準拠で実体ファイル（`docs/IN-<実日付>-<連番>.md`）のみを許可し、テンプレート/ベースライン参照が残るレビューは `done` 遷移不可とする
-  - `Source`: `path#Section`
-  - `Node IDs`: `docs/birdseye/index.json` の node_id
-  - `Objective`: 1〜3行
-  - `Requirements`: 要件IDと整合条件
-  - `Commands`: 仕様整合チェック実行手順
-  - `Dependencies`: 前提タスク/外部条件
-  - `Release Note Draft`: 利用者影響の要約
-  - `Status`: 許可語彙（planned/active/in_progress/reviewing/blocked/done）
 - 全章のレビュー記録が `memx_spec_v3/docs/design-review-spec.md` に準拠している
   - 保存先: `memx_spec_v3/docs/reviews/`
   - 命名: `DESIGN-REVIEW-YYYYMMDD-###.md`
   - 必須項目: 対象章 / 関連 REQ-ID / Node IDs / 指摘一覧（重大度付き） / 再確認結果 / 判定（pass/fail/waiver）
   - 判定根拠: `docs/birdseye/caps/EVALUATION.md.json` pass/fail ルール参照を必須化
-  - 完了条件: `docs/TASKS.md` の `Release Note Draft` / `Status` / `Moved-to-CHANGES` を確認済み
 - 統合受け入れレポートが `memx_spec_v3/docs/design-acceptance-report-spec.md` と `memx_spec_v3/docs/design-acceptance-lifecycle-spec.md` に準拠している
   - 判定手順・入力元・差戻し・再作成・責務分担は `memx_spec_v3/docs/design-acceptance-operations-spec.md` を唯一の参照先として適用する
   - DA-LC-01: テンプレートと実体ファイルの責務分離
@@ -181,6 +173,7 @@ status: planned
 - 章別検証サマリ（`memx_spec_v3/docs/design-chapter-validation-spec.md`）が作成済みで、レビュー記録・受け入れレポートの参照を添付済みである（参照: `memx_spec_v3/docs/reviews/DESIGN-CHAPTER-VALIDATION-20260304.md`）
 - `lint/type/test` ではなく、仕様整合チェック（要件ID網羅率・契約同期・リンク健全性）で受け入れ判定する運用が明文化されている
 - Phase 1〜4 のチェックボックスがすべて完了している
+- 必須成果物の対象範囲と更新タイミングは `memx_spec_v3/docs/design-deliverables-package-spec.md` を正本として適用する
 
 ### Phase 4 Done Criteria 追記案（本文編集は別タスク）
 - 「REQ網羅率/high差分/リンク不達/Birdseye issue」の閾値判定文は `memx_spec_v3/docs/design-doc-dod-spec.md#3. 完成判定ルール（固定）` へ集約参照する。

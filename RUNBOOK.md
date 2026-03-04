@@ -50,6 +50,12 @@ next_review_due: 2026-06-03
 4. `--dry-run` は DB 変更せず予定操作 JSON のみ返却。
 
 
+## 設計更新完了時の最終確認手順
+1. `memx_spec_v3/docs/design-deliverables-package-spec.md` の必須成果物表を上から順に確認し、対象タスクで `design.md` / `interfaces.md` / `traceability.md` / `memx_spec_v3/docs/reviews/*.md` / `CHANGELOG.md` / `memx_spec_v3/CHANGES.md` が更新済みかを点検する。
+2. `docs/TASKS.md` の完了前チェック（`Release Note Draft` / `Status` / `Moved-to-CHANGES`）を順に実施し、Task Seed の記載と差分有無を照合する。
+3. `orchestration/memx-design-docs-authoring.md` の Phase Done Criteria と照合し、最終判定に必要な成果物・証跡が不足していないことを確認する。
+4. 判定ログに確認日時と確認者を記録し、`Status: done` 更新後に CHANGES 移送を完了する。
+
 ## 障害時手順（要件ID紐付け）
 
 - 適用要件: `REQ-NFR-002` / `REQ-NFR-003` / `REQ-NFR-004` / `REQ-NFR-005` / `REQ-NFR-006`
