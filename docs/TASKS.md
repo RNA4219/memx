@@ -68,6 +68,7 @@
 - エラーコードを新規追加・変更するタスクでは、`memx_spec_v3/docs/requirements.md` の「6-4. エラーモデル」と `memx_spec_v3/docs/error-contract.md` を同時更新対象に含める。
 - API/CLI の契約（request/response/error/`--json`）を変更するタスクでは、`memx_spec_v3/docs/contracts/openapi.yaml` と `memx_spec_v3/docs/contracts/cli-json.schema.json` の更新を必須とする。
 - Phase 2〜4 対象タスクでは、`memx_spec_v3/docs/design-chapter-validation-spec.md` に準拠した章別検証サマリ作成（`chapter_id` / `req_coverage` / `contract_alignment_high_count` / `link_broken_count` / `birdseye_issue_count` / `evidence_paths`）を必須要件として記載する。
+- Phase 2〜4 対象タスクでは、`Requirements` に `memx_spec_v3/docs/design-doc-dod-spec.md` 参照を必須で明記する（最終判定の正本）。
 
 ### Commands
 - 実行・検証コマンドを列挙する。
@@ -155,3 +156,10 @@ CLI/API の既存必須フィールド削除、型変更、意味変更、既存
 4. 同内容を `CHANGELOG.md` に 1〜3 行の最小要約で追記する（重複エントリは禁止）。
 5. 互換性破壊がある場合は `memx_spec_v3/CHANGES.md` の「互換性破壊時の記載テンプレート」を必ず併記する。
 6. 移送後、Task Seed 側には `Moved-to-CHANGES: YYYY-MM-DD` を追記してトレース可能にする。
+
+## 4. 変更タスク起票（Design Doc DoD 正本参照の追加）
+以下は、Phase 2〜4 向け Requirements 例へ本仕様参照必須ルールを反映するための変更タスク案（起票用）。
+
+- [ ] Task A: `docs/TASKS.md` の `Requirements` 節（Phase 2〜4 ルール）に `memx_spec_v3/docs/design-doc-dod-spec.md` の正本参照必須を追加する。
+- [ ] Task B: `orchestration/memx-design-docs-authoring.md` の Phase 3/4 Done Criteria を本仕様参照へ置換する差分タスクを起票する（本文置換は別PR）。
+- [ ] Task C: `memx_spec_v3/docs/design-acceptance-report-spec.md` / `memx_spec_v3/docs/design-review-spec.md` へ「最終判定の正本」相互参照を維持する運用チェックを Task Seed の `Requirements` に追加する。

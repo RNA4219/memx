@@ -108,6 +108,10 @@ status: planned
 - 仕様整合チェック結果を各章 Task Seed の `Requirements` と `Commands` に反映済みである
 - 各章の検証結果を `memx_spec_v3/docs/design-chapter-validation-spec.md` 準拠の章別検証サマリとして作成済みである
 
+### Phase 3 Done Criteria 追記案（本文編集は別タスク）
+- 重複する個別判定文（REQ網羅率/契約同期/link 健全性）は、`memx_spec_v3/docs/design-doc-dod-spec.md#3. 完成判定ルール（固定）` 参照へ置換する。
+- 置換後の判定文案: 「Phase 3 の完成判定は `memx_spec_v3/docs/design-doc-dod-spec.md` を正本として実施する。」
+
 ## Phase 4: 受け入れレビュー
 ### Priority Label Rule
 - Phase 4 の各チェック項目は最終判定阻害の有無で付与する。
@@ -154,3 +158,7 @@ status: planned
 - 章別検証サマリ（`memx_spec_v3/docs/design-chapter-validation-spec.md`）が作成済みで、レビュー記録・受け入れレポートの参照を添付済みである
 - `lint/type/test` ではなく、仕様整合チェック（要件ID網羅率・契約同期・リンク健全性）で受け入れ判定する運用が明文化されている
 - Phase 1〜4 のチェックボックスがすべて完了している
+
+### Phase 4 Done Criteria 追記案（本文編集は別タスク）
+- 「REQ網羅率/high差分/リンク不達/Birdseye issue」の閾値判定文は `memx_spec_v3/docs/design-doc-dod-spec.md#3. 完成判定ルール（固定）` へ集約参照する。
+- 置換後の判定文案: 「最終判定は `memx_spec_v3/docs/design-doc-dod-spec.md` を唯一の正本として `pass` / `fail` を決定する。」

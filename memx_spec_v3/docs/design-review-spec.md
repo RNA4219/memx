@@ -3,6 +3,10 @@
 ## 1. 目的
 本仕様は、設計レビュー記録の必須項目・判定根拠・保存規約を固定し、`EVALUATION.md` と `docs/TASKS.md` に整合した受け入れ判断を行うための共通フォーマットを定義する。
 
+## 1-1. 正本仕様の参照（最終判定）
+- 最終判定の正本は `memx_spec_v3/docs/design-doc-dod-spec.md` とする。
+- レビュー記録の `pass` / `fail` / `waiver` 判定は、本仕様および `memx_spec_v3/docs/design-acceptance-report-spec.md` と相互参照しつつ、最終受け入れ判定時は正本仕様を優先する。
+
 ## 2. 保存先と命名規則（必須）
 - 保存先は **`memx_spec_v3/docs/reviews/`** に固定する。
 - ファイル名は **`DESIGN-REVIEW-YYYYMMDD-###.md`** とする。

@@ -3,6 +3,10 @@
 ## 1. 目的
 本仕様は、設計受け入れレビューの統合レポートの入力元・必須項目・判定規則・保存規約を固定し、Phase 4 の完了判定を一意化する。
 
+## 1-1. 正本仕様の参照（最終判定）
+- 最終判定（`pass` / `fail`）の正本は `memx_spec_v3/docs/design-doc-dod-spec.md` とする。
+- 本仕様の判定規則は `memx_spec_v3/docs/design-doc-dod-spec.md` と矛盾してはならない。
+
 ## 2. 入力元（必須）
 統合レポートは、以下 6 仕様の結果を入力として集約する。
 
@@ -42,6 +46,8 @@
 - 章別検証サマリ参照が欠落している章が 1 件でもある場合、最終判定は `fail` とする。
 
 ## 4. 判定規則（固定）
+- `memx_spec_v3/docs/design-review-spec.md` と合わせて、最終判定の正本は `memx_spec_v3/docs/design-doc-dod-spec.md` とする。
+
 最終判定は以下の固定ルールで算出する。
 
 - `high差分件数 > 0` の場合は `fail`
