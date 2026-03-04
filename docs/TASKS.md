@@ -118,6 +118,12 @@
 - `Status: done` へ遷移する条件として、移送後に `Moved-to-CHANGES: YYYY-MM-DD` を追記済みであること。
 - `docs/birdseye/index.json` と `nodes[].capsule` 実体の不整合を検知した場合は、対象 Task Seed の `Status` を `blocked` へ遷移し、欠落 capsule のパス・検知コマンド・暫定対処を Task Seed に記録する。
 
+### 完了前チェック（`Release Note Draft` / `Status` / `Moved-to-CHANGES`）
+- [ ] `Release Note Draft` を 1〜3 行で記載済み（`CHANGELOG.md` 反映内容と一致）
+- [ ] `Status` が許可語彙（planned/active/in_progress/reviewing/blocked/done）のいずれかで、`done` へ遷移する根拠を記載済み
+- [ ] `Moved-to-CHANGES: YYYY-MM-DD` を追記済み、または未移送理由を明記済み
+- [ ] 上記3項目は `memx_spec_v3/docs/design-deliverables-package-spec.md` の成果物パッケージ要件と矛盾しない
+
 
 #### Phase Gate 判定との対応表
 | Status | gate判定 | 使用条件 | 差し戻し時の更新 |
