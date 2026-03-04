@@ -36,6 +36,8 @@ python tools/codemap/update.py \
    Birdseye を再生成する場合は `docs/birdseye/` 配下を明示してください。
 2. `--emit` で出力対象を指定します。現在は `index+caps` が標準です。
 3. `docs/birdseye/index.json` と `docs/birdseye/hot.json` を同一ターゲットで指定すると、両データセットの鮮度が揃います。
+   `generated_at` と `index.json.nodes[*].mtime` は ISO 8601 UTC（`YYYY-MM-DDTHH:MM:SSZ`）で出力されるため、
+   手動確認時も同フォーマットであることを先に確認してください。
    出力後は `index.json.generated_at` / `hot.json.generated_at` が最新コミットに追随しているか確認し、
    必要に応じてホットリスト項目の `last_verified_at` が対象ノードの最新確認日を反映しているか点検します。
 4. 差分をレビューし、`docs/BIRDSEYE.md` のフォールバック情報と矛盾がないことをチェックしてからコミットします。

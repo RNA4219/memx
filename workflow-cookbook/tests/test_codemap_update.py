@@ -253,10 +253,8 @@ def _prepare_birdseye_root(
     }
 
 
-def _next_serial(serial: str) -> str:
-    match = re.fullmatch(r"\d{5}", serial)
-    assert match, f"serial must be 5 digits, got {serial!r}"
-    return f"{int(serial) + 1:05d}"
+def _is_iso8601_utc(value: str) -> bool:
+    return bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", value))
 
 
 @pytest.mark.parametrize(
@@ -312,18 +310,18 @@ def test_birdseye_root_plan_requires_hot_when_emitting_index(
         builder.build()
 
 
-def test_next_generated_at_handles_non_serial_inputs():
+def test_next_generated_at_uses_fallback_timestamp():
     allocator = update._SerialAllocator()
 
     generated = update._next_generated_at(None, "2025-01-01T00:00:00Z", allocator=allocator)
-    assert generated == "00001"
+    assert generated == "2025-01-01T00:00:00Z"
 
     follow_up = update._next_generated_at(
         "2024-12-31T23:59:59Z",
         "2025-01-01T00:00:00Z",
         allocator=allocator,
     )
-    assert follow_up == "00001"
+    assert follow_up == "2025-01-01T00:00:00Z"
 
     seeded_allocator = update._SerialAllocator()
     seeded_allocator.observe("00041")
@@ -333,7 +331,7 @@ def test_next_generated_at_handles_non_serial_inputs():
         "2025-01-01T00:00:00Z",
         allocator=seeded_allocator,
     )
-    assert advanced == "00042"
+    assert advanced == "2025-01-01T00:00:00Z"
 
 
 _HOT_INDEX_SNAPSHOT = "docs/birdseye/index.json"
@@ -451,17 +449,14 @@ def test_index_contains_docs_birdseye_node_with_bidirectional_edges():
         assert (neighbour, "docs/BIRDSEYE.md") in edges
 
 
-def test_index_mtime_is_serial_numbered():
+def test_index_mtime_is_iso8601_utc():
     repo_root = Path(__file__).resolve().parents[1]
     index_doc = json.loads((repo_root / "docs" / "birdseye" / "index.json").read_text(encoding="utf-8"))
 
     mtimes = [node.get("mtime") for node in index_doc.get("nodes", {}).values()]
 
     assert mtimes, "mtime entries should exist"
-    assert all(isinstance(mtime, str) and re.fullmatch(r"\d{5}", mtime) for mtime in mtimes)
-
-    serials = sorted(int(mtime) for mtime in mtimes)
-    assert serials == list(range(1, len(mtimes) + 1))
+    assert all(isinstance(mtime, str) and _is_iso8601_utc(mtime) for mtime in mtimes)
 
 
 def _prepare_birdseye(
@@ -577,7 +572,7 @@ def test_birdseye_session_plan_targets_root_and_capsule(tmp_path, monkeypatch):
 
     planned_paths = {write.path for write in plan.writes}
 
-    assert plan.generated_at == "00002"
+    assert plan.generated_at == "2025-01-01T00:00:00Z"
     assert planned_paths == {
         index_path,
         hot_path,
@@ -624,7 +619,7 @@ def test_birdseye_session_plan_computes_expected_writes(tmp_path, monkeypatch):
 
     planned_paths = {write.path for write in plan.writes}
 
-    assert plan.generated_at == "00002"
+    assert plan.generated_at == "2025-01-01T00:00:00Z"
     assert index_path in planned_paths
     assert hot_path in planned_paths
     assert cap_paths["alpha.md"] in planned_paths
@@ -787,6 +782,9 @@ def test_run_update_resolves_targets_from_repo_root_outside_cwd(tmp_path, monkey
     resolved = options.resolve_targets()
     assert resolved == (index_path,)
 
+    frozen_now = datetime(2025, 1, 2, tzinfo=timezone.utc)
+    monkeypatch.setattr(update, "utc_now", lambda: frozen_now)
+
     report = update.run_update(options)
 
     expected_writes = {index_path, hot_path}
@@ -796,8 +794,8 @@ def test_run_update_resolves_targets_from_repo_root_outside_cwd(tmp_path, monkey
     refreshed_index = json.loads(index_path.read_text(encoding="utf-8"))
     refreshed_hot = json.loads(hot_path.read_text(encoding="utf-8"))
 
-    assert refreshed_index["generated_at"] == "00002"
-    assert refreshed_hot["generated_at"] == "00002"
+    assert refreshed_index["generated_at"] == "2025-01-02T00:00:00Z"
+    assert refreshed_hot["generated_at"] == "2025-01-02T00:00:00Z"
 
 
 @pytest.mark.parametrize("dry_run", [False, True])
@@ -813,11 +811,8 @@ def test_run_update_refreshes_metadata_and_dependencies(tmp_path, monkeypatch, d
         hot_entries=_HOT_NODE_IDS,
     )
 
-    baseline_index = json.loads(index_path.read_text(encoding="utf-8"))
-    base_serial = baseline_index["generated_at"]
-    expected_serial = _next_serial(base_serial)
-
     frozen_now = datetime(2025, 1, 1, 9, 30, tzinfo=timezone.utc)
+    expected_timestamp = update._format_timestamp(frozen_now)
     monkeypatch.setattr(update, "utc_now", lambda: frozen_now)
 
     snapshots = None
@@ -831,8 +826,8 @@ def test_run_update_refreshes_metadata_and_dependencies(tmp_path, monkeypatch, d
         update.UpdateOptions(targets=(root,), emit="index+caps", dry_run=dry_run)
     )
 
-    assert re.fullmatch(r"\d{5}", report.generated_at)
-    assert report.generated_at == expected_serial
+    assert _is_iso8601_utc(report.generated_at)
+    assert report.generated_at == expected_timestamp
     assert set(report.planned_writes) == {index_path, hot_path, *cap_paths.values()}
 
     if dry_run:
@@ -845,7 +840,7 @@ def test_run_update_refreshes_metadata_and_dependencies(tmp_path, monkeypatch, d
     assert set(report.performed_writes) == {index_path, hot_path, *cap_paths.values()}
 
     refreshed_index = json.loads(index_path.read_text(encoding="utf-8"))
-    assert refreshed_index["generated_at"] == expected_serial
+    assert refreshed_index["generated_at"] == expected_timestamp
 
     refreshed_alpha = json.loads(cap_paths["alpha.md"].read_text(encoding="utf-8"))
     assert refreshed_alpha["deps_out"] == ["beta.md"]
@@ -856,7 +851,7 @@ def test_run_update_refreshes_metadata_and_dependencies(tmp_path, monkeypatch, d
     assert refreshed_beta["deps_in"] == ["alpha.md"]
 
     refreshed_hot = json.loads(hot_path.read_text(encoding="utf-8"))
-    assert refreshed_hot["generated_at"] == expected_serial
+    assert refreshed_hot["generated_at"] == expected_timestamp
     expected_hot_nodes = [dict(node) for node in _HOT_NODES_FIXTURE]
     assert refreshed_hot["index_snapshot"] == _HOT_INDEX_SNAPSHOT
     assert refreshed_hot["refresh_command"] == _HOT_REFRESH_COMMAND
@@ -918,8 +913,6 @@ def test_run_update_preserves_hot_nodes_structure(tmp_path, monkeypatch):
     )
 
     baseline_hot = json.loads(hot_path.read_text(encoding="utf-8"))
-    base_serial = baseline_hot["generated_at"]
-    expected_serial = _next_serial(base_serial)
     assert baseline_hot["index_snapshot"] == _HOT_INDEX_SNAPSHOT
     assert baseline_hot["refresh_command"] == _HOT_REFRESH_COMMAND
     assert baseline_hot["curation_notes"] == _HOT_CURATION_NOTES
@@ -937,17 +930,18 @@ def test_run_update_preserves_hot_nodes_structure(tmp_path, monkeypatch):
         assert node["curation_notes"] == _HOT_CURATION_NOTES
 
     frozen_now = datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc)
+    expected_timestamp = update._format_timestamp(frozen_now)
     monkeypatch.setattr(update, "utc_now", lambda: frozen_now)
 
     report = update.run_update(
         update.UpdateOptions(targets=(root,), emit="index+caps", dry_run=False)
     )
 
-    assert re.fullmatch(r"\d{5}", report.generated_at)
-    assert report.generated_at == expected_serial
+    assert _is_iso8601_utc(report.generated_at)
+    assert report.generated_at == expected_timestamp
 
     refreshed_hot = json.loads(hot_path.read_text(encoding="utf-8"))
-    assert refreshed_hot["generated_at"] == expected_serial
+    assert refreshed_hot["generated_at"] == expected_timestamp
     assert refreshed_hot["index_snapshot"] == _HOT_INDEX_SNAPSHOT
     assert refreshed_hot["refresh_command"] == _HOT_REFRESH_COMMAND
     assert refreshed_hot["curation_notes"] == _HOT_CURATION_NOTES
@@ -1053,7 +1047,7 @@ def test_run_update_refreshes_caps_generated_at(tmp_path, monkeypatch):
     frozen_now = datetime(2025, 1, 5, tzinfo=timezone.utc)
     monkeypatch.setattr(update, "utc_now", lambda: frozen_now)
 
-    expected_serial = _next_serial(base_serial)
+    expected_timestamp = update._format_timestamp(frozen_now)
     report = update.run_update(
         update.UpdateOptions(targets=(cap_paths["beta.md"],), emit="caps", dry_run=False)
     )
@@ -1063,15 +1057,15 @@ def test_run_update_refreshes_caps_generated_at(tmp_path, monkeypatch):
         for cap_id in ("alpha.md", "beta.md", "gamma.md", "delta.md")
     }
 
-    assert re.fullmatch(r"\d{5}", report.generated_at)
-    assert report.generated_at == expected_serial
+    assert _is_iso8601_utc(report.generated_at)
+    assert report.generated_at == expected_timestamp
     assert set(report.planned_writes) == expected_caps
     assert set(report.performed_writes) == expected_caps
 
     for cap_id in ("alpha.md", "beta.md", "gamma.md", "delta.md"):
         refreshed = json.loads(cap_paths[cap_id].read_text(encoding="utf-8"))
-        assert re.fullmatch(r"\d{5}", refreshed["generated_at"])
-        assert refreshed["generated_at"] == expected_serial
+        assert _is_iso8601_utc(refreshed["generated_at"])
+        assert refreshed["generated_at"] == expected_timestamp
         expected_out, expected_in = expected_deps[cap_id]
         assert refreshed["deps_out"] == expected_out
         assert refreshed["deps_in"] == expected_in
@@ -1108,25 +1102,28 @@ def test_run_update_recovers_non_serial_generated_at(tmp_path, monkeypatch):
     hot_payload["generated_at"] = "2023-12-31T23:59:59Z"
     _write_json(hot_path, hot_payload)
 
+    frozen_now = datetime(2025, 1, 3, tzinfo=timezone.utc)
+    monkeypatch.setattr(update, "utc_now", lambda: frozen_now)
+
     report = update.run_update(
         update.UpdateOptions(targets=(cap_paths["beta.md"],), emit="index+caps", dry_run=False)
     )
 
-    expected_serial = "00008"
+    expected_timestamp = update._format_timestamp(frozen_now)
 
-    assert report.generated_at == expected_serial
+    assert report.generated_at == expected_timestamp
 
     refreshed_index = json.loads(index_path.read_text(encoding="utf-8"))
-    assert refreshed_index["generated_at"] == expected_serial
+    assert refreshed_index["generated_at"] == expected_timestamp
 
     refreshed_hot = json.loads(hot_path.read_text(encoding="utf-8"))
-    assert refreshed_hot["generated_at"] == expected_serial
+    assert refreshed_hot["generated_at"] == expected_timestamp
 
     refreshed_beta = json.loads(cap_paths["beta.md"].read_text(encoding="utf-8"))
-    assert refreshed_beta["generated_at"] == expected_serial
+    assert refreshed_beta["generated_at"] == expected_timestamp
 
     updated_alpha = json.loads(cap_paths["alpha.md"].read_text(encoding="utf-8"))
-    assert updated_alpha["generated_at"] == expected_serial
+    assert updated_alpha["generated_at"] == expected_timestamp
 
 
 def test_run_update_accepts_caps_directory_target(tmp_path, monkeypatch):
@@ -1149,13 +1146,10 @@ def test_run_update_accepts_caps_directory_target(tmp_path, monkeypatch):
     )
 
     monkeypatch.setattr(update, "_REPO_ROOT", tmp_path)
-    baseline_index = json.loads(index_path.read_text(encoding="utf-8"))
-    base_serial = baseline_index["generated_at"]
-    expected_serial = _next_serial(base_serial)
-
     monkeypatch.chdir(tmp_path)
 
     frozen_now = datetime(2025, 1, 4, tzinfo=timezone.utc)
+    expected_timestamp = update._format_timestamp(frozen_now)
     monkeypatch.setattr(update, "utc_now", lambda: frozen_now)
 
     report = update.run_update(
@@ -1165,16 +1159,16 @@ def test_run_update_accepts_caps_directory_target(tmp_path, monkeypatch):
     expected_caps = {cap_paths[cap_id] for cap_id in cap_paths}
     expected_writes = expected_caps | {index_path, hot_path}
 
-    assert re.fullmatch(r"\d{5}", report.generated_at)
-    assert report.generated_at == expected_serial
+    assert _is_iso8601_utc(report.generated_at)
+    assert report.generated_at == expected_timestamp
     assert set(report.planned_writes) == expected_writes
     assert set(report.performed_writes) == expected_writes
 
     refreshed_index = json.loads(index_path.read_text(encoding="utf-8"))
-    assert refreshed_index["generated_at"] == expected_serial
+    assert refreshed_index["generated_at"] == expected_timestamp
 
     refreshed_hot = json.loads(hot_path.read_text(encoding="utf-8"))
-    assert refreshed_hot["generated_at"] == expected_serial
+    assert refreshed_hot["generated_at"] == expected_timestamp
     assert len(refreshed_hot["nodes"]) == len(_HOT_NODE_IDS)
 
     expected_deps = {
@@ -1395,7 +1389,7 @@ def test_refresh_hot_updates_serial_and_preserves_metadata(tmp_path):
     assert report.planned_writes == (hot_path,)
     assert report.performed_writes == (hot_path,)
     refreshed = json.loads(hot_path.read_text(encoding="utf-8"))
-    assert refreshed["generated_at"] == "00043"
+    assert refreshed["generated_at"] == timestamp
     assert refreshed["index_snapshot"] == _HOT_INDEX_SNAPSHOT
     assert refreshed["refresh_command"] == _HOT_REFRESH_COMMAND
     assert refreshed["curation_notes"] == _HOT_CURATION_NOTES
@@ -1439,7 +1433,7 @@ def test_refresh_capsule_updates_dependencies_and_serial(tmp_path):
     refreshed = json.loads(cap_path.read_text(encoding="utf-8"))
     assert refreshed["deps_out"] == ["beta"]
     assert refreshed["deps_in"] == ["gamma"]
-    assert refreshed["generated_at"] == "00011"
+    assert refreshed["generated_at"] == "2025-01-02T00:00:00Z"
 
 
 def test_focus_resolver_returns_all_capsules_for_root_target():

@@ -218,6 +218,7 @@ in_progress → blocked → in_progress（解除後に戻す）
 - タスク自動生成ツールはドライランでJSON出力を確認後にIssue化
 - 生成後は `CHANGELOG.md` へ反映済みタスクを移すことで履歴が追える
 - Birdseye 鮮度: `docs/birdseye/index.json.generated_at` が最新コミットより古ければ再収集を要求。
+  `generated_at` と `index.json.nodes[*].mtime` は ISO 8601 UTC（`YYYY-MM-DDTHH:MM:SSZ`）で判定する。
   該当 Capsule も同時更新。
 - 鮮度判断と人間エスカレーション条件は [`GUARDRAILS.md` の「鮮度管理（Staleness Handling）」](GUARDRAILS.md#鮮度管理staleness-handling) を正とし、
   `index.generated_at` 逆転 / Caps 不在 / 対象ノード未登録 / `codemap.update` 未実装時は同節の依頼フローへ遷移する。

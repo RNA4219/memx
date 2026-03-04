@@ -404,8 +404,15 @@ class _SerialAllocator:
 
 
 def _next_generated_at(existing: Any, fallback: str, *, allocator: _SerialAllocator) -> str:
-    del fallback
-    return allocator.allocate(existing)
+    del existing, allocator
+    return fallback
+
+
+def _resolve_node_mtime(node_id: str) -> str | None:
+    target = (_REPO_ROOT / node_id).resolve()
+    if not target.exists():
+        return None
+    return _format_timestamp(datetime.fromtimestamp(target.stat().st_mtime, tz=timezone.utc))
 
 
 @dataclass(frozen=True)
@@ -664,6 +671,18 @@ class BirdseyeRootBuilder:
         if index_data.get("generated_at") != new_generated:
             index_data["generated_at"] = new_generated
             self._remember_generated(new_generated)
+
+        nodes = index_data.get("nodes")
+        if isinstance(nodes, dict):
+            for node_id, payload in nodes.items():
+                if not isinstance(node_id, str) or not isinstance(payload, dict):
+                    continue
+                mtime = _resolve_node_mtime(node_id)
+                if mtime is None:
+                    continue
+                if payload.get("mtime") != mtime:
+                    payload["mtime"] = mtime
+
         serialized = _dump_json(index_data)
         if serialized != index_original:
             self._writes.append(

@@ -4,117 +4,117 @@
     "README.md": {
       "role": "overview",
       "caps": "docs/birdseye/caps/README.md.json",
-      "mtime": "00007"
+      "mtime": "2026-03-04T08:40:59Z"
     },
     "HUB.codex.md": {
       "role": "navigation",
       "caps": "docs/birdseye/caps/HUB.codex.md.json",
-      "mtime": "00006"
+      "mtime": "2026-03-04T08:44:13Z"
     },
     "GUARDRAILS.md": {
       "role": "policy",
       "caps": "docs/birdseye/caps/GUARDRAILS.md.json",
-      "mtime": "00005"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "BLUEPRINT.md": {
       "role": "requirements",
       "caps": "docs/birdseye/caps/BLUEPRINT.md.json",
-      "mtime": "00001"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "RUNBOOK.md": {
       "role": "operations",
       "caps": "docs/birdseye/caps/RUNBOOK.md.json",
-      "mtime": "00008"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "EVALUATION.md": {
       "role": "quality",
       "caps": "docs/birdseye/caps/EVALUATION.md.json",
-      "mtime": "00004"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "TASK.codex.md": {
       "role": "template",
       "caps": "docs/birdseye/caps/TASK.codex.md.json",
-      "mtime": "00010"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "CHECKLISTS.md": {
       "role": "checklist",
       "caps": "docs/birdseye/caps/CHECKLISTS.md.json",
-      "mtime": "00003"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "CHANGELOG.md": {
       "role": "history",
       "caps": "docs/birdseye/caps/CHANGELOG.md.json",
-      "mtime": "00002"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/IN-20250115-001.md": {
       "role": "incident",
       "caps": "docs/birdseye/caps/docs.IN-20250115-001.md.json",
-      "mtime": "00012"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "SECURITY.md": {
       "role": "security",
       "caps": "docs/birdseye/caps/SECURITY.md.json",
-      "mtime": "00009"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "governance/policy.yaml": {
       "role": "governance",
       "caps": "docs/birdseye/caps/governance.policy.yaml.json",
-      "mtime": "00016"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "governance/prioritization.yaml": {
       "role": "governance",
       "caps": "docs/birdseye/caps/governance.prioritization.yaml.json",
-      "mtime": "00017"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/birdseye/index.json": {
       "role": "index",
       "caps": "docs/birdseye/caps/docs.birdseye.index.json.json",
-      "mtime": "00015"
+      "mtime": "2026-03-04T08:43:48Z"
     },
     "docs/BIRDSEYE.md": {
       "role": "fallback",
       "caps": "docs/birdseye/caps/docs.BIRDSEYE.md.json",
-      "mtime": "00011"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/birdseye/caps/": {
       "role": "collection",
       "caps": "docs/birdseye/caps/docs.birdseye.caps.json",
-      "mtime": "00014"
+      "mtime": "2026-03-04T08:44:40Z"
     },
     "tools/codemap/": {
       "role": "tooling",
       "caps": "docs/birdseye/caps/tools.codemap.json",
-      "mtime": "00018"
+      "mtime": "2026-03-04T08:44:37Z"
     },
     "tools/codemap/README.md": {
       "role": "guide",
       "caps": "docs/birdseye/caps/tools.codemap.README.md.json",
-      "mtime": "00019"
+      "mtime": "2026-03-04T08:40:59Z"
     },
     "tools/codemap/update.py": {
       "role": "script",
       "caps": "docs/birdseye/caps/tools.codemap.update.py.json",
-      "mtime": "00020"
+      "mtime": "2026-03-04T08:42:35Z"
     },
     "docs/INCIDENT_TEMPLATE.md": {
       "role": "template",
       "caps": "docs/birdseye/caps/docs.INCIDENT_TEMPLATE.md.json",
-      "mtime": "00013"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/IMPLEMENTATION-PLAN.md": {
       "role": "plan",
       "caps": "docs/birdseye/caps/docs.IMPLEMENTATION-PLAN.md.json",
-      "mtime": "00021"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/AUTOSAVE-DESIGN-IMPL.md": {
       "role": "design",
       "caps": "docs/birdseye/caps/docs.AUTOSAVE-DESIGN-IMPL.md.json",
-      "mtime": "00022"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/MERGE-DESIGN-IMPL.md": {
       "role": "design",
       "caps": "docs/birdseye/caps/docs.MERGE-DESIGN-IMPL.md.json",
-      "mtime": "00023"
+      "mtime": "2026-03-04T08:32:10Z"
     },
     "docs/tasks/task-autosave-project-locks.md": {
       "role": "task",
