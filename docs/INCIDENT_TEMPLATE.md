@@ -8,6 +8,21 @@
 - ステータス: `Open | Mitigated | Resolved | Closed`
 - 関連要件: [`memx 要件定義: 0.目的とスコープ`](../memx_spec_v3/docs/requirements.md#0-目的とスコープ)
 
+- 使用規約: `docs/incident-record-operations-spec.md`（テンプレート/実体の利用境界、誤用防止、Task Seed 連携の正本）
+
+## 実体ファイル作成時の必須項目（同期定義）
+
+- 対象: `docs/IN-<実日付>-<連番>.md`
+- 以下は必須記録項目（`docs/incident-record-operations-spec.md` と同一定義）。
+  - ID/参照ID: `インシデントID` / `Task Seed 参照ID（インシデントIDと同値）`
+  - 時刻: `発生日（UTC）` / `起票日（UTC）` / `検知日時` / `暫定復旧完了日時` / `恒久復旧完了日時`
+  - 要件ID: `関連要件ID` / `waiver対象要件ID`（waiver時）
+  - waiver項目: `waiver理由` / `期限（UTC）` / `暫定リスク受容者` / `代替統制` / `解除条件`
+  - 証跡パス: `関連証跡パス`
+- 誤用防止:
+  - テンプレート（`docs/IN-YYYYMMDD-001.md`）へ実運用値を記載しない。
+  - `EVALUATION` 証跡として参照するのは実体（`docs/IN-<実日付>-<連番>.md`）のみ。
+
 ## 最小監査項目（REQ-NFR-006）
 
 - 適用要件: `REQ-NFR-006`

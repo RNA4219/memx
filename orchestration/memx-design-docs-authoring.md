@@ -37,6 +37,7 @@ status: planned
 - `docs/IN-*.md`（実績インシデントのみ。テンプレート除外）
 - `orchestration/*.md`
 - `docs/INCIDENT_TEMPLATE.md`（必要時の参照のみ。実績証跡扱い不可）
+- `docs/incident-record-operations-spec.md`（Incident source evidence 採用可否条件の正本）
 
 > 注記: Dependencies では非正規名の記載を許可するが、Task Seed / Phase 1 抽出表 / 章ドラフト / レビュー記録へ転記する時点で `memx_spec_v3/docs/design-reference-resolution-spec.md` に従い正規パスへ正規化すること。
 
@@ -49,6 +50,7 @@ status: planned
 - [ ] `docs/birdseye/caps/RUNBOOK.md.json` の運用手順と契約依存箇所を抽出する（Task Seed 1件、<=0.5d）
 - [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、`memx_spec_v3/docs/design-chapter-node-mapping-spec.md` 準拠の章対応表（chapter_id -> node_id）を更新する（Task Seed 1件、<=0.5d）
 - [ ] `docs/IN-*.md`（実績インシデント）から再発防止要件・運用証跡を抽出し、テンプレート（`docs/INCIDENT_TEMPLATE.md`）混入を除外する（Task Seed 1件、<=0.5d）
+- [ ] Incident source evidence は `docs/incident-record-operations-spec.md` に従い、必須項目（ID/時刻/要件ID/waiver項目/証跡パス）充足時のみ採用する（Task Seed 1件、<=0.5d）
 - [ ] `orchestration/*.md` の依存関係（depends_on 相当）を抽出し、未解決依存を `blocked` 条件として明示する（Task Seed 1件、<=0.5d）
 - [ ] `memx_spec_v3/docs/design-reference-conformance-spec.md` に従い、Phase 1 抽出表の参照解決適合（`path#section` / warn/fail 判定）を確認する（Task Seed 1件、<=0.5d）
 
@@ -141,6 +143,7 @@ status: planned
 - `docs/birdseye/caps/EVALUATION.md.json`
 - `docs/birdseye/caps/RUNBOOK.md.json`
 - `docs/birdseye/index.json`
+- `docs/incident-record-operations-spec.md`（Phase 4 source evidence 最終判定条件）
 
 - [ ] 章ごとに `Release Note Draft`（1〜3行）を作成する（Task Seed 1件/章、<=0.5d）
 - [ ] レビュー記録は [テンプレート](../memx_spec_v3/docs/reviews/TEMPLATE.md) から作成し、[保存先ルール](../memx_spec_v3/docs/reviews/README.md) に従って `memx_spec_v3/docs/reviews/` へ保存する（Task Seed 1件、<=0.5d）
@@ -153,6 +156,7 @@ status: planned
 ### Done Criteria
 - 全章が `docs/TASKS.md` 必須項目フォーマットへマッピング済みである
 - 最終 gate 再計算時に `gate_hub_source_coverage`（`high/medium/low`）を必須入力として記録し、判定根拠は `docs/IN-*.md`・`orchestration/*.md`・`TASK.*` を対象に検索キー `Incident` / `Orchestration` / `TASK` で固定する
+- Incident を source evidence として採用する場合、`docs/incident-record-operations-spec.md` 準拠で実体ファイル（`docs/IN-<実日付>-<連番>.md`）のみを許可し、テンプレート/ベースライン参照が残るレビューは `done` 遷移不可とする
   - `Source`: `path#Section`
   - `Node IDs`: `docs/birdseye/index.json` の node_id
   - `Objective`: 1〜3行
