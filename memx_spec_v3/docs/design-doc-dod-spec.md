@@ -20,6 +20,7 @@
 3. リンク不達件数が `0`（`memx_spec_v3/docs/link-integrity-spec.md`）
 4. Birdseye issue 未解決件数が `0`（`docs/birdseye/memx-birdseye-validation-spec.md`）
 5. レビュー記録が必須項目を満たして完備（`memx_spec_v3/docs/design-review-spec.md`）
+6. 参照解決適合率が `100%`（`memx_spec_v3/docs/design-reference-conformance-spec.md`）
 
 ## 4. 判定実行順（推奨固定順）
 1. 章別検証サマリを更新する。

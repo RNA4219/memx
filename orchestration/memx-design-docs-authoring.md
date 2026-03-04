@@ -50,6 +50,7 @@ status: planned
 - [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、`memx_spec_v3/docs/design-chapter-node-mapping-spec.md` 準拠の章対応表（chapter_id -> node_id）を更新する（Task Seed 1件、<=0.5d）
 - [ ] `docs/IN-*.md`（実績インシデント）から再発防止要件・運用証跡を抽出し、テンプレート（`docs/INCIDENT_TEMPLATE.md`）混入を除外する（Task Seed 1件、<=0.5d）
 - [ ] `orchestration/*.md` の依存関係（depends_on 相当）を抽出し、未解決依存を `blocked` 条件として明示する（Task Seed 1件、<=0.5d）
+- [ ] `memx_spec_v3/docs/design-reference-conformance-spec.md` に従い、Phase 1 抽出表の参照解決適合（`path#section` / warn/fail 判定）を確認する（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
 - Phase 1 Done Criteria は `../memx_spec_v3/docs/design-source-inventory-spec.md` と `../memx_spec_v3/docs/design-chapter-node-mapping-spec.md` を正本として判定する（情報源7ファイル一覧化、Task Seed 粒度、`docs/TASKS.md` 転記可否、node 解決成否を含む）
@@ -77,6 +78,7 @@ status: planned
 
 - [ ] 章ごとに `Objective`（1〜3行）を作成する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Source` を `path#Section` 形式で記述する（Task Seed 1件/章、<=0.5d）
+- [ ] `memx_spec_v3/docs/design-reference-conformance-spec.md` に従い、章ドラフト `Source` の参照解決適合（`path#section` / warn/fail 判定）を確認する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Node IDs` を `docs/birdseye/index.json` 参照で付与し、章対応表（chapter_id -> node_id）を更新する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Requirements` を要件ID箇条書きで記述する（Task Seed 1件/章、<=0.5d）
 - [ ] 章ごとに `Commands`（仕様整合チェック用）を記述する（Task Seed 1件/章、<=0.5d）
