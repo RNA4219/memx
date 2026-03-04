@@ -136,6 +136,35 @@ plan:
 4. `workflow-cookbook/docs/birdseye/hot.json` を読み込み未解決ノードを補完
 5. 不足時のみ `workflow-cookbook/tools/codemap/update.py` へ遷移
 
+#### Access DoD
+
+- `docs/birdseye/index.json` で対象 `node_id` が解決できる。
+- `source_caps` に指定した `docs/birdseye/caps/*.json` が存在し内容を読める。
+- 未解決ノードがある場合 `docs/birdseye/hot.json` で補完される。
+
+`notes.readiness_status` との対応:
+
+| readiness_status | Access DoD判定 |
+| --- | --- |
+| `ready` | DoD達成（補完不要または補完済み） |
+| `degraded` | DoD一部未達（欠損Capsありで限定継続） |
+| `blocked` | DoD未達（`index.json` 不在/破損などで停止） |
+
+- `degraded` 継続条件: `index.json` で解決できる既知 `node_id` と可読な `source_caps` が揃うタスクに限定して継続する。
+- `blocked` 停止条件: `node_id` 解決に必要な `index.json` が利用不能、または DoD の必須要件が満たせない場合はタスク化を停止する。
+
+`plan` 出力例（DoD達成後に埋まる必須項目）:
+
+```yaml
+plan:
+  - task_id: bootstrap-01
+    objective: Birdseye 参照整備
+    node_id: node-workflow-cookbook-docs-birdseye
+    role: orchestration
+    source_caps:
+      - caps/core.json
+```
+
 この順序を満たさない場合はタスク化を開始しない。
 
 2. **Birdseye 専用サブステップ**:
