@@ -408,6 +408,7 @@ short 固有:
 | [`REQ-NFR-001`](./requirements.md#5-1-性能目標v1必須3エンドポイント) | 6.1 | ingest/search/show | p95 閾値の達成（計測プロトコル準拠） |
 | [`REQ-NFR-002`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 6.1 | 運用復旧フロー | RTO/RPO 同時成立 |
 | [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 6.1 | short→archive 補償 | 30分以内収束または IN 起票 |
+| [`REQ-NFR-006`](./requirements.md#5-4-インシデント記録docsin-md最小監査項目) | 6.2 | インシデント監査記録/waiver 記録 | 必須監査項目 + waiver 項目欠落なし |
 
 ## 6.1 NFR設計（性能 / 復旧 / 整合性回復）
 
@@ -434,9 +435,10 @@ short 固有:
 - `REQ-NFR-003`
 - `REQ-NFR-004`
 - `REQ-NFR-005`
+- `REQ-NFR-006`
 
 ### Commands
-- 要件ID網羅: `rg -n "REQ-NFR-00[1-5]" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
+- 要件ID網羅: `rg -n "REQ-NFR-00[1-6]" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md`
 - 契約同期: `rg -n "p95|RTO|RPO|30分以内|15分以内|再処理" memx_spec_v3/docs/design.md RUNBOOK.md EVALUATION.md`
 - リンク健全性: `python scripts/check_links.py memx_spec_v3/docs/design.md`
 
@@ -455,6 +457,49 @@ short 固有:
 | [`REQ-NFR-003`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 検知時刻 / 暫定復旧時刻ログ | 検知〜暫定復旧が 15 分以内 |
 | [`REQ-NFR-004`](./requirements.md#5-2-可用性復旧整合性回復運用nfr) | 再試行履歴、ジョブログ | 1 リクエストあたり再処理 2 回以内 |
 | [`REQ-NFR-005`](./requirements.md#5-3-整合性回復要件archive-補償フロー) | 補償フロー実行ログ、`docs/IN-*.md` 起票有無 | 30分以内収束、未収束時は IN 起票 |
+
+## 6.2 REQ-NFR-006（監査記録 / waiver）責務境界
+
+### Objective
+- `REQ-NFR-006` の監査記録と waiver 要件について、設計責務（記録対象/参照導線）と運用責務（起票/承認/維持）の境界を固定する。
+
+### Source
+- `memx_spec_v3/docs/design.md#6-2-req-nfr-006監査記録--waiver-責務境界`
+- `memx_spec_v3/docs/requirements.md#5-4-インシデント記録docsin-md最小監査項目`
+- `memx_spec_v3/docs/requirements.md#5-4-1-waiver-時の必須記録docsin-md-運用連動`
+- `memx_spec_v3/docs/operations-spec.md#2-waiver-記録必須項目req-nfr-006`
+- `memx_spec_v3/docs/operations-spec.md#6-必須証跡ファイル一覧とキー定義`
+
+### Node IDs
+- `design`
+  - depends_on: `requirements`, `traceability`
+- `operations`
+  - depends_on: `requirements`, `runbook`
+- `evidence`
+  - depends_on: `operations`
+
+### Requirements
+- `REQ-NFR-006`
+
+### Commands
+- 要件ID網羅: `rg -n "REQ-NFR-006" memx_spec_v3/docs/design.md memx_spec_v3/docs/requirements.md memx_spec_v3/docs/traceability.md EVALUATION.md`
+- 証跡導線確認: `rg -n "docs/IN-\*\.md|artifacts/ops/incident-summary.json|artifacts/ops/recovery-log.ndjson" memx_spec_v3/docs/design.md memx_spec_v3/docs/operations-spec.md`
+
+### Dependencies
+- `memx_spec_v3/docs/operations-spec.md`
+- `EVALUATION.md`
+- `docs/IN-*.md`
+- `artifacts/ops/incident-summary.json`
+- `artifacts/ops/recovery-log.ndjson`
+
+### Status
+- active
+
+| 責務層 | 固定責務 | 非責務（運用へ委譲） | 参照固定先 |
+| --- | --- | --- | --- |
+| 設計（本書） | 必須監査項目と waiver 項目のデータ境界を定義し、評価/証跡への参照導線を固定する。 | 個別インシデントの起票判断、承認実施、期限更新の実務判断。 | `memx_spec_v3/docs/operations-spec.md#2-waiver-記録必須項目req-nfr-006`, `memx_spec_v3/docs/operations-spec.md#6-必須証跡ファイル一覧とキー定義` |
+| 運用（operations-spec / RUNBOOK） | `docs/IN-<実日付>-<連番>.md` 起票、waiver 7 項目の記録・期限管理、証跡ファイル更新を実行する。 | 要件自体の閾値変更や判定基準の再定義。 | `memx_spec_v3/docs/operations-spec.md#7-waiver-運用発動条件期限解除条件未解除時エスカレーション`, `RUNBOOK.md#障害時手順要件id紐付け` |
+| 評価（EVALUATION） | `REQ-NFR-006` 合否を必須監査項目欠落/waiver期限切れ/再計画チケット欠落で機械判定する。 | 証跡の作成・補完作業。 | `EVALUATION.md#運用nfr可用性復旧整合性回復合否基準` |
 
 ## 7. design-template 段階移行チェックリスト（章単位）
 
