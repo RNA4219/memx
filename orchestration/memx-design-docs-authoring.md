@@ -65,6 +65,7 @@ status: planned
 - `docs/birdseye/index.json`
 
 - [ ] 要件ID網羅率を算出し、章別ドラフトの欠落IDを補完する（Task Seed 1件、<=0.5d）
+- [ ] `design.md` と `interfaces.md` の契約差分を比較し、相違を解消する（`memx_spec_v3/docs/contract-alignment-spec.md` に従う）（Task Seed 1件、<=0.5d）
 - [ ] `traceability.md` を入力成果物として参照し、要件ID網羅率と契約対応の欠落を補完する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` と `interfaces.md` の契約差分を比較し、相違を解消する（Task Seed 1件、<=0.5d）
 - [ ] `RUNBOOK.md` の手順リンクが契約記述と一致するか確認する（Task Seed 1件、<=0.5d）
@@ -74,7 +75,7 @@ status: planned
 
 ### Done Criteria
 - 仕様整合チェックを満たす（要件ID網羅率 100%）
-- 仕様整合チェックを満たす（契約同期: `design.md` と `interfaces.md` の差分 0 件）
+- 仕様整合チェックを満たす（契約同期: `memx_spec_v3/docs/contract-alignment-spec.md` に基づく判定で high=0 件）
 - 仕様整合チェックを満たす（リンク健全性: 章内/章間/運用リンクの不達 0 件）
 - 仕様整合チェック結果を各章 Task Seed の `Requirements` と `Commands` に反映済みである
 
