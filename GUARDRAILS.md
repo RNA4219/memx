@@ -37,3 +37,8 @@ next_review_due: 2026-06-03
 - `archive_move` / `archive_purge` の監査ログは、成功/失敗を問わず `result`, `reason`, `retryable`, `owner`, `next_attempt_at` を必須記録とする。
 - requirements（`memx_spec_v3/docs/requirements.md` 2-7節）と矛盾時は requirements を正本とし、本書を追従更新する。
 - fail-closed 整合チェック要件（`REQ-SEC-GRD-001`）は requirements 2-7-5 を正本とする。
+
+
+## エージェント出力契約
+- `plan/patch/tests/commands/notes` の出力契約および `plan` の Birdseye 必須項目（`node_id` / `role` / `source_caps`）は `HUB.codex.md` を正本とする。
+- 本書に同種の規定を追加する場合も重複定義を避け、`HUB.codex.md` への参照のみを保持する。
