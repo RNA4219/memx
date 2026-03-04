@@ -173,5 +173,32 @@ in_progress → blocked → in_progress（解除後に戻す）
 - 生成後は `CHANGELOG.md` へ反映済みタスクを移すことで履歴が追える
 - Birdseye 鮮度: `docs/birdseye/index.json.generated_at` が最新コミットより古ければ再収集を要求。
   該当 Capsule も同時更新。
+- 鮮度判断と人間エスカレーション条件は [`GUARDRAILS.md` の「鮮度管理（Staleness Handling）」](GUARDRAILS.md#鮮度管理staleness-handling) を正とし、
+  `index.generated_at` 逆転 / Caps 不在 / 対象ノード未登録 / `codemap.update` 未実装時は同節の依頼フローへ遷移する。
 - `codemap.update` は Birdseye 再生成時のみ実行。
   Dual Stack では関数呼び出し→`tool_request` ミラーを同一内容で送る。
+
+### Birdseyeアクセス異常時ハンドリング
+
+- **ケースA（`index.json` 不在/破損）**
+  - 判定: `docs/birdseye/index.json` が読めない、または JSON パース失敗。
+  - 処理: **タスク生成を停止**し、新規分割を行わない。
+  - ステータス: 全候補を `blocked`。
+  - 次アクション: `codemap.update` による `index+caps` 再生成を人間へ依頼（`GUARDRAILS.md` の鮮度管理フローに準拠）。
+- **ケースB（`caps` 部分欠損）**
+  - 判定: `index.json` は読めるが、参照先 `docs/birdseye/caps/*.json` の一部が欠損/破損。
+  - 処理: **既知ノードのみ限定タスク化**し、欠損ノード依存のタスクは生成しても `blocked` に固定。
+  - ステータス: 既知ノード=`planned`/`active` 可、欠損ノード=`blocked`。
+  - 次アクション: 欠損 Capsule のみを対象に `codemap.update`（`emit:"caps"`）再生成を依頼。
+- **ケースC（`hot.json` のみ欠損）**
+  - 判定: `index.json` と必要 `caps` は利用可能で、`docs/birdseye/hot.json` のみ欠損/破損。
+  - 処理: **`index`/`caps` ベースで継続処理**し、ホットリスト最適化のみ無効化。
+  - ステータス: 通常どおり（警告付き）でタスク生成を継続。
+  - 次アクション: 警告を `notes` に残し、次回 Birdseye 再生成時に `hot.json` を復旧。
+
+#### `notes` 必須記録項目（Birdseye欠損時）
+
+- `missing_files`: 欠損/破損ファイルの相対パス（例: `docs/birdseye/index.json`）。
+- `impacted_node_ids`: 影響を受けたノードID一覧（不明な場合は `unknown` を明記）。
+- `provisional_decision`: 暫定判断（停止 / 限定継続 / 警告付き継続）と理由。
+- `regen_request_to`: 再生成依頼先（担当チーム/ロール名、または `human-operator`）。
