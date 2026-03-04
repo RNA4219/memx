@@ -45,6 +45,25 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | memx_spec_v3/docs/design.md#chapter-03-data-flow | 3. データフロー | design-dataflow | requirements-core,interfaces-contract | active | 2026-03-04T00:00:00Z | initial |
 
+
+### 4.3 章対応表（2026-03-04 再検証）
+| chapter_id | display_title | node_id | depends_on | status | last_verified_at | review_note |
+| --- | --- | --- | --- | --- | --- | --- |
+| `memx_spec_v3/docs/design.md#1. レイヤ構成` | `1. レイヤ構成` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/design.md#2. DB 責務分割` | `2. DB 責務分割` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/design.md#3. 移行戦略` | `3. 移行戦略` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/design.md#4. ユースケース設計` | `4. ユースケース設計` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/design.md#5. ADR参照運用ルール` | `5. ADR参照運用ルール` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/design.md#6. 設計→契約→検証 導線（要件ID単位）` | `6. 設計→契約→検証 導線（要件ID単位）` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/design.md#7. design-template 段階移行チェックリスト（章単位）` | `7. design-template 段階移行チェックリスト（章単位）` | `design` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#0. 文書の位置づけ` | `0. 文書の位置づけ` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#1. CLI I/O（v1 必須）` | `1. CLI I/O（v1 必須）` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#2. API I/O（v1 必須）` | `2. API I/O（v1 必須）` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#3. 互換ルール` | `3. 互換ルール` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#4. エラー面` | `4. エラー面` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#5. 契約変更手順（更新順序固定）` | `5. 契約変更手順（更新順序固定）` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+| `memx_spec_v3/docs/interfaces.md#6. 付録: RUNBOOK連携 I/F ID（v1運用）` | `6. 付録: RUNBOOK連携 I/F ID（v1運用）` | `interfaces` | `requirements` | `active` | `2026-03-04T08:40:55Z` | `chapter coverage recalculation` |
+
 ## 5. `docs/birdseye/index.json` 更新時の追随ルール
 
 ### 5.0 `source_path#section` から `chapter_id`・`node_id` を解決する標準手順

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-03T08:48:22Z",
+  "generated_at": "2026-03-04T08:40:55Z",
   "hub": {
     "node_id": "hub_memx_birdseye",
     "role": "HUB",
@@ -11,7 +11,7 @@
       "service",
       "api"
     ],
-    "generated_at": "2026-03-03T08:48:22Z"
+    "generated_at": "2026-03-04T08:40:55Z"
   },
   "nodes": [
     {
@@ -31,6 +31,17 @@
       "generated_at": "2026-03-03T08:48:22Z",
       "source": "memx_spec_v3/docs/design.md",
       "capsule": "docs/birdseye/caps/design.json"
+    },
+    {
+      "node_id": "interfaces",
+      "role": "spec_interface",
+      "depends_on": [
+        "requirements",
+        "design"
+      ],
+      "generated_at": "2026-03-04T08:40:55Z",
+      "source": "memx_spec_v3/docs/interfaces.md",
+      "capsule": "docs/birdseye/caps/memx_spec_v3__docs__interfaces.md.json"
     },
     {
       "node_id": "quickstart",
