@@ -8,6 +8,11 @@ next_review_due: 2026-06-03
 
 # EVALUATION
 
+## Phase 3 契約整合レポート参照
+
+- report_id: CONTRACT-ALIGN-20260304-001
+- report_path: memx_spec_v3/docs/contracts/reports/CONTRACT-ALIGN-20260304-001.md
+
 ## v1 受け入れ基準（Release Scope Matrix 準拠）
 - 判定対象（MUST (v1)）: `mem in short` / `mem out search` / `mem out show` と `POST /v1/notes:ingest` / `POST /v1/notes:search` / `GET /v1/notes/{id}`。
 - 入出力互換（`REQ-CLI-001` / `REQ-API-001`）: MUST (v1) の CLI→API 入出力マッピングが保持される。
