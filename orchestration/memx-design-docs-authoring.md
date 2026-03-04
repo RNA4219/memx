@@ -13,6 +13,7 @@ status: planned
 ## Phase 1: 情報収集
 ### Dependencies
 - `requirements.md`
+- `traceability.md`
 - `design.md`
 - `interfaces.md`
 - `EVALUATION.md`
@@ -20,6 +21,7 @@ status: planned
 - `docs/birdseye/index.json`
 
 - [ ] `requirements.md` から要件ID一覧を抽出し、重複・欠番を洗い出す（Task Seed 1件、<=0.5d）
+- [ ] `traceability.md` を入力成果物として主要 REQ-ID の設計/I/F/評価/契約マッピングを確認する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` の章見出しと要件IDの参照有無を対応表にする（Task Seed 1件、<=0.5d）
 - [ ] `interfaces.md` の入出力契約を要件ID単位で列挙する（Task Seed 1件、<=0.5d）
 - [ ] `EVALUATION.md` の評価観点を要件IDに紐づける（Task Seed 1件、<=0.5d）
@@ -27,7 +29,7 @@ status: planned
 - [ ] `docs/birdseye/index.json` から node_id と depends_on を取得し、章候補との対応表を作る（Task Seed 1件、<=0.5d）
 
 ### Done Criteria
-- 情報源6ファイルの抽出結果が要件ID/契約ID/node_id単位で一覧化されている
+- 情報源7ファイルの抽出結果が要件ID/契約ID/node_id単位で一覧化されている
 - 抽出結果を Task Seed 化可能な粒度（1項目=1タスク、<=0.5d）で分割している
 - `docs/TASKS.md` 必須項目のうち `Source` / `Node IDs` / `Requirements` へ直接転記できる状態になっている
 
@@ -55,6 +57,7 @@ status: planned
 ## Phase 3: 契約整合
 ### Dependencies
 - `requirements.md`
+- `traceability.md`
 - `design.md`
 - `interfaces.md`
 - `EVALUATION.md`
@@ -62,6 +65,7 @@ status: planned
 - `docs/birdseye/index.json`
 
 - [ ] 要件ID網羅率を算出し、章別ドラフトの欠落IDを補完する（Task Seed 1件、<=0.5d）
+- [ ] `traceability.md` を入力成果物として参照し、要件ID網羅率と契約対応の欠落を補完する（Task Seed 1件、<=0.5d）
 - [ ] `design.md` と `interfaces.md` の契約差分を比較し、相違を解消する（Task Seed 1件、<=0.5d）
 - [ ] `RUNBOOK.md` の手順リンクが契約記述と一致するか確認する（Task Seed 1件、<=0.5d）
 - [ ] `EVALUATION.md` の評価項目リンクが最新章へ到達するか確認する（Task Seed 1件、<=0.5d）
