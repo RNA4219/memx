@@ -22,6 +22,7 @@ const (
 // GatekeeperMeta は Gatekeeper 判定に使うメタ情報。
 type GatekeeperMeta struct {
 	SourceType  string
+	SourceTrust string
 	Sensitivity string
 	Store       StoreKind
 }

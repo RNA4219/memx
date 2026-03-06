@@ -27,6 +27,8 @@ func (s *HTTPServer) Handler() http.Handler {
 
 	mux.HandleFunc("/v1/notes:ingest", s.handleNotesIngest)
 	mux.HandleFunc("/v1/notes:search", s.handleNotesSearch)
+	mux.HandleFunc("/v1/notes:summarize", s.handleSummarize)
+	mux.HandleFunc("/v1/notes:summarize-batch", s.handleSummarizeBatch)
 	mux.HandleFunc("/v1/gc:run", s.handleGCRun)
 	mux.HandleFunc("/v1/notes/", s.handleNotesGet)
 
@@ -99,6 +101,42 @@ func (s *HTTPServer) handleGCRun(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, apiErr := s.InProc.GCRun(r.Context(), req)
+	if apiErr != nil {
+		writeErr(w, apiErr)
+		return
+	}
+	writeOK(w, resp)
+}
+
+func (s *HTTPServer) handleSummarize(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req SummarizeRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeErr(w, &Error{Code: CodeInvalidArgument, Message: "invalid json"})
+		return
+	}
+	resp, apiErr := s.InProc.Summarize(r.Context(), req.ID)
+	if apiErr != nil {
+		writeErr(w, apiErr)
+		return
+	}
+	writeOK(w, resp)
+}
+
+func (s *HTTPServer) handleSummarizeBatch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req SummarizeBatchRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeErr(w, &Error{Code: CodeInvalidArgument, Message: "invalid json"})
+		return
+	}
+	resp, apiErr := s.InProc.SummarizeBatch(r.Context(), req)
 	if apiErr != nil {
 		writeErr(w, apiErr)
 		return

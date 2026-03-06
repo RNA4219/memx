@@ -155,9 +155,15 @@ next_review_due: 2026-06-03
 | `INVALID_ARGUMENT` | 400 | false | 入力修正後に再実行（自動再試行しない） |
 | `NOT_FOUND` | 404 | false | 対象 ID/条件を見直し、必要なら ingest 後に再実行 |
 | `CONFLICT` | 409 | false | 競合解消（重複・状態整合）後に再実行 |
-| `GATEKEEP_DENY` | 403 | false | ポリシー変更または権限見直しまで停止 |
+| `GATEKEEP_DENY` | 403 | false | ポリシー変更または権限見直しまで停止（実装済み: `service.ErrPolicyDenied`) |
+| `NEEDS_HUMAN` | 403 | false | 人間承認フロー完了まで停止（実装済み: `service.ErrNeedsHuman`） |
 | `FEATURE_DISABLED` | 409 | false | feature flag 有効化まで停止 |
 | `INTERNAL` | 500 | conditional | 一時障害判定時のみ指数バックオフ再試行（最大2回） |
+
+**実装状況（2026-03-06 更新）**:
+- `service.ErrPolicyDenied`: Gatekeeper が `deny` 判定時に返却
+- `service.ErrNeedsHuman`: Gatekeeper が `needs_human` 判定時に返却（v1.3 ではエラー扱い）
+- `api/errors.go`: `mapError` で `GATEKEEP_DENY` にマッピング
 
 ### 4.2 整合元
 - エラーコード区分・運用差分は `error-contract.md` を正本運用要約として参照。

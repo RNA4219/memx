@@ -15,7 +15,10 @@ import (
 // Service は memx の Usecase 層。
 // DB/LLM/Gatekeeper などの実装詳細を隠蔽し、API から呼び出される。
 type Service struct {
-	Conn *db.Conn
+	Conn       *db.Conn
+	Gate       db.Gatekeeper
+	MiniLLM    db.MiniLLMClient // 任意（nil の場合は要約生成なし）
+	ReflectLLM db.ReflectLLMClient
 }
 
 func New(paths db.Paths) (*Service, error) {
@@ -23,7 +26,10 @@ func New(paths db.Paths) (*Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Service{Conn: c}, nil
+	return &Service{
+		Conn: c,
+		Gate: db.NewDefaultGatekeeper(db.GateProfileNormal), // デフォルトは NORMAL
+	}, nil
 }
 
 func (s *Service) Close() error {
@@ -31,6 +37,16 @@ func (s *Service) Close() error {
 		return nil
 	}
 	return s.Conn.Close()
+}
+
+// SetMiniLLM は MiniLLM クライアントを設定する。
+func (s *Service) SetMiniLLM(client db.MiniLLMClient) {
+	s.MiniLLM = client
+}
+
+// SetReflectLLM は ReflectLLM クライアントを設定する。
+func (s *Service) SetReflectLLM(client db.ReflectLLMClient) {
+	s.ReflectLLM = client
 }
 
 // IngestNoteRequest は short への投入（最小）。
@@ -44,6 +60,7 @@ type IngestNoteRequest struct {
 	SourceTrust string
 	Sensitivity string
 	Tags        []string
+	NoLLM       bool // true の場合は LLM による要約・タグ生成をスキップ
 }
 
 func (r *IngestNoteRequest) normalize() {
@@ -65,12 +82,103 @@ func (r *IngestNoteRequest) normalize() {
 	}
 }
 
+// validate は入力値の妥当性を検証する。
+func (r *IngestNoteRequest) validate() error {
+	// タイトル長制限（最大 500 文字）
+	if len(r.Title) > 500 {
+		return fmt.Errorf("%w: title exceeds 500 characters", ErrInvalidArgument)
+	}
+
+	// 本文長制限（最大 100000 文字 = 約 50KB）
+	if len(r.Body) > 100000 {
+		return fmt.Errorf("%w: body exceeds 100000 characters", ErrInvalidArgument)
+	}
+
+	// source_type の列挙値チェック
+	validSourceTypes := map[string]bool{
+		"web":    true,
+		"file":   true,
+		"chat":   true,
+		"agent":  true,
+		"manual": true,
+	}
+	if !validSourceTypes[r.SourceType] {
+		return fmt.Errorf("%w: invalid source_type: %s", ErrInvalidArgument, r.SourceType)
+	}
+
+	// source_trust の列挙値チェック
+	validSourceTrust := map[string]bool{
+		"trusted":    true,
+		"user_input": true,
+		"untrusted":  true,
+	}
+	if !validSourceTrust[r.SourceTrust] {
+		return fmt.Errorf("%w: invalid source_trust: %s", ErrInvalidArgument, r.SourceTrust)
+	}
+
+	// sensitivity の列挙値チェック
+	validSensitivity := map[string]bool{
+		"public":   true,
+		"internal": true,
+		"secret":   true,
+	}
+	if !validSensitivity[r.Sensitivity] {
+		return fmt.Errorf("%w: invalid sensitivity: %s", ErrInvalidArgument, r.Sensitivity)
+	}
+
+	return nil
+}
+
 // IngestShort は short.db にノートを保存する。
-// LLM / Gatekeeper は今後差し込む（v1.3 ではフックのみ）。
+// Gatekeeper によるポリシーチェックを行い、deny の場合は保存しない。
+// MiniLLM が設定されている場合、Summary が空なら自動で要約を生成する。
 func (s *Service) IngestShort(ctx context.Context, req IngestNoteRequest) (Note, error) {
 	req.normalize()
 	if req.Title == "" || req.Body == "" {
 		return Note{}, fmt.Errorf("%w: title/body is required", ErrInvalidArgument)
+	}
+
+	// 入力値検証
+	if err := req.validate(); err != nil {
+		return Note{}, err
+	}
+
+	// Gatekeeper チェック
+	if s.Gate != nil {
+		decision, err := s.Gate.Check(ctx, db.GatekeeperCheckRequest{
+			Kind:    db.GateKindMemoryStore,
+			Profile: db.GateProfileNormal, // TODO: 設定可能にする
+			Content: req.Title + "\n" + req.Body,
+			Meta: db.GatekeeperMeta{
+				SourceType:  req.SourceType,
+				SourceTrust: req.SourceTrust,
+				Sensitivity: req.Sensitivity,
+				Store:       db.StoreShort,
+			},
+		})
+		if err != nil {
+			return Note{}, fmt.Errorf("gatekeeper check: %w", err)
+		}
+		switch decision.Decision {
+		case db.DecisionDeny:
+			return Note{}, fmt.Errorf("%w: %s", ErrPolicyDenied, decision.Reason)
+		case db.DecisionNeedsHuman:
+			// v1.3 では needs_human もエラーとして扱う
+			// 将来的には保留キューに入れる等の処理
+			return Note{}, fmt.Errorf("%w: %s", ErrNeedsHuman, decision.Reason)
+		}
+	}
+
+	// 自動要約生成（NoLLM=false, Summary空, MiniLLM設定済みの場合）
+	summary := req.Summary
+	if !req.NoLLM && summary == "" && s.MiniLLM != nil {
+		result, err := s.MiniLLM.Summarize(ctx, req.Title, req.Body)
+		if err != nil {
+			// 要約生成失敗は警告レベルとし、空の要約で保存を継続
+			// TODO: ログ出力
+		} else {
+			summary = result.Summary
+		}
 	}
 
 	id, err := newUUIDLike()
@@ -85,7 +193,6 @@ func (s *Service) IngestShort(ctx context.Context, req IngestNoteRequest) (Note,
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	// NOTE: summary は v1.3 時点では空でもよい。
 	_, err = tx.ExecContext(ctx, `
 INSERT INTO notes(
   id, title, summary, body,
@@ -93,7 +200,7 @@ INSERT INTO notes(
   access_count,
   source_type, origin, source_trust, sensitivity
 ) VALUES(?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)
-`, id, req.Title, req.Summary, req.Body, now, now, now, req.SourceType, req.Origin, req.SourceTrust, req.Sensitivity)
+`, id, req.Title, summary, req.Body, now, now, now, req.SourceType, req.Origin, req.SourceTrust, req.Sensitivity)
 	if err != nil {
 		return Note{}, err
 	}
@@ -118,7 +225,7 @@ INSERT INTO notes(
 	return Note{
 		ID:             id,
 		Title:          req.Title,
-		Summary:        req.Summary,
+		Summary:        summary,
 		Body:           req.Body,
 		CreatedAt:      now,
 		UpdatedAt:      now,
@@ -159,8 +266,16 @@ func (s *Service) SearchShort(ctx context.Context, query string, topK int) ([]No
 	if query == "" {
 		return nil, fmt.Errorf("%w: query is required", ErrInvalidArgument)
 	}
+	// クエリ長制限（最大 1000 文字）
+	if len(query) > 1000 {
+		return nil, fmt.Errorf("%w: query exceeds 1000 characters", ErrInvalidArgument)
+	}
 	if topK <= 0 {
 		topK = 20
+	}
+	// topK 上限
+	if topK > 100 {
+		topK = 100
 	}
 
 	rows, err := s.Conn.DB.QueryContext(ctx, `
@@ -201,6 +316,15 @@ func (s *Service) GetShort(ctx context.Context, id string) (Note, error) {
 	id = strings.TrimSpace(id)
 	if id == "" {
 		return Note{}, fmt.Errorf("%w: id is required", ErrInvalidArgument)
+	}
+	// ID 形式チェック（32文字のhex）
+	if len(id) != 32 {
+		return Note{}, fmt.Errorf("%w: invalid id format", ErrInvalidArgument)
+	}
+	for _, c := range id {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+			return Note{}, fmt.Errorf("%w: invalid id format: must be hex", ErrInvalidArgument)
+		}
 	}
 
 	now := time.Now().UTC().Format(time.RFC3339Nano)
@@ -251,4 +375,94 @@ func newUUIDLike() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(b), nil
+}
+
+// SummarizeNoteRequest は既存ノートの要約再生成リクエスト。
+type SummarizeNoteRequest struct {
+	ID string
+}
+
+// SummarizeNote は既存ノートの要約を再生成して更新する。
+func (s *Service) SummarizeNote(ctx context.Context, id string) (Note, error) {
+	id = strings.TrimSpace(id)
+	if id == "" {
+		return Note{}, fmt.Errorf("%w: id is required", ErrInvalidArgument)
+	}
+
+	// ノート取得
+	note, err := s.GetShort(ctx, id)
+	if err != nil {
+		return Note{}, err
+	}
+
+	// LLM で要約生成
+	if s.MiniLLM == nil {
+		return Note{}, fmt.Errorf("%w: MiniLLM is not configured", ErrInvalidArgument)
+	}
+
+	result, err := s.MiniLLM.Summarize(ctx, note.Title, note.Body)
+	if err != nil {
+		return Note{}, fmt.Errorf("summarize: %w", err)
+	}
+
+	// 更新
+	now := time.Now().UTC().Format(time.RFC3339Nano)
+	_, err = s.Conn.DB.ExecContext(ctx, `
+UPDATE notes SET summary = ?, updated_at = ? WHERE id = ?;
+`, result.Summary, now, id)
+	if err != nil {
+		return Note{}, err
+	}
+
+	note.Summary = result.Summary
+	note.UpdatedAt = now
+	return note, nil
+}
+
+// SummarizeNotesRequest は複数ノートの統合要約リクエスト。
+type SummarizeNotesRequest struct {
+	IDs []string
+}
+
+// SummarizeNotesResult は複数ノート統合要約の結果。
+type SummarizeNotesResult struct {
+	Summary   string
+	NoteCount int
+}
+
+// SummarizeNotes は複数ノートを統合して1つの要約を生成する。
+func (s *Service) SummarizeNotes(ctx context.Context, ids []string) (SummarizeNotesResult, error) {
+	if len(ids) == 0 {
+		return SummarizeNotesResult{}, fmt.Errorf("%w: at least one id is required", ErrInvalidArgument)
+	}
+
+	if s.ReflectLLM == nil {
+		return SummarizeNotesResult{}, fmt.Errorf("%w: ReflectLLM is not configured", ErrInvalidArgument)
+	}
+
+	// ノート本文を収集
+	var bodies []string
+	for _, id := range ids {
+		note, err := s.GetShort(ctx, strings.TrimSpace(id))
+		if err != nil {
+			return SummarizeNotesResult{}, fmt.Errorf("get note %s: %w", id, err)
+		}
+		bodies = append(bodies, note.Body)
+	}
+
+	// 統合要約
+	input := db.ClusterInput{
+		NoteIDs: ids,
+		Body:    strings.Join(bodies, "\n\n---\n\n"),
+	}
+
+	summary, err := s.ReflectLLM.SummarizeCluster(ctx, input)
+	if err != nil {
+		return SummarizeNotesResult{}, fmt.Errorf("summarize cluster: %w", err)
+	}
+
+	return SummarizeNotesResult{
+		Summary:   summary,
+		NoteCount: len(ids),
+	}, nil
 }

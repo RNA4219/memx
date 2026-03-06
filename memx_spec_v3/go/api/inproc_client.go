@@ -59,6 +59,25 @@ func (c *InProcClient) GCRun(ctx context.Context, req GCRunRequest) (GCRunRespon
 	return GCRunResponse{Status: "ok"}, nil
 }
 
+func (c *InProcClient) Summarize(ctx context.Context, id string) (SummarizeResponse, *Error) {
+	n, err := c.Svc.SummarizeNote(ctx, id)
+	if err != nil {
+		return SummarizeResponse{}, mapError(err)
+	}
+	return SummarizeResponse{Note: fromServiceNote(n)}, nil
+}
+
+func (c *InProcClient) SummarizeBatch(ctx context.Context, req SummarizeBatchRequest) (SummarizeBatchResponse, *Error) {
+	result, err := c.Svc.SummarizeNotes(ctx, req.IDs)
+	if err != nil {
+		return SummarizeBatchResponse{}, mapError(err)
+	}
+	return SummarizeBatchResponse{
+		Summary:   result.Summary,
+		NoteCount: result.NoteCount,
+	}, nil
+}
+
 func fromServiceNote(n service.Note) Note {
 	return Note{
 		ID:             n.ID,

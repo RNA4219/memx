@@ -259,12 +259,14 @@ short 固有:
 - レイヤ通過順（CLI/API/Service/DB/LLM/Gatekeeper）
   - CLI（入力整形） → API（契約検証） → Service（ingest実行） → Gatekeeper（機密/ポリシー判定） → DB（shortへ保存）
 - 失敗分岐（INVALID_ARGUMENT / POLICY_DENIED / INTERNAL）
-  - `INVALID_ARGUMENT`: `content` 空/不正
-  - `POLICY_DENIED`: Gatekeeper が fail-closed で拒否
+  - `INVALID_ARGUMENT`: `content` 空/不正、title/body長制限超過、enum値不正
+  - `POLICY_DENIED`: Gatekeeper が fail-closed で拒否（`sensitivity=secret` 等）
+  - `NEEDS_HUMAN`: Gatekeeper が要人間判定（v1.3 ではエラーとして扱う）
   - `INTERNAL`: DB 書き込み失敗、予期しない実行時エラー
 - 再試行可否（retryable true/false）
   - `INVALID_ARGUMENT`: `false`
   - `POLICY_DENIED`: `false`
+  - `NEEDS_HUMAN`: `false`
   - `INTERNAL`: `true`
 
 ### 4.2 Search
@@ -512,3 +514,55 @@ short 固有:
 - [x] 5. ADR参照運用ルール を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
 - [x] 6. 設計→契約→検証 導線（要件ID単位） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
 - [x] 6.1 NFR設計（性能 / 復旧 / 整合性回復） を `memx_spec_v3/docs/design-template.md` 準拠へ移行（Objective/Source/Node IDs/Requirements/Commands/Dependencies/Status）
+
+## 8. 実装状況（2026-03-06 更新）
+
+### 8.1 マイグレーション層
+| ファイル | 状態 | 説明 |
+| --- | --- | --- |
+| `go/db/migrate_short.go` | 完了 | short.db スキーマ適用 |
+| `go/db/migrate_other.go` | 完了 | chronicle/memopedia/archive スキーマ適用 |
+| `go/db/open.go` | 完了 | 4DB ATTACH + マイグレーション |
+
+**実装詳細**:
+- 各ストアを個別に開いてマイグレーション後、ATTACH する方式
+- `PRAGMA user_version` による冪等性保証
+- スキーマ構成は `requirements.md#1-2-1` 参照
+
+### 8.2 Gatekeeper 層
+| ファイル | 状態 | 説明 |
+| --- | --- | --- |
+| `go/db/gatekeeper.go` | 完了 | インターフェース定義 |
+| `go/db/gatekeeper_impl.go` | 完了 | DefaultGatekeeper 実装 |
+
+**実装詳細**:
+- `DefaultGatekeeper`: プロファイルベースのルール判定
+- `AllowAllGatekeeper` / `DenyAllGatekeeper`: テスト用ヘルパー
+- プロファイル: `STRICT` / `NORMAL` / `DEV`
+- fail-closed: `sensitivity=secret` は常に拒否
+
+### 8.3 Service 層
+| ファイル | 状態 | 説明 |
+| --- | --- | --- |
+| `go/service/service.go` | 完了 | IngestShort/SearchShort/GetShort |
+| `go/service/errors.go` | 完了 | エラー定義（ErrPolicyDenied, ErrNeedsHuman 追加） |
+| `go/service/models.go` | 完了 | Note モデル |
+
+**実装詳細**:
+- `IngestShort`: Gatekeeper.Check 呼び出し、入力バリデーション
+- 入力バリデーション: title/body 長制限、enum 値チェック
+
+### 8.4 API 層
+| ファイル | 状態 | 説明 |
+| --- | --- | --- |
+| `go/api/types.go` | 完了 | API 型定義 |
+| `go/api/errors.go` | 完了 | エラーマッピング（GATEKEEP_DENY 対応） |
+| `go/api/http_server.go` | 完了 | HTTP サーバー |
+| `go/api/http_client.go` | 完了 | HTTP クライアント |
+| `go/api/inproc_client.go` | 完了 | in-proc クライアント |
+
+### 8.5 テスト
+| パッケージ | テスト数 | 状態 |
+| --- | --- | --- |
+| `go/db` | 8 | 全て PASS |
+| `go/service` | 5 | 全て PASS |

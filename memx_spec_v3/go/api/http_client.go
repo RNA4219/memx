@@ -58,6 +58,22 @@ func (c *HTTPClient) GCRun(ctx context.Context, req GCRunRequest) (GCRunResponse
 	return out, nil
 }
 
+func (c *HTTPClient) Summarize(ctx context.Context, id string) (SummarizeResponse, *Error) {
+	var out SummarizeResponse
+	if err := c.post(ctx, "/v1/notes:summarize", SummarizeRequest{ID: id}, &out); err != nil {
+		return SummarizeResponse{}, err
+	}
+	return out, nil
+}
+
+func (c *HTTPClient) SummarizeBatch(ctx context.Context, req SummarizeBatchRequest) (SummarizeBatchResponse, *Error) {
+	var out SummarizeBatchResponse
+	if err := c.post(ctx, "/v1/notes:summarize-batch", req, &out); err != nil {
+		return SummarizeBatchResponse{}, err
+	}
+	return out, nil
+}
+
 func (c *HTTPClient) post(ctx context.Context, path string, in interface{}, out interface{}) *Error {
 	b, _ := json.Marshal(in)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+path, bytes.NewReader(b))

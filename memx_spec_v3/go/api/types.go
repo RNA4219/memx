@@ -71,3 +71,24 @@ type GCRunRequest struct {
 type GCRunResponse struct {
 	Status string `json:"status"` // "ok"
 }
+
+// SummarizeRequest は単一ノートの要約リクエスト。
+type SummarizeRequest struct {
+	ID string `json:"id"`
+}
+
+// SummarizeResponse は単一ノートの要約レスポンス。
+type SummarizeResponse struct {
+	Note Note `json:"note"`
+}
+
+// SummarizeBatchRequest は複数ノートの統合要約リクエスト。
+type SummarizeBatchRequest struct {
+	IDs []string `json:"ids"`
+}
+
+// SummarizeBatchResponse は複数ノートの統合要約レスポンス。
+type SummarizeBatchResponse struct {
+	Summary   string `json:"summary"`
+	NoteCount int    `json:"note_count"`
+}

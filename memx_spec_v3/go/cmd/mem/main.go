@@ -30,6 +30,8 @@ func main() {
 		cmdIn(os.Args[2:])
 	case "out":
 		cmdOut(os.Args[2:])
+	case "summarize":
+		cmdSummarize(os.Args[2:])
 	default:
 		usage()
 		os.Exit(2)
@@ -37,13 +39,15 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, `mem - memx CLI (v1.3)
+	fmt.Fprint(os.Stderr, `mem - memx CLI (v1.3)
 
 Usage:
   mem api serve   [--addr 127.0.0.1:7766] [--short short.db] ...
   mem in short    --title TITLE [--body BODY | --stdin] [--tag TAG ...]
   mem out search  QUERY
   mem out show    NOTE_ID
+  mem summarize   NOTE_ID [--json]
+  mem summarize   --ids ID1,ID2,... [--json]
 
 Global (for client-mode):
   --api-url http://127.0.0.1:7766   # if set, CLI calls HTTP API
@@ -264,6 +268,57 @@ func cmdOut(args []string) {
 		usage()
 		os.Exit(2)
 	}
+}
+
+// -------------------- summarize --------------------
+
+func cmdSummarize(args []string) {
+	fs := flag.NewFlagSet("mem summarize", flag.ExitOnError)
+	cf := &commonFlags{}
+	cf.bind(fs)
+	ids := fs.String("ids", "", "comma-separated note IDs for batch summarization")
+	_ = fs.Parse(args)
+
+	ctx := context.Background()
+	client, cleanup, err := makeClient(ctx, cf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cleanup()
+
+	// Batch summarization
+	if *ids != "" {
+		idList := strings.Split(*ids, ",")
+		for i, id := range idList {
+			idList[i] = strings.TrimSpace(id)
+		}
+		resp, apiErr := client.SummarizeBatch(ctx, api.SummarizeBatchRequest{IDs: idList})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		fmt.Printf("Summary (%d notes):\n%s\n", resp.NoteCount, resp.Summary)
+		return
+	}
+
+	// Single note summarization
+	if len(fs.Args()) < 1 {
+		log.Fatal("NOTE_ID is required (or use --ids for batch)")
+	}
+	id := fs.Args()[0]
+
+	resp, apiErr := client.Summarize(ctx, id)
+	if apiErr != nil {
+		log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+	}
+	if cf.json {
+		printJSON(resp)
+		return
+	}
+	fmt.Printf("# %s\n\nSummary: %s\n", resp.Note.Title, resp.Note.Summary)
 }
 
 // -------------------- helpers --------------------

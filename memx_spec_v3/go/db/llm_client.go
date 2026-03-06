@@ -17,9 +17,15 @@ type TagsAndScores struct {
 	Sensitivity      string
 }
 
+// SummarizeResult は要約生成の結果。
+type SummarizeResult struct {
+	Summary string
+}
+
 // MiniLLMClient はタグ付けとスコアリングを担当する軽量モデルのインターフェース。
 type MiniLLMClient interface {
 	TagAndScore(ctx context.Context, noteBody string) (TagsAndScores, error)
+	Summarize(ctx context.Context, title, body string) (SummarizeResult, error)
 }
 
 // ClusterInput は ReflectLLM が観測ノート群から要約を生成する際の入力。

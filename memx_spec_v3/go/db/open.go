@@ -10,9 +10,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-// migrateFn は ATTACH 後にスキーマを適用する関数の型。
-type migrateFn func(db *sql.DB, schemaName string) error
-
 // MustOpenAll は short.db をメインとして開き、
 // chronicle / memopedia / archive を ATTACH + migrate した Conn を返す。
 func MustOpenAll(paths Paths) *Conn {
@@ -50,22 +47,23 @@ func OpenAll(paths Paths) (*Conn, error) {
 		return nil, fmt.Errorf("migrate short.db: %w", err)
 	}
 
+	// 他ストアを個別に開いてマイグレーション後、ATTACH する
 	if paths.Chronicle != "" {
-		if err := attachAndMigrate(db, paths.Chronicle, "chronicle", migrateChronicle); err != nil {
+		if err := migrateAndAttach(db, paths.Chronicle, "chronicle", migrateChronicle); err != nil {
 			_ = db.Close()
-			return nil, fmt.Errorf("attach/migrate chronicle.db: %w", err)
+			return nil, fmt.Errorf("migrate/attach chronicle.db: %w", err)
 		}
 	}
 	if paths.Memopedia != "" {
-		if err := attachAndMigrate(db, paths.Memopedia, "memopedia", migrateMemopedia); err != nil {
+		if err := migrateAndAttach(db, paths.Memopedia, "memopedia", migrateMemopedia); err != nil {
 			_ = db.Close()
-			return nil, fmt.Errorf("attach/migrate memopedia.db: %w", err)
+			return nil, fmt.Errorf("migrate/attach memopedia.db: %w", err)
 		}
 	}
 	if paths.Archive != "" {
-		if err := attachAndMigrate(db, paths.Archive, "archive", migrateArchive); err != nil {
+		if err := migrateAndAttach(db, paths.Archive, "archive", migrateArchive); err != nil {
 			_ = db.Close()
-			return nil, fmt.Errorf("attach/migrate archive.db: %w", err)
+			return nil, fmt.Errorf("migrate/attach archive.db: %w", err)
 		}
 	}
 
@@ -80,15 +78,32 @@ func (c *Conn) Close() error {
 	return nil
 }
 
-// attachAndMigrate は DB を ATTACH し、指定された migrateFn を呼び出す。
-func attachAndMigrate(db *sql.DB, path string, schemaName string, fn migrateFn) error {
+// migrateAndAttach は DB ファイルを個別に開いてマイグレーションし、その後 ATTACH する。
+// これにより、各ストアのスキーマを独立して管理できる。
+func migrateAndAttach(mainDB *sql.DB, path string, schemaName string, migrateFunc func(*sql.DB) error) error {
+	// 1. 個別に開く
+	dsn := fmt.Sprintf("file:%s", path)
+	storeDB, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return fmt.Errorf("open %s: %w", schemaName, err)
+	}
+	defer storeDB.Close()
+
+	// 2. マイグレーション実行
+	if err := migrateFunc(storeDB); err != nil {
+		return fmt.Errorf("migrate %s: %w", schemaName, err)
+	}
+
+	// 3. 閉じる（WALのコミット等）
+	if err := storeDB.Close(); err != nil {
+		return fmt.Errorf("close %s after migration: %w", schemaName, err)
+	}
+
+	// 4. ATTACH
 	attachSQL := fmt.Sprintf("ATTACH DATABASE '%s' AS %s;", path, schemaName)
-	if _, err := db.Exec(attachSQL); err != nil {
+	if _, err := mainDB.Exec(attachSQL); err != nil {
 		return fmt.Errorf("attach %s: %w", schemaName, err)
 	}
 
-	if err := fn(db, schemaName); err != nil {
-		return fmt.Errorf("migrate %s: %w", schemaName, err)
-	}
 	return nil
 }

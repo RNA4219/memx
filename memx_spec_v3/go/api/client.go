@@ -9,4 +9,7 @@ type Client interface {
 	NotesSearch(ctx context.Context, req NotesSearchRequest) (NotesSearchResponse, *Error)
 	NotesGet(ctx context.Context, id string) (Note, *Error)
 	GCRun(ctx context.Context, req GCRunRequest) (GCRunResponse, *Error)
+	// 要約機能
+	Summarize(ctx context.Context, id string) (SummarizeResponse, *Error)
+	SummarizeBatch(ctx context.Context, req SummarizeBatchRequest) (SummarizeBatchResponse, *Error)
 }
