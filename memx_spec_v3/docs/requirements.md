@@ -66,14 +66,14 @@ priority: high
 
 | ファイル | 内容 | 元セクション |
 | --- | --- | --- |
-| [requirements-release.md](./requirements-release.md) | Release Scope Matrix / バージョニング / トレーサビリティ | 0-1, 0-2, 0-3 |
-| [requirements-architecture.md](./requirements-architecture.md) | 全体アーキテクチャ / ストア構成 / Gatekeeper | 1-0 〜 1-5 |
-| [requirements-data-model.md](./requirements-data-model.md) | データモデル / Security & Retention | 2-1 〜 2-7 |
-| [requirements-cli.md](./requirements-cli.md) | CLI 要件 | 3-1 〜 3-6 |
-| [requirements-llm.md](./requirements-llm.md) | LLM 戦略 | 4-1 〜 4-4 |
-| [requirements-nfr.md](./requirements-nfr.md) | 非機能要件 | 5-1 〜 5-4 |
-| [requirements-api.md](./requirements-api.md) | API 要件 | 6-1 〜 6-5 |
-| [requirements-incident.md](./requirements-incident.md) | インシデント対応要件 | 11 |
+| [requirements/release.md](./requirements/requirements-release.md) | Release Scope Matrix / バージョニング / トレーサビリティ | 0-1, 0-2, 0-3 |
+| [requirements/architecture.md](./requirements/requirements-architecture.md) | 全体アーキテクチャ / ストア構成 / Gatekeeper | 1-0 〜 1-5 |
+| [requirements/data-model.md](./requirements/requirements-data-model.md) | データモデル / Security & Retention | 2-1 〜 2-7 |
+| [requirements/cli.md](./requirements/requirements-cli.md) | CLI 要件 | 3-1 〜 3-6 |
+| [requirements/llm.md](./requirements/requirements-llm.md) | LLM 戦略 | 4-1 〜 4-4 |
+| [requirements/nfr.md](./requirements/requirements-nfr.md) | 非機能要件 | 5-1 〜 5-4 |
+| [requirements/api.md](./requirements/requirements-api.md) | API 要件 | 6-1 〜 6-5 |
+| [requirements/incident.md](./requirements/requirements-incident.md) | インシデント対応要件 | 11 |
 
 ---
 
@@ -83,9 +83,9 @@ priority: high
 
 | ID | 説明 | 詳細 |
 | --- | --- | --- |
-| `REQ-CLI-001` | CLI v1必須3コマンド | [requirements-cli.md](./requirements-cli.md) |
-| `REQ-API-001` | API v1必須3エンドポイント | [requirements-api.md](./requirements-api.md) |
-| `REQ-GC-001` | GC dry-run | [requirements-cli.md#3-5](./requirements-cli.md#3-5-mem-gc-shortobserver--reflector) |
-| `REQ-SEC-001` | fail-closed security | [requirements-data-model.md#2-7](./requirements-data-model.md#2-7-security--retention-requirements) |
-| `REQ-ERR-001` | エラーモデル | [requirements-api.md#6-4](./requirements-api.md#6-4-エラーモデル) |
-| `REQ-NFR-001` | 性能目標 | [requirements-nfr.md#5-1](./requirements-nfr.md#5-1-性能目標v1必須3エンドポイント) |
+| `REQ-CLI-001` | CLI v1必須3コマンド | [requirements/cli.md](./requirements/requirements-cli.md) |
+| `REQ-API-001` | API v1必須3エンドポイント | [requirements/api.md](./requirements/requirements-api.md) |
+| `REQ-GC-001` | GC dry-run | [requirements/cli.md#3-5](./requirements/requirements-cli.md#3-5-mem-gc-shortobserver--reflector) |
+| `REQ-SEC-001` | fail-closed security | [requirements/data-model.md#2-7](./requirements/requirements-data-model.md#2-7-security--retention-requirements) |
+| `REQ-ERR-001` | エラーモデル | [requirements/api.md#6-4](./requirements/requirements-api.md#6-4-エラーモデル) |
+| `REQ-NFR-001` | 性能目標 | [requirements/nfr.md#5-1](./requirements/requirements-nfr.md#5-1-性能目標v1必須3エンドポイント) |
