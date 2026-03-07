@@ -1,9 +1,105 @@
-package api
+package service
 
 import (
 	"context"
 	"fmt"
 )
+
+// Resolver は typed_ref からエンティティを解決するインターフェース。
+// P4 Phase 3B: current memx-core adapter 用の最小実装。
+type Resolver interface {
+	// ResolveRef は単一の typed_ref を解決する。
+	ResolveRef(ctx context.Context, ref TypedRef) (ResolvedRef, error)
+
+	// ResolveMany は複数の typed_ref を一括解決する。
+	ResolveMany(ctx context.Context, refs []TypedRef) (*ResolveReport, error)
+
+	// LoadSummary は要約を取得する（summary-first retrieval）。
+	LoadSummary(ctx context.Context, ref TypedRef) (*SummaryPayload, error)
+
+	// LoadSelectedRaw は必要時のみ raw データを取得する。
+	LoadSelectedRaw(ctx context.Context, ref TypedRef, selector RawSelector) (*RawPayload, error)
+}
+
+// TypedRef は typed_ref の service パッケージ内表現。
+// api.TypedRef との変換は境界層で行う。
+type TypedRef struct {
+	Domain     string
+	Type       string
+	Provider   string
+	ID         string
+}
+
+func (r TypedRef) String() string {
+	return fmt.Sprintf("%s:%s:%s:%s", r.Domain, r.Type, r.Provider, r.ID)
+}
+
+func (r TypedRef) IsValid() bool {
+	return r.Domain != "" && r.Type != "" && r.Provider != "" && r.ID != ""
+}
+
+// ResolvedRef は解決結果を表す。
+type ResolvedRef struct {
+	Ref      TypedRef
+	Status   RefStatus
+	Summary  string
+	Metadata RefMetadata
+}
+
+// RefStatus は解決状態を表す。
+type RefStatus string
+
+const (
+	RefStatusResolved    RefStatus = "resolved"
+	RefStatusUnresolved  RefStatus = "unresolved"
+	RefStatusUnsupported RefStatus = "unsupported"
+)
+
+// RefMetadata は参照先のメタデータ。
+type RefMetadata struct {
+	Title       string
+	SourceType  string
+	Sensitivity string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
+// ResolveReport は一括解決結果を表す。
+type ResolveReport struct {
+	Resolved    []ResolvedRef
+	Unresolved  []TypedRef
+	Unsupported []TypedRef
+	Diagnostics ResolverDiagnostics
+}
+
+// ResolverDiagnostics は解決診断情報。
+type ResolverDiagnostics struct {
+	MissingRefs     []TypedRef
+	UnsupportedRefs []TypedRef
+	ResolverWarnings []string
+	PartialBundle   bool
+}
+
+// SummaryPayload は要約取得結果。
+type SummaryPayload struct {
+	Ref     TypedRef
+	Summary string
+	Exists  bool
+}
+
+// RawSelector は raw データ取得時のセレクタ。
+type RawSelector struct {
+	IncludeBody bool
+	IncludeTags bool
+	Fields      []string
+}
+
+// RawPayload は raw データ取得結果。
+type RawPayload struct {
+	Ref   TypedRef
+	Raw   string
+	Found bool
+}
 
 // ShortNoteResolver は short ストアを使った Resolver の実装。
 // P4 Phase 3B: 現時点の memx-core 実装に合わせた最小 adapter。
@@ -26,15 +122,7 @@ func NewShortNoteResolver(
 // ResolveRef は単一の typed_ref を解決する。
 func (r *ShortNoteResolver) ResolveRef(ctx context.Context, ref TypedRef) (ResolvedRef, error) {
 	// memx ドメインのみ対応
-	if ref.Domain != DomainMemx {
-		return ResolvedRef{}, &ErrUnsupportedRef{Ref: ref}
-	}
-
-	// memx の known entity types を確認
-	switch ref.Type {
-	case EntityTypeEvidence, EntityTypeKnowledge, EntityTypeArtifact, EntityTypeLineage:
-		// OK
-	default:
+	if ref.Domain != "memx" {
 		return ResolvedRef{}, &ErrUnsupportedRef{Ref: ref}
 	}
 
@@ -109,7 +197,7 @@ func (r *ShortNoteResolver) ResolveMany(ctx context.Context, refs []TypedRef) (*
 // LoadSummary は要約を取得する（summary-first retrieval）。
 func (r *ShortNoteResolver) LoadSummary(ctx context.Context, ref TypedRef) (*SummaryPayload, error) {
 	// memx ドメインのみ対応
-	if ref.Domain != DomainMemx {
+	if ref.Domain != "memx" {
 		return &SummaryPayload{Ref: ref, Exists: false}, &ErrUnsupportedRef{Ref: ref}
 	}
 
@@ -128,7 +216,7 @@ func (r *ShortNoteResolver) LoadSummary(ctx context.Context, ref TypedRef) (*Sum
 // LoadSelectedRaw は必要時のみ raw データを取得する。
 func (r *ShortNoteResolver) LoadSelectedRaw(ctx context.Context, ref TypedRef, selector RawSelector) (*RawPayload, error) {
 	// memx ドメインのみ対応
-	if ref.Domain != DomainMemx {
+	if ref.Domain != "memx" {
 		return &RawPayload{Ref: ref, Found: false}, &ErrUnsupportedRef{Ref: ref}
 	}
 
@@ -152,6 +240,25 @@ func (r *ShortNoteResolver) LoadSelectedRaw(ctx context.Context, ref TypedRef, s
 	}, nil
 }
 
+// ErrUnsupportedRef は未対応の typed_ref が指定された場合のエラー。
+type ErrUnsupportedRef struct {
+	Ref TypedRef
+}
+
+func (e *ErrUnsupportedRef) Error() string {
+	return fmt.Sprintf("unsupported typed_ref: %s", e.Ref)
+}
+
+// ErrUnresolvedRef は解決できない typed_ref が指定された場合のエラー。
+type ErrUnresolvedRef struct {
+	Ref    TypedRef
+	Reason string
+}
+
+func (e *ErrUnresolvedRef) Error() string {
+	return fmt.Sprintf("unresolved typed_ref: %s (%s)", e.Ref, e.Reason)
+}
+
 // ValidateTypedRefForResolve は解決可能な typed_ref かどうかを検証する。
 func ValidateTypedRefForResolve(ref TypedRef) error {
 	if !ref.IsValid() {
@@ -159,12 +266,12 @@ func ValidateTypedRefForResolve(ref TypedRef) error {
 	}
 
 	// 現状は memx ドメインのみ対応
-	if ref.Domain != DomainMemx {
+	if ref.Domain != "memx" {
 		return &ErrUnsupportedRef{Ref: ref}
 	}
 
 	// provider は local のみ対応
-	if ref.Provider != ProviderLocal {
+	if ref.Provider != "local" {
 		return &ErrUnsupportedRef{Ref: ref}
 	}
 

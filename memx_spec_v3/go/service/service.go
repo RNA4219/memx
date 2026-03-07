@@ -49,6 +49,29 @@ func (s *Service) SetReflectLLM(client db.ReflectLLMClient) {
 	s.ReflectLLM = client
 }
 
+// NewResolver は typed_ref 解決用の Resolver を作成する。
+// P4 Phase 3B: 現時点の memx-core 実装に合わせた ShortNoteResolver を返す。
+func (s *Service) NewResolver() *ShortNoteResolver {
+	return NewShortNoteResolver(
+		s.searchShortInternal,
+		s.showShortInternal,
+	)
+}
+
+// searchShortInternal は Resolver 内部用の検索関数。
+func (s *Service) searchShortInternal(ctx context.Context, query string, topK int) ([]Note, error) {
+	return s.SearchShort(ctx, query, topK)
+}
+
+// showShortInternal は Resolver 内部用の取得関数。
+func (s *Service) showShortInternal(ctx context.Context, id string) (*Note, error) {
+	n, err := s.GetShort(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &n, nil
+}
+
 // IngestNoteRequest は short への投入（最小）。
 // v1.3 では CLI はこれを API に渡すだけ。
 type IngestNoteRequest struct {
@@ -118,9 +141,10 @@ func (r *IngestNoteRequest) validate() error {
 
 	// sensitivity の列挙値チェック
 	validSensitivity := map[string]bool{
-		"public":   true,
-		"internal": true,
-		"secret":   true,
+		"public":      true,
+		"internal":    true,
+		"confidential": true,
+		"secret":      true,
 	}
 	if !validSensitivity[r.Sensitivity] {
 		return fmt.Errorf("%w: invalid sensitivity: %s", ErrInvalidArgument, r.Sensitivity)
