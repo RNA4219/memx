@@ -31,7 +31,36 @@ memx は用途別に4つのストアを提供します：
 | **knowledge** | 知識ベース（FAQ、手順書、概念説明） | 永続 |
 | **archive** | アーカイブ（不要だが保持する情報） | 無期限 |
 
-**v1 では `short` ストアのみ実装されています。**
+**v1.3 では全ストアが実装されています。**
+
+---
+
+## Claude Code スキル
+
+memx は Claude Code 用のスキルを提供しています。これらを使用することで、自然言語で memx を操作できます。
+
+| スキル | 説明 | 例 |
+|--------|------|-----|
+| `/remember` | 情報を short ストアに保存 | `/remember API認証は JWT を使用` |
+| `/recall` | 情報を検索 | `/recall 認証` |
+| `/journal` | journal ストアにログ追加 | `/journal --scope project:memx 実装完了` |
+| `/knowledge` | knowledge ストアに知識追加 | `/knowledge --scope glossary JWT = JSON Web Token` |
+| `/show` | ノート詳細表示 | `/show abc123...` |
+| `/memx-help` | ヘルプ表示 | `/memx-help` |
+
+### スキル定義ファイル
+
+スキルは `.claude/commands/` ディレクトリに定義されています：
+
+```
+.claude/commands/
+├── remember.md    # /remember スキル
+├── recall.md      # /recall スキル
+├── journal.md     # /journal スキル
+├── knowledge.md   # /knowledge スキル
+├── show.md        # /show スキル
+└── memx-help.md   # /memx-help スキル
+```
 
 ---
 
@@ -48,6 +77,8 @@ go build ./cmd/mem
 
 #### 1. メモを保存する（ingest）
 
+**short ストア**（短期記憶）：
+
 ```bash
 # タイトルと本文を指定
 mem in short --title "会議メモ" --body "明日の10時に打ち合わせ"
@@ -59,7 +90,26 @@ echo "重要な情報" | mem in short --title "メモ" --stdin
 mem in short --title "バグ報告" --body "詳細..." --tag bug --tag priority-high
 ```
 
+**journal ストア**（時系列ログ）：
+
+```bash
+# working_scope が必須
+mem in journal --title "進捗ログ" --body "API実装完了" --scope project:memx
+```
+
+**knowledge ストア**（知識ベース）：
+
+```bash
+# working_scope が必須
+mem in knowledge --title "用語定義" --body "JWT = JSON Web Token" --scope glossary
+
+# ピン留め付き
+mem in knowledge --title "重要な設定" --body "環境変数..." --scope config --pinned
+```
+
 #### 2. メモを検索する（search）
+
+**short ストア**：
 
 ```bash
 # キーワード検索
@@ -67,6 +117,21 @@ mem out search "会議"
 
 # 結果数を指定
 mem out search "バグ" -k 5
+```
+
+**journal ストア**：
+
+```bash
+mem out journal search "実装"
+mem out journal list --scope project:memx
+```
+
+**knowledge ストア**：
+
+```bash
+mem out knowledge search "JWT"
+mem out knowledge list --scope glossary
+mem out knowledge pinned  # ピン留め一覧
 ```
 
 #### 3. メモを詳細表示する（show）
@@ -114,6 +179,8 @@ mem api serve --addr 127.0.0.1:7766
 
 ### API エンドポイント
 
+**short ストア**：
+
 | エンドポイント | 用途 |
 |----------------|------|
 | `POST /v1/notes:ingest` | メモ保存 |
@@ -121,6 +188,34 @@ mem api serve --addr 127.0.0.1:7766
 | `GET /v1/notes/{id}` | メモ取得 |
 | `POST /v1/notes:summarize` | 要約生成 |
 | `POST /v1/gc:run` | GC実行 |
+
+**journal ストア**：
+
+| エンドポイント | 用途 |
+|----------------|------|
+| `POST /v1/journal:ingest` | ログ保存 |
+| `POST /v1/journal:search` | ログ検索 |
+| `GET /v1/journal/{id}` | ログ取得 |
+| `POST /v1/journal:list-by-scope` | スコープ別一覧 |
+
+**knowledge ストア**：
+
+| エンドポイント | 用途 |
+|----------------|------|
+| `POST /v1/knowledge:ingest` | 知識保存 |
+| `POST /v1/knowledge:search` | 知識検索 |
+| `GET /v1/knowledge/{id}` | 知識取得 |
+| `POST /v1/knowledge/{id}:pin` | ピン留め |
+| `POST /v1/knowledge/{id}:unpin` | ピン解除 |
+| `POST /v1/knowledge:list-pinned` | ピン留め一覧 |
+
+**archive ストア**：
+
+| エンドポイント | 用途 |
+|----------------|------|
+| `GET /v1/archive` | アーカイブ一覧 |
+| `GET /v1/archive/{id}` | アーカイブ取得 |
+| `POST /v1/archive/{id}:restore` | 復元 |
 
 ### CLI から API を使う
 

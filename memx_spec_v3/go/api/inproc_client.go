@@ -38,7 +38,7 @@ func fromServiceJournalNote(n service.JournalNote) JournalNote {
 	return JournalNote{
 		NoteBase: NoteBase{
 			ID:             n.ID,
-			Ref:            NewTypedRef(EntityTypeKnowledge, n.ID),
+			Ref:            NewTypedRef(EntityTypeEvidence, n.ID),
 			Title:          n.Title,
 			Summary:        n.Summary,
 			Body:           n.Body,
