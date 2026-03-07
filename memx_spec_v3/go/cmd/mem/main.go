@@ -89,7 +89,7 @@ type commonFlags struct {
 	json   bool
 
 	short     string
-	journal string
+	journal   string
 	knowledge string
 	archive   string
 }
@@ -106,7 +106,7 @@ func (c *commonFlags) bind(fs *flag.FlagSet) {
 func (c *commonFlags) paths() db.Paths {
 	return db.Paths{
 		Short:     c.short,
-		Journal: c.journal,
+		Journal:   c.journal,
 		Knowledge: c.knowledge,
 		Archive:   c.archive,
 	}
@@ -120,6 +120,10 @@ func makeClient(ctx context.Context, cf *commonFlags) (api.Client, func(), error
 	if err != nil {
 		return nil, nil, err
 	}
+	if err := attachOpenAIFromEnv(svc); err != nil {
+		_ = svc.Close()
+		return nil, nil, err
+	}
 	cleanup := func() { _ = svc.Close() }
 	return api.NewInProcClient(svc), cleanup, nil
 }
@@ -128,6 +132,10 @@ func printJSON(v interface{}) {
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	_ = enc.Encode(v)
+}
+
+func attachOpenAIFromEnv(svc *service.Service) error {
+	return svc.ConfigureLLMsFromEnv()
 }
 
 // -------------------- api --------------------
@@ -147,6 +155,10 @@ func cmdAPI(args []string) {
 
 		svc, err := service.New(cf.paths())
 		if err != nil {
+			log.Fatal(err)
+		}
+		if err := attachOpenAIFromEnv(svc); err != nil {
+			_ = svc.Close()
 			log.Fatal(err)
 		}
 		defer func() { _ = svc.Close() }()
@@ -487,7 +499,7 @@ func cmdGC(args []string) {
 		}
 
 		resp, apiErr := client.GCRun(ctx, api.GCRunRequest{
-			Target: "short",
+			Target:  "short",
 			Options: api.GCOptions{DryRun: *dryRun},
 		})
 		if apiErr != nil {

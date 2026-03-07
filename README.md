@@ -39,6 +39,49 @@ mem out show <NOTE_ID>
 
 ---
 
+## LLM 連携
+
+要約を有効にするには、OpenAI か Alibaba Cloud Model Studio のどちらかを環境変数で設定します。
+
+### OpenAI
+
+```bash
+export MEMX_LLM_PROVIDER="openai"
+export OPENAI_API_KEY="sk-..."
+export MEMX_OPENAI_MODEL="gpt-5-mini"
+# 任意: 統合要約だけ別モデルにしたい場合
+export MEMX_OPENAI_REFLECT_MODEL="gpt-5"
+```
+
+### Alibaba Cloud Model Studio
+
+```bash
+export MEMX_LLM_PROVIDER="alibaba"
+export DASHSCOPE_API_KEY="sk-..."
+export MEMX_ALIBABA_MODEL="qwen3-max"
+# 任意: 互換 endpoint を明示したい場合
+export MEMX_ALIBABA_BASE_URL="https://dashscope-intl.aliyuncs.com/api/v2/apps/protocols/compatible-mode/v1"
+```
+
+主な設定:
+
+- `MEMX_LLM_PROVIDER`: 任意。`openai` か `alibaba`。未指定時は OpenAI → Alibaba の順に自動検出します。
+- `OPENAI_API_KEY`: OpenAI 利用時の必須キー。
+- `MEMX_OPENAI_MODEL`: OpenAI の単一ノート要約モデル。既定値は `gpt-5-mini`。
+- `MEMX_OPENAI_REFLECT_MODEL`: OpenAI の複数ノート統合要約モデル。未設定時は `MEMX_OPENAI_MODEL` を使います。
+- `MEMX_OPENAI_BASE_URL`: OpenAI 互換 API のベースURL。既定値は `https://api.openai.com/v1`。
+- `DASHSCOPE_API_KEY`: Alibaba Cloud Model Studio 利用時の必須キー。
+- `MEMX_ALIBABA_MODEL`: Alibaba の単一ノート要約モデル。既定値は `qwen3-max`。
+- `MEMX_ALIBABA_REFLECT_MODEL`: Alibaba の複数ノート統合要約モデル。未設定時は `MEMX_ALIBABA_MODEL` を使います。
+- `MEMX_ALIBABA_REGION`: Alibaba のリージョン切替用。未設定時は `singapore` です。Responses API の公式記載は現時点で Singapore です。
+- `MEMX_ALIBABA_BASE_URL`: Alibaba の OpenAI 互換 Responses API ベースURLを明示したい場合に使います。
+- `MEMX_OPENAI_TIMEOUT_SECONDS` / `MEMX_ALIBABA_TIMEOUT_SECONDS`: HTTP タイムアウト秒数。
+- `OPENAI_PROJECT` / `OPENAI_ORGANIZATION`: OpenAI 利用時のみ任意。
+
+この設定は `mem summarize` と、要約未指定での `mem in short|journal|knowledge` の自動要約に使われます。Alibaba 互換モードでは `instructions` 非対応差分を吸収するため、memx 側でプロンプトを `input` に自動展開します。
+
+---
+
 ## 主な機能
 
 | 機能 | コマンド | 説明 |
@@ -139,3 +182,9 @@ KV優先ロードマップに従って以下を順次実装：
 ## License
 
 MIT License
+
+
+
+
+
+
