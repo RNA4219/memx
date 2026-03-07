@@ -46,8 +46,22 @@ func usage() {
 Usage:
   mem api serve   [--addr 127.0.0.1:7766] [--short short.db] ...
   mem in short    --title TITLE [--body BODY | --stdin] [--tag TAG ...]
+  mem in chronicle --title TITLE --body BODY --scope SCOPE [--tag TAG ...]
+  mem in memopedia --title TITLE --body BODY --scope SCOPE [--tag TAG ...] [--pinned]
   mem out search  QUERY
   mem out show    NOTE_ID
+  mem out chronicle search QUERY
+  mem out chronicle show ID
+  mem out chronicle list --scope SCOPE
+  mem out memopedia search QUERY
+  mem out memopedia show ID
+  mem out memopedia list --scope SCOPE
+  mem out memopedia pinned [--scope SCOPE]
+  mem out memopedia pin ID
+  mem out memopedia unpin ID
+  mem out archive list
+  mem out archive show ID
+  mem out archive restore ID
   mem gc short    [--dry-run] [--enable-gc]
   mem summarize   NOTE_ID [--json]
   mem summarize   --ids ID1,ID2,... [--json]
@@ -203,6 +217,113 @@ func cmdIn(args []string) {
 			return
 		}
 		fmt.Printf("ok id=%s\n", resp.Note.ID)
+
+	case "chronicle":
+		fs := flag.NewFlagSet("mem in chronicle", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		title := fs.String("title", "", "note title")
+		body := fs.String("body", "", "note body")
+		stdin := fs.Bool("stdin", false, "read body from stdin")
+		scope := fs.String("scope", "", "working scope (required)")
+		tags := multiStringFlag{}
+		fs.Var(&tags, "tag", "tag (repeatable)")
+		sourceType := fs.String("source-type", "manual", "source type")
+		origin := fs.String("origin", "", "origin")
+		sourceTrust := fs.String("source-trust", "user_input", "source trust")
+		sensitivity := fs.String("sensitivity", "internal", "sensitivity")
+		_ = fs.Parse(args[1:])
+
+		b := *body
+		if *stdin {
+			b = readAllStdin()
+		}
+
+		if *scope == "" {
+			log.Fatal("--scope is required for chronicle")
+		}
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.ChronicleIngest(ctx, api.ChronicleIngestRequest{
+			Title:        *title,
+			Body:         b,
+			SourceType:   *sourceType,
+			Origin:       *origin,
+			SourceTrust:  *sourceTrust,
+			Sensitivity:  *sensitivity,
+			Tags:         tags,
+			WorkingScope: *scope,
+		})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		fmt.Printf("ok id=%s\n", resp.Note.ID)
+
+	case "memopedia":
+		fs := flag.NewFlagSet("mem in memopedia", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		title := fs.String("title", "", "note title")
+		body := fs.String("body", "", "note body")
+		stdin := fs.Bool("stdin", false, "read body from stdin")
+		scope := fs.String("scope", "", "working scope (required)")
+		tags := multiStringFlag{}
+		fs.Var(&tags, "tag", "tag (repeatable)")
+		pinned := fs.Bool("pinned", false, "pin the note")
+		sourceType := fs.String("source-type", "manual", "source type")
+		origin := fs.String("origin", "", "origin")
+		sourceTrust := fs.String("source-trust", "user_input", "source trust")
+		sensitivity := fs.String("sensitivity", "internal", "sensitivity")
+		_ = fs.Parse(args[1:])
+
+		b := *body
+		if *stdin {
+			b = readAllStdin()
+		}
+
+		if *scope == "" {
+			log.Fatal("--scope is required for memopedia")
+		}
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.MemopediaIngest(ctx, api.MemopediaIngestRequest{
+			Title:        *title,
+			Body:         b,
+			SourceType:   *sourceType,
+			Origin:       *origin,
+			SourceTrust:  *sourceTrust,
+			Sensitivity:  *sensitivity,
+			Tags:         tags,
+			WorkingScope: *scope,
+			IsPinned:     *pinned,
+		})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		fmt.Printf("ok id=%s\n", resp.Note.ID)
+
 	default:
 		usage()
 		os.Exit(2)
@@ -270,6 +391,15 @@ func cmdOut(args []string) {
 			return
 		}
 		fmt.Printf("# %s\n\n%s\n", n.Title, n.Body)
+
+	case "chronicle":
+		cmdOutChronicle(args[1:])
+
+	case "memopedia":
+		cmdOutMemopedia(args[1:])
+
+	case "archive":
+		cmdOutArchive(args[1:])
 
 	default:
 		usage()
@@ -394,4 +524,386 @@ func readAllStdin() string {
 		b.WriteByte('\n')
 	}
 	return b.String()
+}
+
+// -------------------- chronicle commands --------------------
+
+func cmdOutChronicle(args []string) {
+	if len(args) < 1 {
+		usage()
+		os.Exit(2)
+	}
+	switch args[0] {
+	case "search":
+		fs := flag.NewFlagSet("mem out chronicle search", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		topK := fs.Int("k", 20, "top k")
+		_ = fs.Parse(args[1:])
+		query := strings.Join(fs.Args(), " ")
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.ChronicleSearch(ctx, api.ChronicleSearchRequest{Query: query, TopK: *topK})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		for _, n := range resp.Notes {
+			fmt.Printf("%s\t%s\t[%s]\n", n.ID, n.Title, n.WorkingScope)
+		}
+
+	case "show":
+		fs := flag.NewFlagSet("mem out chronicle show", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		_ = fs.Parse(args[1:])
+		if len(fs.Args()) < 1 {
+			log.Fatal("ID is required")
+		}
+		id := fs.Args()[0]
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		n, apiErr := client.ChronicleGet(ctx, id)
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(n)
+			return
+		}
+		fmt.Printf("# %s\n\nScope: %s\n\n%s\n", n.Title, n.WorkingScope, n.Body)
+
+	case "list":
+		fs := flag.NewFlagSet("mem out chronicle list", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		scope := fs.String("scope", "", "working scope (required)")
+		limit := fs.Int("limit", 20, "limit")
+		_ = fs.Parse(args[1:])
+
+		if *scope == "" {
+			log.Fatal("--scope is required")
+		}
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.ChronicleListByScope(ctx, api.ChronicleListByScopeRequest{
+			WorkingScope: *scope,
+			Limit:        *limit,
+		})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		for _, n := range resp.Notes {
+			fmt.Printf("%s\t%s\n", n.ID, n.Title)
+		}
+
+	default:
+		usage()
+		os.Exit(2)
+	}
+}
+
+// -------------------- memopedia commands --------------------
+
+func cmdOutMemopedia(args []string) {
+	if len(args) < 1 {
+		usage()
+		os.Exit(2)
+	}
+	switch args[0] {
+	case "search":
+		fs := flag.NewFlagSet("mem out memopedia search", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		topK := fs.Int("k", 20, "top k")
+		_ = fs.Parse(args[1:])
+		query := strings.Join(fs.Args(), " ")
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.MemopediaSearch(ctx, api.MemopediaSearchRequest{Query: query, TopK: *topK})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		for _, n := range resp.Notes {
+			pinned := ""
+			if n.IsPinned {
+				pinned = " [pinned]"
+			}
+			fmt.Printf("%s\t%s\t[%s]%s\n", n.ID, n.Title, n.WorkingScope, pinned)
+		}
+
+	case "show":
+		fs := flag.NewFlagSet("mem out memopedia show", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		_ = fs.Parse(args[1:])
+		if len(fs.Args()) < 1 {
+			log.Fatal("ID is required")
+		}
+		id := fs.Args()[0]
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		n, apiErr := client.MemopediaGet(ctx, id)
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(n)
+			return
+		}
+		pinned := ""
+		if n.IsPinned {
+			pinned = " (pinned)"
+		}
+		fmt.Printf("# %s%s\n\nScope: %s\n\n%s\n", n.Title, pinned, n.WorkingScope, n.Body)
+
+	case "list":
+		fs := flag.NewFlagSet("mem out memopedia list", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		scope := fs.String("scope", "", "working scope (required)")
+		limit := fs.Int("limit", 20, "limit")
+		_ = fs.Parse(args[1:])
+
+		if *scope == "" {
+			log.Fatal("--scope is required")
+		}
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.MemopediaListByScope(ctx, api.MemopediaListByScopeRequest{
+			WorkingScope: *scope,
+			Limit:        *limit,
+		})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		for _, n := range resp.Notes {
+			fmt.Printf("%s\t%s\n", n.ID, n.Title)
+		}
+
+	case "pinned":
+		fs := flag.NewFlagSet("mem out memopedia pinned", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		scope := fs.String("scope", "", "working scope (optional)")
+		limit := fs.Int("limit", 20, "limit")
+		_ = fs.Parse(args[1:])
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.MemopediaListPinned(ctx, api.MemopediaListPinnedRequest{
+			WorkingScope: *scope,
+			Limit:        *limit,
+		})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		for _, n := range resp.Notes {
+			fmt.Printf("%s\t%s\t[%s]\n", n.ID, n.Title, n.WorkingScope)
+		}
+
+	case "pin":
+		fs := flag.NewFlagSet("mem out memopedia pin", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		_ = fs.Parse(args[1:])
+		if len(fs.Args()) < 1 {
+			log.Fatal("ID is required")
+		}
+		id := fs.Args()[0]
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		_, apiErr := client.MemopediaPin(ctx, id)
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		fmt.Println("ok")
+
+	case "unpin":
+		fs := flag.NewFlagSet("mem out memopedia unpin", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		_ = fs.Parse(args[1:])
+		if len(fs.Args()) < 1 {
+			log.Fatal("ID is required")
+		}
+		id := fs.Args()[0]
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		_, apiErr := client.MemopediaUnpin(ctx, id)
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		fmt.Println("ok")
+
+	default:
+		usage()
+		os.Exit(2)
+	}
+}
+
+// -------------------- archive commands --------------------
+
+func cmdOutArchive(args []string) {
+	if len(args) < 1 {
+		usage()
+		os.Exit(2)
+	}
+	switch args[0] {
+	case "list":
+		fs := flag.NewFlagSet("mem out archive list", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		limit := fs.Int("limit", 20, "limit")
+		_ = fs.Parse(args[1:])
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.ArchiveList(ctx, api.ArchiveListRequest{Limit: *limit})
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		for _, n := range resp.Notes {
+			fmt.Printf("%s\t%s\n", n.ID, n.Title)
+		}
+
+	case "show":
+		fs := flag.NewFlagSet("mem out archive show", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		_ = fs.Parse(args[1:])
+		if len(fs.Args()) < 1 {
+			log.Fatal("ID is required")
+		}
+		id := fs.Args()[0]
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		n, apiErr := client.ArchiveGet(ctx, id)
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(n)
+			return
+		}
+		fmt.Printf("# %s\n\n%s\n", n.Title, n.Body)
+
+	case "restore":
+		fs := flag.NewFlagSet("mem out archive restore", flag.ExitOnError)
+		cf := &commonFlags{}
+		cf.bind(fs)
+		_ = fs.Parse(args[1:])
+		if len(fs.Args()) < 1 {
+			log.Fatal("ID is required")
+		}
+		id := fs.Args()[0]
+
+		ctx := context.Background()
+		client, cleanup, err := makeClient(ctx, cf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer cleanup()
+
+		resp, apiErr := client.ArchiveRestore(ctx, id)
+		if apiErr != nil {
+			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
+		}
+		if cf.json {
+			printJSON(resp)
+			return
+		}
+		fmt.Printf("restored: %s\n", resp.Note.ID)
+
+	default:
+		usage()
+		os.Exit(2)
+	}
 }
