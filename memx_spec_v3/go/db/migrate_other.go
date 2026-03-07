@@ -108,6 +108,14 @@ func getChronicleDDL() []string {
   is_pinned         INTEGER NOT NULL DEFAULT 0
 );`,
 
+		// インデックス
+		`CREATE INDEX IF NOT EXISTS idx_notes_created_at ON notes(created_at);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_last_accessed_at ON notes(last_accessed_at);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_source_trust ON notes(source_trust);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_sensitivity ON notes(sensitivity);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_working_scope ON notes(working_scope);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_is_pinned ON notes(is_pinned);`,
+
 		// FTS5 仮想テーブル
 		`CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
   title,
@@ -115,6 +123,18 @@ func getChronicleDDL() []string {
   content='notes',
   content_rowid='rowid'
 );`,
+
+		// FTS 同期トリガー
+		`CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
+  INSERT INTO notes_fts(rowid, title, body) VALUES (new.rowid, new.title, new.body);
+END;`,
+		`CREATE TRIGGER IF NOT EXISTS notes_au AFTER UPDATE ON notes BEGIN
+  DELETE FROM notes_fts WHERE rowid = old.rowid;
+  INSERT INTO notes_fts(rowid, title, body) VALUES (new.rowid, new.title, new.body);
+END;`,
+		`CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
+  DELETE FROM notes_fts WHERE rowid = old.rowid;
+END;`,
 
 		// tags テーブル
 		`CREATE TABLE IF NOT EXISTS tags (
@@ -127,6 +147,8 @@ func getChronicleDDL() []string {
   usage_count INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(parent_id) REFERENCES tags(id) ON DELETE SET NULL
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name);`,
+		`CREATE INDEX IF NOT EXISTS idx_tags_parent ON tags(parent_id);`,
 
 		// note_tags テーブル
 		`CREATE TABLE IF NOT EXISTS note_tags (
@@ -136,6 +158,8 @@ func getChronicleDDL() []string {
   FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id);`,
+		`CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags(note_id);`,
 
 		// note_embeddings テーブル
 		`CREATE TABLE IF NOT EXISTS note_embeddings (
@@ -144,6 +168,29 @@ func getChronicleDDL() []string {
   vector  BLOB NOT NULL,
   FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_note_embeddings_dim ON note_embeddings(dim);`,
+
+		// chronicle_meta テーブル
+		`CREATE TABLE IF NOT EXISTS chronicle_meta (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);`,
+		`INSERT OR IGNORE INTO chronicle_meta(key, value) VALUES ('note_count', '0');`,
+		`INSERT OR IGNORE INTO chronicle_meta(key, value) VALUES ('token_sum', '0');`,
+		`INSERT OR IGNORE INTO chronicle_meta(key, value) VALUES ('last_gc_at', '1970-01-01T00:00:00Z');`,
+
+		// lineage テーブル
+		`CREATE TABLE IF NOT EXISTS lineage (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  src_store      TEXT NOT NULL,
+  src_note_id    TEXT NOT NULL,
+  dest_store     TEXT NOT NULL,
+  dest_note_id   TEXT NOT NULL,
+  relation       TEXT NOT NULL,
+  created_at     TEXT NOT NULL
+);`,
+		`CREATE INDEX IF NOT EXISTS idx_lineage_src ON lineage(src_store, src_note_id);`,
+		`CREATE INDEX IF NOT EXISTS idx_lineage_dest ON lineage(dest_store, dest_note_id);`,
 	}
 }
 
@@ -152,6 +199,7 @@ func getMemopediaDDL() []string {
 	return []string{
 		`PRAGMA foreign_keys = ON;`,
 
+		// notes テーブル（working_scope, is_pinned を追加）
 		`CREATE TABLE IF NOT EXISTS notes (
   id                TEXT PRIMARY KEY,
   title             TEXT NOT NULL,
@@ -174,6 +222,15 @@ func getMemopediaDDL() []string {
   is_pinned         INTEGER NOT NULL DEFAULT 0
 );`,
 
+		// インデックス
+		`CREATE INDEX IF NOT EXISTS idx_notes_created_at ON notes(created_at);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_last_accessed_at ON notes(last_accessed_at);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_source_trust ON notes(source_trust);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_sensitivity ON notes(sensitivity);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_working_scope ON notes(working_scope);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_is_pinned ON notes(is_pinned);`,
+
+		// FTS5 仮想テーブル
 		`CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
   title,
   body,
@@ -181,6 +238,19 @@ func getMemopediaDDL() []string {
   content_rowid='rowid'
 );`,
 
+		// FTS 同期トリガー
+		`CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
+  INSERT INTO notes_fts(rowid, title, body) VALUES (new.rowid, new.title, new.body);
+END;`,
+		`CREATE TRIGGER IF NOT EXISTS notes_au AFTER UPDATE ON notes BEGIN
+  DELETE FROM notes_fts WHERE rowid = old.rowid;
+  INSERT INTO notes_fts(rowid, title, body) VALUES (new.rowid, new.title, new.body);
+END;`,
+		`CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
+  DELETE FROM notes_fts WHERE rowid = old.rowid;
+END;`,
+
+		// tags テーブル
 		`CREATE TABLE IF NOT EXISTS tags (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name        TEXT NOT NULL UNIQUE,
@@ -191,7 +261,10 @@ func getMemopediaDDL() []string {
   usage_count INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(parent_id) REFERENCES tags(id) ON DELETE SET NULL
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name);`,
+		`CREATE INDEX IF NOT EXISTS idx_tags_parent ON tags(parent_id);`,
 
+		// note_tags テーブル
 		`CREATE TABLE IF NOT EXISTS note_tags (
   note_id TEXT NOT NULL,
   tag_id  INTEGER NOT NULL,
@@ -199,13 +272,39 @@ func getMemopediaDDL() []string {
   FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id);`,
+		`CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags(note_id);`,
 
+		// note_embeddings テーブル
 		`CREATE TABLE IF NOT EXISTS note_embeddings (
   note_id TEXT PRIMARY KEY,
   dim     INTEGER NOT NULL,
   vector  BLOB NOT NULL,
   FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_note_embeddings_dim ON note_embeddings(dim);`,
+
+		// memopedia_meta テーブル
+		`CREATE TABLE IF NOT EXISTS memopedia_meta (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);`,
+		`INSERT OR IGNORE INTO memopedia_meta(key, value) VALUES ('note_count', '0');`,
+		`INSERT OR IGNORE INTO memopedia_meta(key, value) VALUES ('token_sum', '0');`,
+		`INSERT OR IGNORE INTO memopedia_meta(key, value) VALUES ('last_gc_at', '1970-01-01T00:00:00Z');`,
+
+		// lineage テーブル
+		`CREATE TABLE IF NOT EXISTS lineage (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  src_store      TEXT NOT NULL,
+  src_note_id    TEXT NOT NULL,
+  dest_store     TEXT NOT NULL,
+  dest_note_id   TEXT NOT NULL,
+  relation       TEXT NOT NULL,
+  created_at     TEXT NOT NULL
+);`,
+		`CREATE INDEX IF NOT EXISTS idx_lineage_src ON lineage(src_store, src_note_id);`,
+		`CREATE INDEX IF NOT EXISTS idx_lineage_dest ON lineage(dest_store, dest_note_id);`,
 	}
 }
 
@@ -214,6 +313,7 @@ func getArchiveDDL() []string {
 	return []string{
 		`PRAGMA foreign_keys = ON;`,
 
+		// notes テーブル（working_scope, is_pinned なし）
 		`CREATE TABLE IF NOT EXISTS notes (
   id                TEXT PRIMARY KEY,
   title             TEXT NOT NULL,
@@ -234,6 +334,13 @@ func getArchiveDDL() []string {
   route_override    TEXT
 );`,
 
+		// インデックス
+		`CREATE INDEX IF NOT EXISTS idx_notes_created_at ON notes(created_at);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_last_accessed_at ON notes(last_accessed_at);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_source_trust ON notes(source_trust);`,
+		`CREATE INDEX IF NOT EXISTS idx_notes_sensitivity ON notes(sensitivity);`,
+
+		// tags テーブル
 		`CREATE TABLE IF NOT EXISTS tags (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name        TEXT NOT NULL UNIQUE,
@@ -244,7 +351,10 @@ func getArchiveDDL() []string {
   usage_count INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(parent_id) REFERENCES tags(id) ON DELETE SET NULL
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name);`,
+		`CREATE INDEX IF NOT EXISTS idx_tags_parent ON tags(parent_id);`,
 
+		// note_tags テーブル
 		`CREATE TABLE IF NOT EXISTS note_tags (
   note_id TEXT NOT NULL,
   tag_id  INTEGER NOT NULL,
@@ -252,6 +362,30 @@ func getArchiveDDL() []string {
   FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );`,
+		`CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id);`,
+		`CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags(note_id);`,
+
+		// archive_meta テーブル
+		`CREATE TABLE IF NOT EXISTS archive_meta (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);`,
+		`INSERT OR IGNORE INTO archive_meta(key, value) VALUES ('note_count', '0');`,
+		`INSERT OR IGNORE INTO archive_meta(key, value) VALUES ('token_sum', '0');`,
+		`INSERT OR IGNORE INTO archive_meta(key, value) VALUES ('last_gc_at', '1970-01-01T00:00:00Z');`,
+
+		// lineage テーブル
+		`CREATE TABLE IF NOT EXISTS lineage (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  src_store      TEXT NOT NULL,
+  src_note_id    TEXT NOT NULL,
+  dest_store     TEXT NOT NULL,
+  dest_note_id   TEXT NOT NULL,
+  relation       TEXT NOT NULL,
+  created_at     TEXT NOT NULL
+);`,
+		`CREATE INDEX IF NOT EXISTS idx_lineage_src ON lineage(src_store, src_note_id);`,
+		`CREATE INDEX IF NOT EXISTS idx_lineage_dest ON lineage(dest_store, dest_note_id);`,
 	}
 }
 

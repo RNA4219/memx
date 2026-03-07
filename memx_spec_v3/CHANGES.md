@@ -2,7 +2,8 @@
 
 ## v3 (requirements v1.3)
 
-
+- GC機能を実装：`mem gc short --dry-run` CLI、`POST /v1/gc:run` API、Phase0トリガ判定、Phase3 Archive退避。feature flag `--enable-gc` 対応。
+- chronicle/memopedia/archive スキーマを完全実装：FTS同期トリガー、インデックス、*_meta テーブル、lineage テーブルを追加。
 - [#incident:IN-20260303-002][#sev:SEV2][#action:mitigation] `POST /v1/gc:run` の flag OFF 契約を v1 正本に合わせて `INTERNAL/500` フォールバック継続へ統一（[記録](docs/IN-20260303-002.md)）。
 - 移行条件: `service.ErrFeatureDisabled` 実装と `go/api/errors.go` の `FEATURE_DISABLED -> 409` 明示マッピングが同一リリースで有効化された時点で 409 へ移行する。
 - CLI と API を分離：CLI は API の薄いラッパ。

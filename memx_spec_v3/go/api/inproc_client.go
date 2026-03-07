@@ -52,11 +52,23 @@ func (c *InProcClient) NotesGet(ctx context.Context, id string) (Note, *Error) {
 }
 
 func (c *InProcClient) GCRun(ctx context.Context, req GCRunRequest) (GCRunResponse, *Error) {
-	// v1.3: GC はまだスタブ。
-	// ただし API の形は固定する。
-	_ = ctx
-	_ = req
-	return GCRunResponse{Status: "ok"}, nil
+	result, err := c.Svc.GCShort(ctx, service.GCRequest{
+		Target:  req.Target,
+		DryRun:  req.Options.DryRun,
+		Enabled: true, // in-proc は常に有効（CLI側で制御）
+	})
+	if err != nil {
+		return GCRunResponse{}, mapError(err)
+	}
+
+	// dry-run の場合は詳細を含める
+	if result.DryRun && result.DryRunResult != nil {
+		return GCRunResponse{
+			Status: result.DryRunResult.ToJSON(),
+		}, nil
+	}
+
+	return GCRunResponse{Status: result.Status}, nil
 }
 
 func (c *InProcClient) Summarize(ctx context.Context, id string) (SummarizeResponse, *Error) {

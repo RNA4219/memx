@@ -1,8 +1,8 @@
 ---
 owner: memx-core
 status: active
-last_reviewed_at: 2026-03-03
-next_review_due: 2026-06-03
+last_reviewed_at: 2026-03-06
+next_review_due: 2026-06-06
 ---
 
 # memx 要求事項 - API
@@ -12,6 +12,7 @@ next_review_due: 2026-06-03
 ## 6. API 要件（v1.3 追加）
 
 - Requirement ID: `REQ-API-001`
+- **実装状況: ✅ 完了（2026-03-06）**
 
 ### Dependencies
 
@@ -35,21 +36,23 @@ next_review_due: 2026-06-03
 ### 6-3. エンドポイント（v1）
 - ADR: [ADR-0002: v1必須3エンドポイント固定方針](../../docs/ADR/ADR-0002-v1-required-endpoints.md)
 
-- `GET /healthz` → `ok`
-- `POST /v1/notes:ingest`
+- `GET /healthz` → `ok` ✅
+- `POST /v1/notes:ingest` ✅
   - request: `{title, body, summary?, source_type?, origin?, source_trust?, sensitivity?, tags?}`
   - response: `{note: Note}`
-- `POST /v1/notes:search`
+- `POST /v1/notes:search` ✅
   - request: `{query, top_k?}`
   - response: `{notes: Note[]}`
-- `GET /v1/notes/{id}` → `Note`
-- `POST /v1/gc:run`（SHOULD (v1.x): `mem.features.gc_short=true` 時のみ有効な実験機能）
-  - request: `{target, options?}`
+- `GET /v1/notes/{id}` → `Note` ✅
+- `POST /v1/gc:run` ✅（SHOULD (v1.x): 実装完了）
+  - request: `{target, options: {dry_run?}}`
   - response: `{status}`
 
-`POST /v1/gc:run` は v1 MUST には含めない。SHOULD としては、公開可否（route mount）と実行可否（flag 判定）を分離し、無効時は `NOT_FOUND`（公開 OFF）または `INTERNAL`（公開 ON かつ `mem.features.gc_short=false` 時）を返す。
-
-クライアントは `NOT_FOUND` を「未公開（または未提供）」、`INTERNAL` を「公開中だが実行不可（flag OFF を含む）のサーバー側失敗」の運用解釈で扱う。`FAILED_PRECONDITION` / `FEATURE_DISABLED` 相当コードは v1 契約外とし、導入時は `REQ-ERR-001` の拡張手順に従う。
+**`POST /v1/gc:run` 実装状況**:
+- Phase 0: トリガ判定 ✅
+- Phase 3: Archive退避 ✅
+- dry_run オプション ✅
+- Feature flag: CLI側で `--enable-gc` または `--dry-run` で制御
 
 ### 6-3-1. v1必須3エンドポイント契約（`requirements.md` × `go/api/types.go` 照合）
 

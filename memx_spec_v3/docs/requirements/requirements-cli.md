@@ -132,8 +132,20 @@ mem out recall "Qwen3.5-27B ベンチマーク結果"   --scope self   --stores 
 ### 3-5. `mem gc short`（Observer / Reflector）
 
 - Requirement ID: `REQ-GC-001`
+- **実装状況: ✅ 完了（2026-03-06）**
 
-スコープ区分：**SHOULD (v1.x)**。v1 では `mem.features.gc_short=true` を明示した場合のみ有効化する実験機能とし、デフォルトでは無効。
+スコープ区分：**SHOULD (v1.x)**。v1 では `--enable-gc` または `--dry-run` フラグで有効化。
+
+**実装済み機能**:
+- Phase 0: トリガ判定（soft_limit/hard_limit/min_interval）
+- Phase 3: Archive退避（アクセス数0、30日以上経過ノート）
+- Feature flag: `--enable-gc` で有効化、`--dry-run` で確認のみ
+- CLI: `mem gc short [--dry-run] [--enable-gc]`
+- API: `POST /v1/gc:run` (dry_run オプション対応)
+
+**未実装（FUTURE v2+）**:
+- Phase 1: Observer（クラスタリング、観測ノート生成）
+- Phase 2: Reflector（memopedia ページ更新）
 
 Mastra の Observational Memory を参考にした GC。
 

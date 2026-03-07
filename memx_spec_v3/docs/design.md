@@ -529,6 +529,27 @@ short 固有:
 - `PRAGMA user_version` による冪等性保証
 - スキーマ構成は `requirements.md#1-2-1` 参照
 
+**スキーマ構成（各ストア共通）**:
+
+| テーブル | short | chronicle | memopedia | archive |
+| --- | :---: | :---: | :---: | :---: |
+| `notes` | ✅ | ✅ | ✅ | ✅ |
+| `notes_fts` (FTS5) | ✅ | ✅ | ✅ | ❌ |
+| FTS同期トリガー | ✅ | ✅ | ✅ | ❌ |
+| `tags` / `note_tags` | ✅ | ✅ | ✅ | ✅ |
+| `note_embeddings` | ✅ | ✅ | ✅ | ❌ |
+| `lineage` | ✅ | ✅ | ✅ | ✅ |
+| `*_meta` (GC用) | ✅ | ✅ | ✅ | ✅ |
+| `working_scope` 列 | ❌ | ✅ | ✅ | ❌ |
+| `is_pinned` 列 | ❌ | ✅ | ✅ | ❌ |
+
+**インデックス**（全ストア共通）:
+- `idx_notes_created_at`, `idx_notes_last_accessed_at`
+- `idx_notes_source_trust`, `idx_notes_sensitivity`
+- `idx_tags_name`, `idx_tags_parent`
+- `idx_note_tags_tag_id`, `idx_note_tags_note_id`
+- `idx_lineage_src`, `idx_lineage_dest`
+
 ### 8.2 Gatekeeper 層
 | ファイル | 状態 | 説明 |
 | --- | --- | --- |
@@ -561,8 +582,23 @@ short 固有:
 | `go/api/http_client.go` | 完了 | HTTP クライアント |
 | `go/api/inproc_client.go` | 完了 | in-proc クライアント |
 
-### 8.5 テスト
+### 8.5 GC機能
+| ファイル | 状態 | 説明 |
+| --- | --- | --- |
+| `go/service/gc.go` | 完了 | Phase0トリガ判定、Phase3 Archive退避 |
+| `go/service/gc_test.go` | 完了 | GC機能テスト |
+
+**実装詳細**:
+- Phase0: ノート数とlast_gc_atに基づくトリガ判定
+  - soft_limit: 1200ノード (interval経過後実行)
+  - hard_limit: 2000ノード (即時実行)
+  - min_interval: 180分
+- Phase3: アクセス数0で30日以上経過のノートをarchiveへ退避
+- dry-run: DB更新せず判定結果のみ返却
+- feature flag: `--enable-gc` で有効化（デフォルト無効）
+
+### 8.6 テスト
 | パッケージ | テスト数 | 状態 |
 | --- | --- | --- |
 | `go/db` | 8 | 全て PASS |
-| `go/service` | 5 | 全て PASS |
+| `go/service` | 13 | 全て PASS |

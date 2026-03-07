@@ -1,8 +1,8 @@
 ---
 owner: memx-core
 status: active
-last_reviewed_at: 2026-03-03
-next_review_due: 2026-03-06
+last_reviewed_at: 2026-03-06
+next_review_due: 2026-06-06
 ---
 
 # memx 要求事項 - Release & Traceability
@@ -15,15 +15,23 @@ next_review_due: 2026-03-06
 
 | MUST (v1) | SHOULD (v1.x) | FUTURE (v2+) |
 | --- | --- | --- |
-| `mem in short`, `mem out search`, `mem out show` | `mem gc short`（`mem.features.gc_short=true` 時のみ有効な実験機能） | `mem out recall`, `mem working`, `mem tag`, `mem meta`, `mem lineage`, `mem distill`, `mem out context` |
+| `mem in short`, `mem out search`, `mem out show` ✅ | `mem gc short` ✅（`--enable-gc` または `--dry-run` で有効化） | `mem out recall`, `mem working`, `mem tag`, `mem meta`, `mem lineage`, `mem distill`, `mem out context` |
 
 ### API
 
 | MUST (v1) | SHOULD (v1.x) | FUTURE (v2+) |
 | --- | --- | --- |
-| `POST /v1/notes:ingest`, `POST /v1/notes:search`, `GET /v1/notes/{id}` | `POST /v1/gc:run`（`mem.features.gc_short=true` 時のみ有効な実験機能） | Recall/Working/Tag/Meta/Lineage 系 API |
+| `POST /v1/notes:ingest` ✅, `POST /v1/notes:search` ✅, `GET /v1/notes/{id}` ✅ | `POST /v1/gc:run` ✅（dry_run オプション対応） | Recall/Working/Tag/Meta/Lineage 系 API |
 
-### 受け入れ条件
+### 実装状況（2026-03-06 更新）
+
+| 領域 | 要件ID | 状態 | 備考 |
+| --- | --- | --- | --- |
+| CLI v1必須 | `REQ-CLI-001` | ✅ 完了 | in/search/show |
+| API v1必須 | `REQ-API-001` | ✅ 完了 | ingest/search/get |
+| GC dry-run | `REQ-GC-001` | ✅ 完了 | Phase0/Phase3実装 |
+| fail-closed | `REQ-SEC-001` | ✅ 完了 | Gatekeeper実装 |
+| エラーモデル | `REQ-ERR-001` | ✅ 完了 | 400/404/409/403/500 |
 
 受け入れ判定で適用する品質ゲートの言語境界は Go を対象とし、Python/Node は現行運用では対象外とする（判定基準・運用コマンドは `docs/QUALITY_GATES.md` を正とする）。
 
