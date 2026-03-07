@@ -144,6 +144,12 @@ func (r *ShortNoteResolver) ResolveRef(ctx context.Context, ref TypedRef) (Resol
 			Status: RefStatusUnresolved,
 		}, nil
 	}
+	if note == nil {
+		return ResolvedRef{
+			Ref:    ref,
+			Status: RefStatusUnresolved,
+		}, nil
+	}
 
 	return ResolvedRef{
 		Ref:     ref,
