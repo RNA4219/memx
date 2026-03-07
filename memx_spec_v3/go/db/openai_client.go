@@ -36,9 +36,10 @@ type OpenAIConfig struct {
 	Organization       string
 	Timeout            time.Duration
 	InlineInstructions bool
+	UseChatCompletions bool
 }
 
-// OpenAIClient は OpenAI Responses API 互換の LLM クライアント。
+// OpenAIClient は OpenAI 互換 API を使う LLM クライアント。
 type OpenAIClient struct {
 	apiKey             string
 	baseURL            string
@@ -47,6 +48,7 @@ type OpenAIClient struct {
 	project            string
 	organization       string
 	inlineInstructions bool
+	useChatCompletions bool
 	httpClient         *http.Client
 }
 
@@ -85,6 +87,7 @@ func NewOpenAIClient(cfg OpenAIConfig) (*OpenAIClient, error) {
 		project:            strings.TrimSpace(cfg.Project),
 		organization:       strings.TrimSpace(cfg.Organization),
 		inlineInstructions: cfg.InlineInstructions,
+		useChatCompletions: cfg.UseChatCompletions,
 		httpClient:         &http.Client{Timeout: timeout},
 	}, nil
 }
@@ -180,6 +183,7 @@ func loadAlibabaCompatibleConfigFromEnv() (OpenAIConfig, bool, error) {
 		ReflectModel:       reflectModel,
 		Timeout:            timeout,
 		InlineInstructions: true,
+		UseChatCompletions: true,
 	}, true, nil
 }
 
@@ -275,6 +279,10 @@ func (c *OpenAIClient) UpdateKnowledgePage(ctx context.Context, input PageUpdate
 }
 
 func (c *OpenAIClient) runResponses(ctx context.Context, model, instructions, input string, maxOutputTokens int) (string, error) {
+	if c.useChatCompletions {
+		return c.runChatCompletions(ctx, model, instructions, input, maxOutputTokens)
+	}
+
 	if c.inlineInstructions && strings.TrimSpace(instructions) != "" {
 		input = fmt.Sprintf("Follow these instructions carefully.\n\nInstructions:\n%s\n\nTask Input:\n%s", strings.TrimSpace(instructions), strings.TrimSpace(input))
 		instructions = ""
@@ -286,6 +294,13 @@ func (c *OpenAIClient) runResponses(ctx context.Context, model, instructions, in
 		Instructions:    instructions,
 		MaxOutputTokens: maxOutputTokens,
 		Store:           false,
+	}
+	if !c.inlineInstructions {
+		reqBody.Reasoning = &openAIReasoningRequest{Effort: "minimal"}
+		reqBody.Text = &openAITextRequest{
+			Verbosity: "low",
+			Format:    &openAITextFormatRequest{Type: "text"},
+		}
 	}
 
 	payload, err := json.Marshal(reqBody)
@@ -319,8 +334,10 @@ func (c *OpenAIClient) runResponses(ctx context.Context, model, instructions, in
 
 	if resp.StatusCode >= http.StatusBadRequest {
 		var apiErr openAIErrorResponse
-		if err := json.Unmarshal(body, &apiErr); err == nil && strings.TrimSpace(apiErr.Error.Message) != "" {
-			return "", fmt.Errorf("openai responses api: %s", strings.TrimSpace(apiErr.Error.Message))
+		if err := json.Unmarshal(body, &apiErr); err == nil {
+			if message := apiErr.message(); message != "" {
+				return "", fmt.Errorf("openai responses api: %s", message)
+			}
 		}
 		return "", fmt.Errorf("openai responses api: status %d", resp.StatusCode)
 	}
@@ -333,6 +350,79 @@ func (c *OpenAIClient) runResponses(ctx context.Context, model, instructions, in
 	text := extractResponseText(decoded)
 	if text == "" {
 		return "", fmt.Errorf("openai responses api returned empty text")
+	}
+	return text, nil
+}
+
+func (c *OpenAIClient) runChatCompletions(ctx context.Context, model, instructions, input string, maxOutputTokens int) (string, error) {
+	if c.inlineInstructions && strings.TrimSpace(instructions) != "" {
+		input = fmt.Sprintf("Follow these instructions carefully.\n\nInstructions:\n%s\n\nTask Input:\n%s", strings.TrimSpace(instructions), strings.TrimSpace(input))
+		instructions = ""
+	}
+
+	reqBody := openAIChatCompletionsRequest{
+		Model:     model,
+		MaxTokens: maxOutputTokens,
+		Messages:  make([]openAIChatMessageRequest, 0, 2),
+	}
+	if strings.TrimSpace(instructions) != "" {
+		reqBody.Messages = append(reqBody.Messages, openAIChatMessageRequest{
+			Role:    "system",
+			Content: instructions,
+		})
+	}
+	reqBody.Messages = append(reqBody.Messages, openAIChatMessageRequest{
+		Role:    "user",
+		Content: input,
+	})
+
+	payload, err := json.Marshal(reqBody)
+	if err != nil {
+		return "", fmt.Errorf("marshal chat completions request: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/chat/completions", bytes.NewReader(payload))
+	if err != nil {
+		return "", fmt.Errorf("create chat completions request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+	if c.project != "" {
+		req.Header.Set("OpenAI-Project", c.project)
+	}
+	if c.organization != "" {
+		req.Header.Set("OpenAI-Organization", c.organization)
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("call chat completions api: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("read chat completions api body: %w", err)
+	}
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		var apiErr openAIErrorResponse
+		if err := json.Unmarshal(body, &apiErr); err == nil {
+			if message := apiErr.message(); message != "" {
+				return "", fmt.Errorf("openai chat completions api: %s", message)
+			}
+		}
+		return "", fmt.Errorf("openai chat completions api: status %d", resp.StatusCode)
+	}
+
+	var decoded openAIChatCompletionsResponse
+	if err := json.Unmarshal(body, &decoded); err != nil {
+		return "", fmt.Errorf("decode chat completions api body: %w", err)
+	}
+
+	text := extractChatCompletionsText(decoded)
+	if text == "" {
+		return "", fmt.Errorf("openai chat completions api returned empty text")
 	}
 	return text, nil
 }
@@ -357,6 +447,40 @@ func extractResponseText(resp openAIResponsesResponse) string {
 		}
 	}
 	return strings.TrimSpace(strings.Join(parts, "\n"))
+}
+
+func extractChatCompletionsText(resp openAIChatCompletionsResponse) string {
+	var parts []string
+	for _, choice := range resp.Choices {
+		for _, text := range flattenChatMessageContent(choice.Message.Content) {
+			if trimmed := strings.TrimSpace(text); trimmed != "" {
+				parts = append(parts, trimmed)
+			}
+		}
+	}
+	return strings.TrimSpace(strings.Join(parts, "\n"))
+}
+
+func flattenChatMessageContent(content any) []string {
+	switch v := content.(type) {
+	case string:
+		return []string{v}
+	case []any:
+		parts := make([]string, 0, len(v))
+		for _, item := range v {
+			m, ok := item.(map[string]any)
+			if !ok {
+				continue
+			}
+			text, _ := m["text"].(string)
+			if text != "" {
+				parts = append(parts, text)
+			}
+		}
+		return parts
+	default:
+		return nil
+	}
 }
 
 func stripCodeFence(s string) string {
@@ -406,16 +530,54 @@ func firstNonEmptyEnv(keys ...string) string {
 }
 
 type openAIResponsesRequest struct {
-	Model           string `json:"model"`
-	Input           string `json:"input"`
-	Instructions    string `json:"instructions,omitempty"`
-	MaxOutputTokens int    `json:"max_output_tokens,omitempty"`
-	Store           bool   `json:"store"`
+	Model           string                  `json:"model"`
+	Input           string                  `json:"input"`
+	Instructions    string                  `json:"instructions,omitempty"`
+	MaxOutputTokens int                     `json:"max_output_tokens,omitempty"`
+	Store           bool                    `json:"store"`
+	Reasoning       *openAIReasoningRequest `json:"reasoning,omitempty"`
+	Text            *openAITextRequest      `json:"text,omitempty"`
+}
+
+type openAIReasoningRequest struct {
+	Effort string `json:"effort,omitempty"`
+}
+
+type openAITextRequest struct {
+	Verbosity string                   `json:"verbosity,omitempty"`
+	Format    *openAITextFormatRequest `json:"format,omitempty"`
+}
+
+type openAITextFormatRequest struct {
+	Type string `json:"type"`
 }
 
 type openAIResponsesResponse struct {
 	OutputText string               `json:"output_text"`
 	Output     []openAIResponseItem `json:"output"`
+}
+
+type openAIChatCompletionsRequest struct {
+	Model     string                     `json:"model"`
+	Messages  []openAIChatMessageRequest `json:"messages"`
+	MaxTokens int                        `json:"max_tokens,omitempty"`
+}
+
+type openAIChatMessageRequest struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type openAIChatCompletionsResponse struct {
+	Choices []openAIChatChoice `json:"choices"`
+}
+
+type openAIChatChoice struct {
+	Message openAIChatMessageResponse `json:"message"`
+}
+
+type openAIChatMessageResponse struct {
+	Content any `json:"content"`
 }
 
 type openAIResponseItem struct {
@@ -433,4 +595,12 @@ type openAIErrorResponse struct {
 	Error struct {
 		Message string `json:"message"`
 	} `json:"error"`
+	Message string `json:"message"`
+}
+
+func (r openAIErrorResponse) message() string {
+	if message := strings.TrimSpace(r.Error.Message); message != "" {
+		return message
+	}
+	return strings.TrimSpace(r.Message)
 }

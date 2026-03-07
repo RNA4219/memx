@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"memx/api"
@@ -18,6 +19,9 @@ import (
 
 func main() {
 	log.SetFlags(0)
+	if err := loadDotEnvFromHierarchy(); err != nil {
+		log.Printf("warning: failed to load .env: %v", err)
+	}
 	if len(os.Args) < 2 {
 		usage()
 		os.Exit(2)
@@ -40,6 +44,81 @@ func main() {
 	}
 }
 
+func loadDotEnvFromHierarchy() error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	path, ok := findDotEnvPath(cwd)
+	if !ok {
+		return nil
+	}
+	return loadDotEnvFile(path)
+}
+
+func findDotEnvPath(start string) (string, bool) {
+	dir := start
+	for {
+		candidate := filepath.Join(dir, ".env")
+		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
+			return candidate, true
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", false
+		}
+		dir = parent
+	}
+}
+
+func loadDotEnvFile(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if strings.HasPrefix(line, "export ") {
+			line = strings.TrimSpace(strings.TrimPrefix(line, "export "))
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		key := strings.TrimSpace(parts[0])
+		value := parseDotEnvValue(parts[1])
+		if key == "" {
+			continue
+		}
+		if _, exists := os.LookupEnv(key); exists {
+			continue
+		}
+		if err := os.Setenv(key, value); err != nil {
+			return err
+		}
+	}
+	return scanner.Err()
+}
+
+func parseDotEnvValue(raw string) string {
+	value := strings.TrimSpace(raw)
+	if len(value) >= 2 {
+		if (strings.HasPrefix(value, "\"") && strings.HasSuffix(value, "\"")) ||
+			(strings.HasPrefix(value, "'") && strings.HasSuffix(value, "'")) {
+			value = value[1 : len(value)-1]
+		}
+	}
+	return value
+}
 func usage() {
 	fmt.Fprint(os.Stderr, `mem - memx CLI (v1.3)
 
@@ -98,9 +177,9 @@ func (c *commonFlags) bind(fs *flag.FlagSet) {
 	fs.StringVar(&c.apiURL, "api-url", "", "HTTP API base URL (if set, CLI uses HTTP client)")
 	fs.BoolVar(&c.json, "json", false, "output JSON")
 	fs.StringVar(&c.short, "short", "short.db", "path to short.db")
-	fs.StringVar(&c.journal, "journal", "", "path to journal.db")
-	fs.StringVar(&c.knowledge, "knowledge", "", "path to knowledge.db")
-	fs.StringVar(&c.archive, "archive", "", "path to archive.db")
+	fs.StringVar(&c.journal, "journal", "journal.db", "path to journal.db")
+	fs.StringVar(&c.knowledge, "knowledge", "knowledge.db", "path to knowledge.db")
+	fs.StringVar(&c.archive, "archive", "archive.db", "path to archive.db")
 }
 
 func (c *commonFlags) paths() db.Paths {
@@ -365,7 +444,7 @@ func cmdOut(args []string) {
 		}
 		defer cleanup()
 
-		resp, apiErr := client.NotesSearch(ctx, api.NotesSearchRequest{Query: query, TopK: *topK})
+		resp, apiErr := searchAcrossStores(ctx, client, query, *topK)
 		if apiErr != nil {
 			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
 		}
@@ -394,7 +473,7 @@ func cmdOut(args []string) {
 		}
 		defer cleanup()
 
-		n, apiErr := client.NotesGet(ctx, id)
+		n, apiErr := resolveNoteAcrossStores(ctx, client, id)
 		if apiErr != nil {
 			log.Fatalf("%s: %s", apiErr.Code, apiErr.Message)
 		}
@@ -402,7 +481,7 @@ func cmdOut(args []string) {
 			printJSON(n)
 			return
 		}
-		fmt.Printf("# %s\n\n%s\n", n.Title, n.Body)
+		printResolvedNote(n)
 
 	case "journal":
 		cmdOutJournal(args[1:])

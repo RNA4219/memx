@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -79,6 +80,9 @@ func TestLoadAlibabaConfigFromEnv(t *testing.T) {
 	if cfg.Timeout != 15*time.Second {
 		t.Fatalf("unexpected timeout: %v", cfg.Timeout)
 	}
+	if !cfg.UseChatCompletions {
+		t.Fatal("expected chat completions mode for Alibaba config")
+	}
 }
 
 func TestLoadAlibabaConfigEnablesInlineInstructions(t *testing.T) {
@@ -103,6 +107,15 @@ func TestOpenAIClientSummarize(t *testing.T) {
 		Instructions    string `json:"instructions"`
 		MaxOutputTokens int    `json:"max_output_tokens"`
 		Store           bool   `json:"store"`
+		Reasoning       struct {
+			Effort string `json:"effort"`
+		} `json:"reasoning"`
+		Text struct {
+			Verbosity string `json:"verbosity"`
+			Format    struct {
+				Type string `json:"type"`
+			} `json:"format"`
+		} `json:"text"`
 	}
 
 	var captured requestPayload
@@ -146,6 +159,12 @@ func TestOpenAIClientSummarize(t *testing.T) {
 	}
 	if captured.Store {
 		t.Fatal("expected store=false")
+	}
+	if captured.Reasoning.Effort != "minimal" {
+		t.Fatalf("unexpected reasoning effort: %q", captured.Reasoning.Effort)
+	}
+	if captured.Text.Verbosity != "low" || captured.Text.Format.Type != "text" {
+		t.Fatalf("unexpected text config: %+v", captured.Text)
 	}
 }
 
@@ -214,17 +233,24 @@ func TestOpenAIClientErrorIncludesAPIMessage(t *testing.T) {
 	}
 }
 
-func TestOpenAIClientAlibabaInlinesInstructions(t *testing.T) {
+func TestOpenAIClientAlibabaUsesChatCompletions(t *testing.T) {
 	var captured struct {
-		Input        string `json:"input"`
-		Instructions string `json:"instructions"`
+		Model     string `json:"model"`
+		MaxTokens int    `json:"max_tokens"`
+		Messages  []struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		} `json:"messages"`
 	}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/v1/chat/completions" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
 		if err := json.NewDecoder(r.Body).Decode(&captured); err != nil {
 			t.Fatalf("decode request: %v", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"output_text":"ok"}`))
+		_, _ = w.Write([]byte(`{"choices":[{"message":{"content":"ok"}}]}`))
 	}))
 	defer server.Close()
 
@@ -233,19 +259,41 @@ func TestOpenAIClientAlibabaInlinesInstructions(t *testing.T) {
 		BaseURL:            server.URL + "/v1",
 		MiniModel:          "qwen3-max",
 		InlineInstructions: true,
+		UseChatCompletions: true,
 	})
 	if err != nil {
 		t.Fatalf("NewOpenAIClient: %v", err)
 	}
 
-	_, err = client.Summarize(context.Background(), "title", "body")
+	result, err := client.Summarize(context.Background(), "title", "body")
 	if err != nil {
 		t.Fatalf("Summarize: %v", err)
 	}
-	if captured.Instructions != "" {
-		t.Fatalf("expected empty instructions field, got %q", captured.Instructions)
+	if result.Summary != "ok" {
+		t.Fatalf("unexpected summary: %q", result.Summary)
 	}
-	if captured.Input == "" || captured.Input == "title" {
-		t.Fatalf("expected combined input, got %q", captured.Input)
+	if captured.Model != "qwen3-max" {
+		t.Fatalf("unexpected model: %q", captured.Model)
 	}
+	if captured.MaxTokens != defaultSummaryMaxTokens {
+		t.Fatalf("unexpected max_tokens: %d", captured.MaxTokens)
+	}
+	if len(captured.Messages) != 1 {
+		t.Fatalf("expected a single user message, got %d", len(captured.Messages))
+	}
+	if captured.Messages[0].Role != "user" {
+		t.Fatalf("unexpected role: %q", captured.Messages[0].Role)
+	}
+	if !containsAll(captured.Messages[0].Content, "Instructions:", "Task Input:", "Title:", "Body:") {
+		t.Fatalf("expected combined prompt, got %q", captured.Messages[0].Content)
+	}
+}
+
+func containsAll(s string, parts ...string) bool {
+	for _, part := range parts {
+		if !strings.Contains(s, part) {
+			return false
+		}
+	}
+	return true
 }

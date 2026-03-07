@@ -238,7 +238,9 @@ func (s *Service) SearchKnowledge(ctx context.Context, query string, topK int) (
 		topK = 100
 	}
 
-	rows, err := s.Conn.DB.QueryContext(ctx, `
+	like := likePattern(query)
+	rows, err := queryRowsWithFallback(ctx, s.Conn.DB,
+		`
 SELECT n.id, n.title, n.summary, n.body,
        n.created_at, n.updated_at, n.last_accessed_at, n.access_count,
        n.source_type, n.origin, n.source_trust, n.sensitivity,
@@ -249,7 +251,19 @@ WHERE n.rowid IN (
 )
 ORDER BY n.created_at DESC
 LIMIT ?;
-`, query, topK)
+`, []interface{}{query, topK},
+		`
+SELECT id, title, summary, body,
+       created_at, updated_at, last_accessed_at, access_count,
+       source_type, origin, source_trust, sensitivity,
+       working_scope, is_pinned
+FROM knowledge.notes
+WHERE title LIKE ?
+   OR summary LIKE ?
+   OR body LIKE ?
+ORDER BY created_at DESC
+LIMIT ?;
+`, []interface{}{like, like, like, topK})
 	if err != nil {
 		return nil, err
 	}

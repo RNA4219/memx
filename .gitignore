@@ -26,3 +26,12 @@ go.work
 # OS
 .DS_Store
 Thumbs.db
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local memx runtime data
+/memx_spec_v3/go/*.db
+/memx_spec_v3/go/*.db-shm
+/memx_spec_v3/go/*.db-wal

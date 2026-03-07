@@ -37,7 +37,7 @@ Shows all available memx commands and their usage.
 ```bash
 cd C:/Users/ryo-n/Codex_dev/memx-core/memx_spec_v3/go
 go run ./cmd/mem in short --title "Title" --body "Body"
-go run ./cmd/mem out search "query"
+go run ./cmd/mem out search --json "query"
 go run ./cmd/mem out show <id>
 ```
 

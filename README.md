@@ -41,7 +41,7 @@ mem out show <NOTE_ID>
 
 ## LLM 連携
 
-要約を有効にするには、OpenAI か Alibaba Cloud Model Studio のどちらかを環境変数で設定します。
+要約を有効にするには、OpenAI か Alibaba Cloud Model Studio のどちらかを環境変数で設定します。`mem` CLI と API サーバーは、`memx-core` 配下で起動した場合に `.env` を自動読込します。
 
 ### OpenAI
 
@@ -60,7 +60,7 @@ export MEMX_LLM_PROVIDER="alibaba"
 export DASHSCOPE_API_KEY="sk-..."
 export MEMX_ALIBABA_MODEL="qwen3-max"
 # 任意: 互換 endpoint を明示したい場合
-export MEMX_ALIBABA_BASE_URL="https://dashscope-intl.aliyuncs.com/api/v2/apps/protocols/compatible-mode/v1"
+export MEMX_ALIBABA_BASE_URL="https://coding-intl.dashscope.aliyuncs.com/v1"
 ```
 
 主な設定:
@@ -73,12 +73,12 @@ export MEMX_ALIBABA_BASE_URL="https://dashscope-intl.aliyuncs.com/api/v2/apps/pr
 - `DASHSCOPE_API_KEY`: Alibaba Cloud Model Studio 利用時の必須キー。
 - `MEMX_ALIBABA_MODEL`: Alibaba の単一ノート要約モデル。既定値は `qwen3-max`。
 - `MEMX_ALIBABA_REFLECT_MODEL`: Alibaba の複数ノート統合要約モデル。未設定時は `MEMX_ALIBABA_MODEL` を使います。
-- `MEMX_ALIBABA_REGION`: Alibaba のリージョン切替用。未設定時は `singapore` です。Responses API の公式記載は現時点で Singapore です。
-- `MEMX_ALIBABA_BASE_URL`: Alibaba の OpenAI 互換 Responses API ベースURLを明示したい場合に使います。
+- `MEMX_ALIBABA_REGION`: Alibaba のリージョン切替用。未設定時は `singapore` です。
+- `MEMX_ALIBABA_BASE_URL`: Alibaba の OpenAI 互換ベースURLを明示したい場合に使います。Coding Plan を使う場合は `https://coding-intl.dashscope.aliyuncs.com/v1` を指定します。
 - `MEMX_OPENAI_TIMEOUT_SECONDS` / `MEMX_ALIBABA_TIMEOUT_SECONDS`: HTTP タイムアウト秒数。
 - `OPENAI_PROJECT` / `OPENAI_ORGANIZATION`: OpenAI 利用時のみ任意。
 
-この設定は `mem summarize` と、要約未指定での `mem in short|journal|knowledge` の自動要約に使われます。Alibaba 互換モードでは `instructions` 非対応差分を吸収するため、memx 側でプロンプトを `input` に自動展開します。
+この設定は `mem summarize` と、要約未指定での `mem in short|journal|knowledge` の自動要約に使われます。Alibaba 互換モードでは `chat/completions` を使い、`instructions` 非対応差分を吸収するため memx 側でプロンプトを本文側に自動展開します。
 
 ---
 
@@ -182,6 +182,8 @@ KV優先ロードマップに従って以下を順次実装：
 ## License
 
 MIT License
+
+
 
 
 

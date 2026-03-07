@@ -141,10 +141,10 @@ func (r *IngestNoteRequest) validate() error {
 
 	// sensitivity の列挙値チェック
 	validSensitivity := map[string]bool{
-		"public":      true,
-		"internal":    true,
+		"public":       true,
+		"internal":     true,
 		"confidential": true,
-		"secret":      true,
+		"secret":       true,
 	}
 	if !validSensitivity[r.Sensitivity] {
 		return fmt.Errorf("%w: invalid sensitivity: %s", ErrInvalidArgument, r.Sensitivity)
@@ -302,7 +302,9 @@ func (s *Service) SearchShort(ctx context.Context, query string, topK int) ([]No
 		topK = 100
 	}
 
-	rows, err := s.Conn.DB.QueryContext(ctx, `
+	like := likePattern(query)
+	rows, err := queryRowsWithFallback(ctx, s.Conn.DB,
+		`
 SELECT n.id, n.title, n.summary, n.body,
        n.created_at, n.updated_at, n.last_accessed_at, n.access_count,
        n.source_type, n.origin, n.source_trust, n.sensitivity
@@ -311,7 +313,18 @@ JOIN notes n ON notes_fts.rowid = n.rowid
 WHERE notes_fts MATCH ?
 ORDER BY bm25(notes_fts)
 LIMIT ?;
-`, query, topK)
+`, []interface{}{query, topK},
+		`
+SELECT id, title, summary, body,
+       created_at, updated_at, last_accessed_at, access_count,
+       source_type, origin, source_trust, sensitivity
+FROM notes
+WHERE title LIKE ?
+   OR summary LIKE ?
+   OR body LIKE ?
+ORDER BY created_at DESC
+LIMIT ?;
+`, []interface{}{like, like, like, topK})
 	if err != nil {
 		return nil, err
 	}

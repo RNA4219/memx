@@ -28,9 +28,10 @@ Use the Bash tool to run:
 cd C:/Users/ryo-n/Codex_dev/memx-core/memx_spec_v3/go && go run ./cmd/mem out show "<note_id>"
 ```
 
-If the note might be in journal or knowledge:
+If you need a store-specific view, these variants are also available:
 
 ```bash
 go run ./cmd/mem out journal show "<note_id>"
 go run ./cmd/mem out knowledge show "<note_id>"
+go run ./cmd/mem out archive show "<note_id>"
 ```
