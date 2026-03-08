@@ -1,0 +1,7 @@
+{
+  "warmup": 20,
+  "query": "alpha",
+  "known_id": "9095844d73ee672c65dbcb5a25a1a1f6",
+  "body_chars": 500,
+  "api_url": "http://127.0.0.1:7791"
+}

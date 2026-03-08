@@ -1,0 +1,33 @@
+{
+  "environment": {
+    "cpu": "12 logical CPUs",
+    "ram": "unknown",
+    "storage": "unknown",
+    "os": "Windows-10-10.0.26200-SP0"
+  },
+  "dataset": {
+    "store": "short",
+    "note_count": 10000,
+    "body_chars": 500
+  },
+  "results": {
+    "ingest": {
+      "p50_ms": 18.46,
+      "p95_ms": 22.39,
+      "runs": 200,
+      "mean_ms": 18.85
+    },
+    "search": {
+      "p50_ms": 61.99,
+      "p95_ms": 71.5,
+      "runs": 200,
+      "mean_ms": 62.99
+    },
+    "show": {
+      "p50_ms": 16.24,
+      "p95_ms": 35.89,
+      "runs": 200,
+      "mean_ms": 20.72
+    }
+  }
+}

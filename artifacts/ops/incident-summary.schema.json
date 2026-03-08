@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Incident Summary",
+  "description": "インシデント概要の正本証跡（REQ-NFR-002/003/005）",
+  "type": "object",
+  "required": ["incident_id", "detected_at", "status"],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "インシデントID（IN-YYYYMMDD-XXX形式）"
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "障害検知時刻（UTC、RFC3339）"
+    },
+    "mitigated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "暫定復旧完了時刻（UTC、RFC3339）"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "恒久復旧完了時刻（UTC、RFC3339）"
+    },
+    "rto_minutes": {
+      "type": "integer",
+      "description": "RTO（分）、detected_atからmitigated_atまたはresolved_atまで"
+    },
+    "rpo_minutes": {
+      "type": "integer",
+      "description": "RPO（分）、データ欠損時間"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["detected", "mitigated", "resolved", "replan"],
+      "description": "インシデント状態"
+    },
+    "related_requirements": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "関連要件ID（例: REQ-NFR-002）"
+    },
+    "waiver": {
+      "type": "object",
+      "properties": {
+        "requirement_id": {"type": "string"},
+        "reason": {"type": "string"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "approver": {"type": "string"},
+        "alternative_control": {"type": "string"},
+        "lift_conditions": {"type": "string"}
+      }
+    },
+    "recovery_log_path": {
+      "type": "string",
+      "description": "復旧ログパス（recovery-log.ndjson）"
+    },
+    "incident_record_path": {
+      "type": "string",
+      "description": "インシデント記録パス（docs/IN-*.md）"
+    }
+  }
+}
