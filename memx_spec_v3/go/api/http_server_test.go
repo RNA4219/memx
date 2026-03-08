@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +20,7 @@ func setupHTTPTestServer(t *testing.T) (*HTTPServer, func()) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -591,9 +592,9 @@ func TestHTTP_MethodNotAllowed(t *testing.T) {
 	defer cleanup()
 
 	tests := []struct {
-		name    string
-		method  string
-		path    string
+		name   string
+		method string
+		path   string
 	}{
 		{"GET ingest", http.MethodGet, "/v1/notes:ingest"},
 		{"GET search", http.MethodGet, "/v1/notes:search"},
@@ -611,5 +612,184 @@ func TestHTTP_MethodNotAllowed(t *testing.T) {
 				t.Errorf("expected status 405, got: %d", rec.Code)
 			}
 		})
+	}
+}
+
+type staticMiniLLM struct {
+	summary string
+}
+
+func (m *staticMiniLLM) TagAndScore(ctx context.Context, noteBody string) (db.TagsAndScores, error) {
+	return db.TagsAndScores{}, nil
+}
+
+func (m *staticMiniLLM) Summarize(ctx context.Context, title, body string) (db.SummarizeResult, error) {
+	return db.SummarizeResult{Summary: m.summary}, nil
+}
+
+func TestHTTP_NotesIngest_NoLLMSkipsAutoSummary(t *testing.T) {
+	server, cleanup := setupHTTPTestServer(t)
+	defer cleanup()
+
+	server.InProc.Svc.SetMiniLLM(&staticMiniLLM{summary: "should not be used"})
+
+	body := NotesIngestRequest{
+		Title:       "No LLM Note",
+		Body:        "This should skip auto-summary.",
+		SourceType:  "manual",
+		SourceTrust: "user_input",
+		Sensitivity: "internal",
+		NoLLM:       true,
+	}
+	jsonBody, _ := json.Marshal(body)
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/notes:ingest", bytes.NewReader(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	server.Handler().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got: %d, body: %s", rec.Code, rec.Body.String())
+	}
+
+	var resp NotesIngestResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to parse response: %v", err)
+	}
+	if resp.Note.Summary != "" {
+		t.Fatalf("expected empty summary when no_llm=true, got: %q", resp.Note.Summary)
+	}
+}
+
+func TestHTTP_NotesRecall_Success(t *testing.T) {
+	server, cleanup := setupHTTPTestServer(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	shortResp, apiErr := server.InProc.NotesIngest(ctx, NotesIngestRequest{
+		Title:       "Recall Short",
+		Body:        "shared recall marker short",
+		Sensitivity: "internal",
+		NoLLM:       true,
+	})
+	if apiErr != nil {
+		t.Fatalf("NotesIngest: %s", apiErr.Message)
+	}
+	journalResp, apiErr := server.InProc.JournalIngest(ctx, JournalIngestRequest{
+		Title:        "Recall Journal",
+		Body:         "shared recall marker journal",
+		WorkingScope: "project:memx",
+		Sensitivity:  "internal",
+		NoLLM:        true,
+	})
+	if apiErr != nil {
+		t.Fatalf("JournalIngest: %s", apiErr.Message)
+	}
+	knowledgeResp, apiErr := server.InProc.KnowledgeIngest(ctx, KnowledgeIngestRequest{
+		Title:        "Recall Knowledge",
+		Body:         "shared recall marker knowledge",
+		WorkingScope: "glossary",
+		Sensitivity:  "internal",
+		NoLLM:        true,
+	})
+	if apiErr != nil {
+		t.Fatalf("KnowledgeIngest: %s", apiErr.Message)
+	}
+
+	jsonBody, _ := json.Marshal(RecallRequest{
+		Query:       "shared recall marker",
+		Stores:      []string{"short", "journal", "knowledge"},
+		FallbackFTS: true,
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/notes:recall", bytes.NewReader(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.Handler().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got: %d, body: %s", rec.Code, rec.Body.String())
+	}
+
+	var resp RecallResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to parse response: %v", err)
+	}
+
+	gotIDs := map[string]struct{}{}
+	for _, result := range resp.Results {
+		gotIDs[result.Anchor.ID] = struct{}{}
+	}
+	for _, wantID := range []string{shortResp.Note.ID, journalResp.Note.ID, knowledgeResp.Note.ID} {
+		if _, ok := gotIDs[wantID]; !ok {
+			t.Fatalf("expected %s in recall response: %#v", wantID, gotIDs)
+		}
+	}
+}
+
+func TestHTTP_BuildBundle_Success(t *testing.T) {
+	server, cleanup := setupHTTPTestServer(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	journalResp, apiErr := server.InProc.JournalIngest(ctx, JournalIngestRequest{
+		Title:        "Bundle Journal",
+		Body:         "bundle journal body",
+		Summary:      "bundle journal summary",
+		WorkingScope: "project:memx",
+		Sensitivity:  "internal",
+		NoLLM:        true,
+	})
+	if apiErr != nil {
+		t.Fatalf("JournalIngest: %s", apiErr.Message)
+	}
+	knowledgeResp, apiErr := server.InProc.KnowledgeIngest(ctx, KnowledgeIngestRequest{
+		Title:        "Bundle Knowledge",
+		Body:         "bundle knowledge body",
+		Summary:      "bundle knowledge summary",
+		WorkingScope: "glossary",
+		Sensitivity:  "internal",
+		NoLLM:        true,
+	})
+	if apiErr != nil {
+		t.Fatalf("KnowledgeIngest: %s", apiErr.Message)
+	}
+
+	jsonBody, _ := json.Marshal(BuildBundleRequest{
+		Purpose:    "verify",
+		SourceRefs: []TypedRef{journalResp.Note.Ref, knowledgeResp.Note.Ref},
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/bundle:build", bytes.NewReader(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.Handler().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got: %d, body: %s", rec.Code, rec.Body.String())
+	}
+
+	var resp BuildBundleResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to parse response: %v", err)
+	}
+	if resp.Bundle.ID == "" {
+		t.Fatal("expected non-empty bundle id")
+	}
+	if resp.Bundle.Purpose != "verify" {
+		t.Fatalf("expected purpose verify, got %q", resp.Bundle.Purpose)
+	}
+	if len(resp.Bundle.SourceRefs) != 2 {
+		t.Fatalf("expected 2 source refs, got %d", len(resp.Bundle.SourceRefs))
+	}
+	if len(resp.Bundle.EvidenceRefs) != 1 || resp.Bundle.EvidenceRefs[0].ID != journalResp.Note.ID {
+		t.Fatalf("expected journal note evidence ref, got %#v", resp.Bundle.EvidenceRefs)
+	}
+	if resp.Bundle.RawIncluded {
+		t.Fatal("expected raw_included=false by default")
+	}
+	if resp.Bundle.Diagnostics.PartialBundle {
+		t.Fatal("expected complete bundle")
 	}
 }

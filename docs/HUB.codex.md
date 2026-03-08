@@ -32,8 +32,8 @@ next_review_due: 2026-06-03
    - **正本（canonical source）** は `memx_spec_v3/docs/quickstart.md` とし、コマンド表記は**リポジトリルート起点**の `go run ./memx_spec_v3/go/cmd/mem ...` に統一する。
    - commands セクションには最低限以下を短く再掲する。
      - ingest: `go run ./memx_spec_v3/go/cmd/mem in short --title "..." --stdin --api-url http://127.0.0.1:7766`
-     - search: `go run ./memx_spec_v3/go/cmd/mem out search "..." --api-url http://127.0.0.1:7766`
-     - show: `go run ./memx_spec_v3/go/cmd/mem out show <NOTE_ID> --api-url http://127.0.0.1:7766`
+     - search: `go run ./memx_spec_v3/go/cmd/mem out search --api-url http://127.0.0.1:7766 "..."`
+     - show: `go run ./memx_spec_v3/go/cmd/mem out show --api-url http://127.0.0.1:7766 <NOTE_ID>`
    - `cd memx_spec_v3/go` + `go run ./cmd/mem ...` は代替表記としてのみ許容し、正本扱いしない。
    - 差異チェック手順（更新時は必須）:
      1. `rg -n "go run ./memx_spec_v3/go/cmd/mem|go run ./cmd/mem|cd memx_spec_v3/go" memx_spec_v3/docs/quickstart.md RUNBOOK.md HUB.codex.md`
@@ -338,3 +338,4 @@ workflow-cookbook の補完資料をそのまま複製せず、memx の運用最
 ### 非採用（workflow-cookbookとの差分）
 - workflow-cookbook 側の詳細テンプレート本文・運用例・CI 手順の全文移植は非採用。
 - 理由: memx では導線統一を優先し、詳細規定は BLUEPRINT / RUNBOOK / GUARDRAILS / EVALUATION を正本とするため。
+

@@ -250,3 +250,19 @@ func TestShowSkillFindsNotesAcrossStoresIncludingArchive(t *testing.T) {
 		t.Fatalf("archive note should resolve via top-level show: %s", archiveOut)
 	}
 }
+
+func TestIngestCommandsAcceptNoLLMFlag(t *testing.T) {
+	binPath := buildMemBinary(t)
+	workdir := t.TempDir()
+
+	for _, args := range [][]string{
+		{"in", "short", "--json", "--no-llm", "--title", "No LLM Short", "--body", "body", "--sensitivity", "internal"},
+		{"in", "journal", "--json", "--no-llm", "--title", "No LLM Journal", "--body", "body", "--scope", "project:memx", "--sensitivity", "internal"},
+		{"in", "knowledge", "--json", "--no-llm", "--title", "No LLM Knowledge", "--body", "body", "--scope", "glossary", "--sensitivity", "internal"},
+	} {
+		out := runMem(t, binPath, workdir, args...)
+		if ingestIDFromJSON(t, out) == "" {
+			t.Fatalf("missing note id for args %v", args)
+		}
+	}
+}

@@ -7,10 +7,10 @@ import (
 // MultiStoreResolver は複数ストアを横断して typed_ref を解決する Resolver。
 // P4 Phase 3C: short/journal/knowledge/archive を統合。
 type MultiStoreResolver struct {
-	shortResolver    *ShortNoteResolver
-	journalResolver  *ShortNoteResolver
+	shortResolver     *ShortNoteResolver
+	journalResolver   *ShortNoteResolver
 	knowledgeResolver *ShortNoteResolver
-	archiveResolver  *ShortNoteResolver
+	archiveResolver   *ShortNoteResolver
 }
 
 // NewMultiStoreResolver は MultiStoreResolver を作成する。
@@ -127,13 +127,17 @@ func (r *MultiStoreResolver) ResolveRef(ctx context.Context, ref TypedRef) (Reso
 	var resolver *ShortNoteResolver
 	switch ref.Type {
 	case EntityTypeEvidence, EntityTypeEvidenceChunk:
-		// evidence は short ストアを優先、見つからなければ archive
-		resolved, err := r.shortResolver.ResolveRef(ctx, ref)
-		if err == nil && resolved.Status == RefStatusResolved {
-			return resolved, nil
+		// evidence は short → journal → archive の順に解決する。
+		for _, resolver := range []*ShortNoteResolver{r.shortResolver, r.journalResolver, r.archiveResolver} {
+			if resolver == nil {
+				continue
+			}
+			resolved, err := resolver.ResolveRef(ctx, ref)
+			if err == nil && resolved.Status == RefStatusResolved {
+				return resolved, nil
+			}
 		}
-		// short になければ archive を試す
-		return r.archiveResolver.ResolveRef(ctx, ref)
+		return ResolvedRef{Ref: ref, Status: RefStatusUnresolved}, nil
 
 	case EntityTypeKnowledge:
 		resolver = r.knowledgeResolver
@@ -184,10 +188,10 @@ func (r *MultiStoreResolver) ResolveMany(ctx context.Context, refs []TypedRef) (
 		Unresolved:  []TypedRef{},
 		Unsupported: []TypedRef{},
 		Diagnostics: ResolverDiagnostics{
-			MissingRefs:     []TypedRef{},
-			UnsupportedRefs: []TypedRef{},
+			MissingRefs:      []TypedRef{},
+			UnsupportedRefs:  []TypedRef{},
 			ResolverWarnings: []string{},
-			PartialBundle:   false,
+			PartialBundle:    false,
 		},
 	}
 
@@ -244,52 +248,56 @@ func (r *MultiStoreResolver) LoadSelectedRaw(ctx context.Context, ref TypedRef, 
 		return &RawPayload{Ref: ref, Found: false}, &ErrUnsupportedRef{Ref: ref}
 	}
 
-	// エンティティタイプに応じて適切なストアから raw を取得
-	var showFunc func(ctx context.Context, id string) (*Note, error)
+	// エンティティタイプに応じて候補ストアから raw を取得する。
+	var showFuncs []func(ctx context.Context, id string) (*Note, error)
 
 	switch ref.Type {
 	case EntityTypeEvidence, EntityTypeEvidenceChunk:
-		// short を優先、なければ archive
-		showFunc = r.shortResolver.showFunc
-		if showFunc == nil {
-			showFunc = r.archiveResolver.showFunc
+		showFuncs = []func(ctx context.Context, id string) (*Note, error){
+			resolverShowFunc(r.shortResolver),
+			resolverShowFunc(r.journalResolver),
+			resolverShowFunc(r.archiveResolver),
 		}
 	case EntityTypeKnowledge, EntityTypeArtifact:
-		showFunc = r.knowledgeResolver.showFunc
+		showFuncs = []func(ctx context.Context, id string) (*Note, error){resolverShowFunc(r.knowledgeResolver)}
 	case EntityTypeLineage:
-		// 最初に見つかったストアから取得
-		for _, res := range []*ShortNoteResolver{
-			r.shortResolver,
-			r.journalResolver,
-			r.knowledgeResolver,
-			r.archiveResolver,
-		} {
-			if res != nil && res.showFunc != nil {
-				showFunc = res.showFunc
-				break
-			}
+		showFuncs = []func(ctx context.Context, id string) (*Note, error){
+			resolverShowFunc(r.shortResolver),
+			resolverShowFunc(r.journalResolver),
+			resolverShowFunc(r.knowledgeResolver),
+			resolverShowFunc(r.archiveResolver),
 		}
 	}
 
-	if showFunc == nil {
-		return &RawPayload{Ref: ref, Found: false}, nil
+	for _, showFunc := range showFuncs {
+		if showFunc == nil {
+			continue
+		}
+		note, err := showFunc(ctx, ref.ID)
+		if err != nil || note == nil {
+			continue
+		}
+
+		var raw string
+		if selector.IncludeBody {
+			raw = note.Body
+		} else {
+			raw = note.Summary
+		}
+
+		return &RawPayload{
+			Ref:   ref,
+			Raw:   raw,
+			Found: true,
+		}, nil
 	}
 
-	note, err := showFunc(ctx, ref.ID)
-	if err != nil {
-		return &RawPayload{Ref: ref, Found: false}, nil
-	}
+	return &RawPayload{Ref: ref, Found: false}, nil
+}
 
-	var raw string
-	if selector.IncludeBody {
-		raw = note.Body
-	} else {
-		raw = note.Summary
+func resolverShowFunc(resolver *ShortNoteResolver) func(ctx context.Context, id string) (*Note, error) {
+	if resolver == nil {
+		return nil
 	}
-
-	return &RawPayload{
-		Ref:   ref,
-		Raw:   raw,
-		Found: true,
-	}, nil
+	return resolver.showFunc
 }

@@ -129,7 +129,7 @@ func (s *Service) IngestJournal(ctx context.Context, req IngestJournalRequest) (
 	if !req.NoLLM && summary == "" && s.MiniLLM != nil {
 		result, err := s.MiniLLM.Summarize(ctx, req.Title, req.Body)
 		if err != nil {
-			// 警告レベル、継続
+			s.warnAutoSummaryFailure("journal", req.Title, err)
 		} else {
 			summary = result.Summary
 		}
@@ -302,15 +302,9 @@ func (s *Service) GetJournal(ctx context.Context, id string) (JournalNote, error
 
 	now := time.Now().UTC().Format(time.RFC3339Nano)
 
-	tx, err := s.Conn.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return JournalNote{}, err
-	}
-	defer func() { _ = tx.Rollback() }()
-
 	var n JournalNote
 	var isPinned int
-	err = tx.QueryRowContext(ctx, `
+	err := s.Conn.DB.QueryRowContext(ctx, `
 SELECT id, title, summary, body,
        created_at, updated_at, last_accessed_at, access_count,
        source_type, origin, source_trust, sensitivity,
@@ -329,15 +323,11 @@ FROM journal.notes WHERE id = ?;
 		return JournalNote{}, err
 	}
 
-	_, _ = tx.ExecContext(ctx, `
+	_, _ = s.Conn.DB.ExecContext(ctx, `
 UPDATE journal.notes
 SET last_accessed_at = ?, access_count = access_count + 1
 WHERE id = ?;
 `, now, id)
-
-	if err := tx.Commit(); err != nil {
-		return JournalNote{}, err
-	}
 
 	n.IsPinned = isPinned == 1
 	n.LastAccessedAt = now

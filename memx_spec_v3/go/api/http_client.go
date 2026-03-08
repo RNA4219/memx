@@ -202,6 +202,48 @@ func (c *HTTPClient) Recall(ctx context.Context, req RecallRequest) (RecallRespo
 	return out, nil
 }
 
+// -------------------- Resolver API (P4) --------------------
+
+func (c *HTTPClient) ResolveRef(ctx context.Context, req ResolveRefRequest) (ResolveRefResponse, *Error) {
+	var out ResolveRefResponse
+	if err := c.post(ctx, "/v1/resolve", req, &out); err != nil {
+		return ResolveRefResponse{}, err
+	}
+	return out, nil
+}
+
+func (c *HTTPClient) ResolveMany(ctx context.Context, req ResolveManyRequest) (ResolveManyResponse, *Error) {
+	var out ResolveManyResponse
+	if err := c.post(ctx, "/v1/resolve-many", req, &out); err != nil {
+		return ResolveManyResponse{}, err
+	}
+	return out, nil
+}
+
+func (c *HTTPClient) LoadSummary(ctx context.Context, req LoadSummaryRequest) (LoadSummaryResponse, *Error) {
+	var out LoadSummaryResponse
+	if err := c.post(ctx, "/v1/summary", req, &out); err != nil {
+		return LoadSummaryResponse{}, err
+	}
+	return out, nil
+}
+
+func (c *HTTPClient) LoadSelectedRaw(ctx context.Context, req LoadSelectedRawRequest) (LoadSelectedRawResponse, *Error) {
+	var out LoadSelectedRawResponse
+	if err := c.post(ctx, "/v1/raw", req, &out); err != nil {
+		return LoadSelectedRawResponse{}, err
+	}
+	return out, nil
+}
+
+func (c *HTTPClient) BuildBundle(ctx context.Context, req BuildBundleRequest) (BuildBundleResponse, *Error) {
+	var out BuildBundleResponse
+	if err := c.post(ctx, "/v1/bundle:build", req, &out); err != nil {
+		return BuildBundleResponse{}, err
+	}
+	return out, nil
+}
+
 func (c *HTTPClient) post(ctx context.Context, path string, in interface{}, out interface{}) *Error {
 	b, _ := json.Marshal(in)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+path, bytes.NewReader(b))

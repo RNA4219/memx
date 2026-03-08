@@ -20,7 +20,6 @@ func TestMultiStoreResolver_ResolveRef(t *testing.T) {
 		{ID: "archive-1", Title: "Archive Note", Body: "ABody", Summary: "ASummary", Ref: TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "archive-1"}},
 	}
 
-	// Mock functions
 	shortSearch := func(ctx context.Context, query string, topK int) ([]Note, error) {
 		return shortNotes, nil
 	}
@@ -78,7 +77,13 @@ func TestMultiStoreResolver_ResolveRef(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name:       "resolve evidence from archive (not in short)",
+			name:       "resolve evidence from journal store",
+			ref:        TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "journal-1"},
+			wantStatus: RefStatusResolved,
+			wantErr:    false,
+		},
+		{
+			name:       "resolve evidence from archive (not in short or journal)",
 			ref:        TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "archive-1"},
 			wantStatus: RefStatusResolved,
 			wantErr:    false,
@@ -255,6 +260,9 @@ func TestMultiStoreResolver_LoadSelectedRaw(t *testing.T) {
 	shortNotes := []Note{
 		{ID: "short-1", Title: "Test", Body: "Full Body Content", Summary: "Summary Content", Ref: TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "short-1"}},
 	}
+	journalNotes := []JournalNote{
+		{NoteBase: NoteBase{ID: "journal-1", Title: "Journal", Body: "Journal Body", Summary: "Journal Summary", Ref: TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "journal-1"}}, WorkingScope: "project:test"},
+	}
 
 	shortSearch := func(ctx context.Context, query string, topK int) ([]Note, error) {
 		return shortNotes, nil
@@ -267,10 +275,15 @@ func TestMultiStoreResolver_LoadSelectedRaw(t *testing.T) {
 		}
 		return nil, nil
 	}
-	noSearch := func(ctx context.Context, query string, topK int) ([]JournalNote, error) {
-		return nil, nil
+	journalSearch := func(ctx context.Context, query string, topK int) ([]JournalNote, error) {
+		return journalNotes, nil
 	}
-	noShow := func(ctx context.Context, id string) (*JournalNote, error) {
+	journalShow := func(ctx context.Context, id string) (*JournalNote, error) {
+		for i := range journalNotes {
+			if journalNotes[i].ID == id {
+				return &journalNotes[i], nil
+			}
+		}
 		return nil, nil
 	}
 	noKnowledgeSearch := func(ctx context.Context, query string, topK int) ([]KnowledgeNote, error) {
@@ -283,7 +296,7 @@ func TestMultiStoreResolver_LoadSelectedRaw(t *testing.T) {
 		return nil, nil
 	}
 
-	resolver := NewMultiStoreResolver(shortSearch, shortShow, noSearch, noShow, noKnowledgeSearch, noKnowledgeShow, noArchiveShow)
+	resolver := NewMultiStoreResolver(shortSearch, shortShow, journalSearch, journalShow, noKnowledgeSearch, noKnowledgeShow, noArchiveShow)
 
 	t.Run("with body", func(t *testing.T) {
 		ref := TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "short-1"}
@@ -310,6 +323,20 @@ func TestMultiStoreResolver_LoadSelectedRaw(t *testing.T) {
 		}
 		if payload.Raw != "Summary Content" {
 			t.Errorf("Expected 'Summary Content', got '%s'", payload.Raw)
+		}
+	})
+
+	t.Run("journal fallback", func(t *testing.T) {
+		ref := TypedRef{Domain: DomainMemx, Type: EntityTypeEvidence, ID: "journal-1"}
+		payload, err := resolver.LoadSelectedRaw(context.Background(), ref, RawSelector{IncludeBody: true})
+		if err != nil {
+			t.Fatalf("LoadSelectedRaw() error = %v", err)
+		}
+		if !payload.Found {
+			t.Error("Expected Found to be true")
+		}
+		if payload.Raw != "Journal Body" {
+			t.Errorf("Expected 'Journal Body', got '%s'", payload.Raw)
 		}
 	})
 }

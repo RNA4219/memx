@@ -14,7 +14,7 @@ func TestIngestKnowledge(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -51,13 +51,49 @@ func TestIngestKnowledge(t *testing.T) {
 	}
 }
 
+func TestIngestKnowledge_AutoSummaryFailureLogsWarning(t *testing.T) {
+	ctx := context.Background()
+
+	tmpDir := t.TempDir()
+	paths := db.Paths{
+		Short:     filepath.Join(tmpDir, "short.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
+		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
+		Archive:   filepath.Join(tmpDir, "archive.db"),
+	}
+
+	svc, err := New(paths)
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	defer svc.Close()
+
+	logBuf, logger := newBufferedTestLogger()
+	svc.SetLogger(logger)
+	svc.SetMiniLLM(&mockMiniLLM{err: errTestLLM})
+
+	note, err := svc.IngestKnowledge(ctx, IngestKnowledgeRequest{
+		Title:        "Knowledge Title",
+		Body:         "本文です",
+		WorkingScope: "knowledge",
+	})
+	if err != nil {
+		t.Fatalf("IngestKnowledge: %v", err)
+	}
+	if note.Summary != "" {
+		t.Errorf("expected empty summary on LLM failure, got %q", note.Summary)
+	}
+
+	assertAutoSummaryWarningLogged(t, logBuf.String(), "knowledge", "Knowledge Title", errTestLLM)
+}
+
 func TestGetKnowledge(t *testing.T) {
 	ctx := context.Background()
 
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -94,7 +130,7 @@ func TestPinUnpinKnowledge(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -152,7 +188,7 @@ func TestListPinnedKnowledge(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -204,7 +240,7 @@ func TestSearchKnowledge(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}

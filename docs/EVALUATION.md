@@ -20,6 +20,7 @@ next_review_due: 2026-06-03
 - GC dry-run 契約（`REQ-GC-001`）: `mem gc short --dry-run` は DB 非更新で判定結果のみ返す。
 - Security fail-closed（`REQ-SEC-001`）: `sensitivity=secret` は保存禁止で評価する。
 - 最小性能目標（同一計測条件、MUST (v1) API のみ）:
+- `ingest` は optional LLM 要約を除外した core write path を測定する（`no_llm=true` / `--no-llm` を使用）。
   - `POST /v1/notes:ingest`: P50 <= 120ms, P95 <= 250ms
   - `POST /v1/notes:search`: P50 <= 80ms, P95 <= 180ms
   - `GET /v1/notes/{id}`: P50 <= 40ms, P95 <= 90ms
@@ -112,6 +113,16 @@ next_review_due: 2026-06-03
 - ウォームアップ有無: あり（各エンドポイント 20 リクエスト）
 - 計測回数: 各エンドポイント 200 リクエスト（ウォームアップ除外）
 
+### 参考検証結果（2026-03-08）
+- 証跡: `artifacts/perf/perf-result.json`, `artifacts/perf/seed-result.json`, `artifacts/perf/warmup-result.json`
+- 実施内容: short 10,000 件 / 本文 500 文字 / warmup 20 回 / 本計測 200 回で再計測済み。
+- 実測値:
+  - `ingest`: p50 `18.46ms`, p95 `22.39ms`
+  - `search`: p50 `61.99ms`, p95 `71.50ms`
+  - `show`: p50 `16.24ms`, p95 `35.89ms`
+- 補足: 上記 6 指標はすべて本書の閾値以内であり、「ものとして十分に速い」ことの参考証跡として扱う。
+- ただし実行環境は `Windows-10-10.0.26200-SP0 / 12 logical CPUs` であり、正式判定条件の `Linux x86_64 / 4 vCPU / 16GB RAM / NVMe SSD` とは一致しないため、本結果のみで `REQ-NFR-001` の正式 pass とは扱わない。
+
 ## スコープ別評価ポリシー
 - MUST (v1): 合否判定対象（本ドキュメントの全受け入れ判定に使用）。
 - SHOULD (v1.x): v1 合否対象外。ただし受け入れ曖昧性防止のため `POST /v1/gc:run` は flag ON/OFF の応答確認を実施し、参考証跡として記録する。
@@ -131,3 +142,4 @@ next_review_due: 2026-06-03
 ## インシデント対応要件
 - インシデントは `IN-YYYYMMDD-XXX` 形式で記録。
 - 初動記録に「検知」「影響」「5 Whys」「再発防止」「タイムライン」を必須記載。
+

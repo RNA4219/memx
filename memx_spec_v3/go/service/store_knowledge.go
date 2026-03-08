@@ -129,7 +129,7 @@ func (s *Service) IngestKnowledge(ctx context.Context, req IngestKnowledgeReques
 	if !req.NoLLM && summary == "" && s.MiniLLM != nil {
 		result, err := s.MiniLLM.Summarize(ctx, req.Title, req.Body)
 		if err != nil {
-			// 警告レベル、継続
+			s.warnAutoSummaryFailure("knowledge", req.Title, err)
 		} else {
 			summary = result.Summary
 		}
@@ -302,15 +302,9 @@ func (s *Service) GetKnowledge(ctx context.Context, id string) (KnowledgeNote, e
 
 	now := time.Now().UTC().Format(time.RFC3339Nano)
 
-	tx, err := s.Conn.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return KnowledgeNote{}, err
-	}
-	defer func() { _ = tx.Rollback() }()
-
 	var n KnowledgeNote
 	var isPinned int
-	err = tx.QueryRowContext(ctx, `
+	err := s.Conn.DB.QueryRowContext(ctx, `
 SELECT id, title, summary, body,
        created_at, updated_at, last_accessed_at, access_count,
        source_type, origin, source_trust, sensitivity,
@@ -329,15 +323,11 @@ FROM knowledge.notes WHERE id = ?;
 		return KnowledgeNote{}, err
 	}
 
-	_, _ = tx.ExecContext(ctx, `
+	_, _ = s.Conn.DB.ExecContext(ctx, `
 UPDATE knowledge.notes
 SET last_accessed_at = ?, access_count = access_count + 1
 WHERE id = ?;
 `, now, id)
-
-	if err := tx.Commit(); err != nil {
-		return KnowledgeNote{}, err
-	}
 
 	n.IsPinned = isPinned == 1
 	n.LastAccessedAt = now

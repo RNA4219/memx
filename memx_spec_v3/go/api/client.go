@@ -36,4 +36,11 @@ type Client interface {
 
 	// Recall
 	Recall(ctx context.Context, req RecallRequest) (RecallResponse, *Error)
+
+	// Resolver API (P4)
+	ResolveRef(ctx context.Context, req ResolveRefRequest) (ResolveRefResponse, *Error)
+	ResolveMany(ctx context.Context, req ResolveManyRequest) (ResolveManyResponse, *Error)
+	LoadSummary(ctx context.Context, req LoadSummaryRequest) (LoadSummaryResponse, *Error)
+	LoadSelectedRaw(ctx context.Context, req LoadSelectedRawRequest) (LoadSelectedRawResponse, *Error)
+	BuildBundle(ctx context.Context, req BuildBundleRequest) (BuildBundleResponse, *Error)
 }

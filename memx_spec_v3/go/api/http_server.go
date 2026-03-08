@@ -26,6 +26,7 @@ func (s *HTTPServer) Handler() http.Handler {
 	// Short store
 	mux.HandleFunc("/v1/notes:ingest", s.handleNotesIngest)
 	mux.HandleFunc("/v1/notes:search", s.handleNotesSearch)
+	mux.HandleFunc("/v1/notes:recall", s.handleRecall)
 	mux.HandleFunc("/v1/notes:summarize", s.handleSummarize)
 	mux.HandleFunc("/v1/notes:summarize-batch", s.handleSummarizeBatch)
 	mux.HandleFunc("/v1/gc:run", s.handleGCRun)
@@ -137,6 +138,24 @@ func (s *HTTPServer) handleNotesSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, apiErr := s.InProc.NotesSearch(r.Context(), req)
+	if apiErr != nil {
+		writeErr(w, apiErr)
+		return
+	}
+	writeOK(w, resp)
+}
+
+func (s *HTTPServer) handleRecall(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req RecallRequest
+	if err := decodeJSON(w, r, &req); err != nil {
+		writeErr(w, err)
+		return
+	}
+	resp, apiErr := s.InProc.Recall(r.Context(), req)
 	if apiErr != nil {
 		writeErr(w, apiErr)
 		return
@@ -548,6 +567,15 @@ func (s *HTTPServer) handleBuildBundle(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	// P4: BuildBundle is temporarily disabled - will be implemented by P4 agent
-	writeErr(w, &Error{Code: CodeInternal, Message: "BuildBundle not yet implemented"})
+	var req BuildBundleRequest
+	if err := decodeJSON(w, r, &req); err != nil {
+		writeErr(w, err)
+		return
+	}
+	resp, apiErr := s.InProc.BuildBundle(r.Context(), req)
+	if apiErr != nil {
+		writeErr(w, apiErr)
+		return
+	}
+	writeOK(w, resp)
 }

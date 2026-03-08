@@ -231,8 +231,13 @@ func (c *Conn) searchStoreByEmbedding(ctx context.Context, store StoreKind, embe
 func (c *Conn) recallFTS(ctx context.Context, q RecallQuery, stores []StoreKind) ([]NoteWithContext, error) {
 	var results []NoteWithContext
 
+	topK := q.TopK
+	if topK <= 0 {
+		topK = 10
+	}
+
 	for _, store := range stores {
-		notes, err := c.searchStoreFTS(ctx, store, q.Text, q.TopK)
+		notes, err := c.searchStoreFTS(ctx, store, q.Text, topK)
 		if err != nil {
 			continue
 		}

@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -67,15 +68,75 @@ func OpenAll(paths Paths) (*Conn, error) {
 		}
 	}
 
-	return &Conn{DB: db}, nil
+	return &Conn{
+		DB:         db,
+		ShortDB:    db, // short.db はメインDBと同じ
+		JournalDB:  openJournalDB(paths.Journal),
+		KnowledgeDB: openKnowledgeDB(paths.Knowledge),
+		ArchiveDB:  openArchiveDB(paths.Archive),
+	}, nil
 }
 
-// Close は基盤となる *sql.DB をクローズする。
-func (c *Conn) Close() error {
-	if c.DB != nil {
-		return c.DB.Close()
+// openJournalDB は journal.db を個別に開く。
+func openJournalDB(path string) *sql.DB {
+	if path == "" {
+		return nil
 	}
-	return nil
+	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s", path))
+	if err != nil {
+		return nil
+	}
+	_ = migrateJournal(db)
+	return db
+}
+
+// openKnowledgeDB は knowledge.db を個別に開く。
+func openKnowledgeDB(path string) *sql.DB {
+	if path == "" {
+		return nil
+	}
+	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s", path))
+	if err != nil {
+		return nil
+	}
+	_ = migrateKnowledge(db)
+	return db
+}
+
+// openArchiveDB は archive.db を個別に開く。
+func openArchiveDB(path string) *sql.DB {
+	if path == "" {
+		return nil
+	}
+	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s", path))
+	if err != nil {
+		return nil
+	}
+	_ = migrateArchive(db)
+	return db
+}
+
+// Close は開いている DB ハンドルを重複なくすべてクローズする。
+func (c *Conn) Close() error {
+	if c == nil {
+		return nil
+	}
+
+	seen := map[*sql.DB]struct{}{}
+	var errs []error
+	for _, dbh := range []*sql.DB{c.ShortDB, c.JournalDB, c.KnowledgeDB, c.ArchiveDB, c.DB} {
+		if dbh == nil {
+			continue
+		}
+		if _, ok := seen[dbh]; ok {
+			continue
+		}
+		seen[dbh] = struct{}{}
+		if err := dbh.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
 }
 
 // migrateAndAttach は DB ファイルを個別に開いてマイグレーションし、その後 ATTACH する。

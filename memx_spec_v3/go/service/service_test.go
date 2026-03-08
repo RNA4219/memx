@@ -12,7 +12,7 @@ func TestService_IngestShort_Validation(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -361,6 +361,36 @@ func TestService_IngestShort_WithAutoSummary(t *testing.T) {
 	if note.Summary != "Auto-generated summary." {
 		t.Errorf("expected auto-generated summary, got: %q", note.Summary)
 	}
+}
+
+func TestService_IngestShort_AutoSummaryFailureLogsWarning(t *testing.T) {
+	tmpDir := t.TempDir()
+	paths := db.Paths{
+		Short: filepath.Join(tmpDir, "short.db"),
+	}
+
+	svc, err := New(paths)
+	if err != nil {
+		t.Fatalf("failed to create service: %v", err)
+	}
+	defer svc.Close()
+
+	logBuf, logger := newBufferedTestLogger()
+	svc.SetLogger(logger)
+	svc.SetMiniLLM(&mockMiniLLM{err: errTestLLM})
+
+	note, err := svc.IngestShort(context.Background(), IngestNoteRequest{
+		Title: "test note",
+		Body:  "Test body for failed auto-summary.",
+	})
+	if err != nil {
+		t.Fatalf("failed to ingest note: %v", err)
+	}
+	if note.Summary != "" {
+		t.Errorf("expected empty summary on LLM failure, got: %q", note.Summary)
+	}
+
+	assertAutoSummaryWarningLogged(t, logBuf.String(), "short", "test note", errTestLLM)
 }
 
 func TestService_IngestShort_NoLLMFlag(t *testing.T) {

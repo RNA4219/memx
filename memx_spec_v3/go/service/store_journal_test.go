@@ -14,7 +14,7 @@ func TestIngestJournal(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -51,13 +51,49 @@ func TestIngestJournal(t *testing.T) {
 	}
 }
 
+func TestIngestJournal_AutoSummaryFailureLogsWarning(t *testing.T) {
+	ctx := context.Background()
+
+	tmpDir := t.TempDir()
+	paths := db.Paths{
+		Short:     filepath.Join(tmpDir, "short.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
+		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
+		Archive:   filepath.Join(tmpDir, "archive.db"),
+	}
+
+	svc, err := New(paths)
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	defer svc.Close()
+
+	logBuf, logger := newBufferedTestLogger()
+	svc.SetLogger(logger)
+	svc.SetMiniLLM(&mockMiniLLM{err: errTestLLM})
+
+	note, err := svc.IngestJournal(ctx, IngestJournalRequest{
+		Title:        "Journal Title",
+		Body:         "本文です",
+		WorkingScope: "project:memx",
+	})
+	if err != nil {
+		t.Fatalf("IngestJournal: %v", err)
+	}
+	if note.Summary != "" {
+		t.Errorf("expected empty summary on LLM failure, got %q", note.Summary)
+	}
+
+	assertAutoSummaryWarningLogged(t, logBuf.String(), "journal", "Journal Title", errTestLLM)
+}
+
 func TestIngestJournal_SecretDeny(t *testing.T) {
 	ctx := context.Background()
 
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -86,7 +122,7 @@ func TestGetJournal(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -135,7 +171,7 @@ func TestSearchJournal(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -182,7 +218,7 @@ func TestFTSExistence(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
@@ -227,7 +263,7 @@ func TestListJournalByScope(t *testing.T) {
 	tmpDir := t.TempDir()
 	paths := db.Paths{
 		Short:     filepath.Join(tmpDir, "short.db"),
-		Journal: filepath.Join(tmpDir, "journal.db"),
+		Journal:   filepath.Join(tmpDir, "journal.db"),
 		Knowledge: filepath.Join(tmpDir, "knowledge.db"),
 		Archive:   filepath.Join(tmpDir, "archive.db"),
 	}
