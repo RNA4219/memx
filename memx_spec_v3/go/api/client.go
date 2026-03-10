@@ -3,7 +3,7 @@ package api
 import "context"
 
 // Client は CLI / Tool / Agent が利用する API クライアント。
-// v1.3 では HTTP と in-proc の両方を提供する。
+// v1.4 では HTTP と in-proc の両方を提供する。
 type Client interface {
 	// Short store
 	NotesIngest(ctx context.Context, req NotesIngestRequest) (NotesIngestResponse, *Error)
@@ -43,4 +43,13 @@ type Client interface {
 	LoadSummary(ctx context.Context, req LoadSummaryRequest) (LoadSummaryResponse, *Error)
 	LoadSelectedRaw(ctx context.Context, req LoadSelectedRawRequest) (LoadSelectedRawResponse, *Error)
 	BuildBundle(ctx context.Context, req BuildBundleRequest) (BuildBundleResponse, *Error)
+
+	// Docs resolver
+	DocsIngest(ctx context.Context, req DocsIngestRequest) (DocsIngestResponse, *Error)
+	DocsResolve(ctx context.Context, req DocsResolveRequest) (DocsResolveResponse, *Error)
+	ChunksGet(ctx context.Context, req ChunksGetRequest) (ChunksGetResponse, *Error)
+	DocsSearch(ctx context.Context, req DocsSearchRequest) (DocsSearchResponse, *Error)
+	ReadsAck(ctx context.Context, req ReadsAckRequest) (ReadsAckResponse, *Error)
+	DocsStaleCheck(ctx context.Context, req DocsStaleCheckRequest) (DocsStaleCheckResponse, *Error)
+	ContractsResolve(ctx context.Context, req ContractsResolveRequest) (ContractsResolveResponse, *Error)
 }
