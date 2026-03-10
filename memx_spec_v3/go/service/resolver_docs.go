@@ -663,10 +663,12 @@ func parseResolverSections(title string, body string, docType string) []resolver
 func extractSectionItems(sections []resolverSection, keywords []string) []string {
 	var out []string
 	for _, section := range sections {
-		joined := strings.ToLower(section.Heading + " " + strings.Join(section.HeadingPath, " > "))
+		// Match only the heading name itself, not the full path
+		// This prevents false positives when document title contains a keyword
+		headingLower := strings.ToLower(section.Heading)
 		matched := false
 		for _, keyword := range keywords {
-			if strings.Contains(joined, keyword) {
+			if strings.Contains(headingLower, keyword) {
 				matched = true
 				break
 			}
@@ -888,7 +890,9 @@ func scoreResolverDocuments(docs []ResolverDocument, feature string, taskID stri
 func filterResolverChunks(chunks []ResolverChunk, heading string, query string, limit int) []ResolverChunk {
 	filtered := make([]ResolverChunk, 0, len(chunks))
 	for _, chunk := range chunks {
-		if heading != "" && !textContainsFold(chunk.Heading, heading) && !textContainsFold(strings.Join(chunk.HeadingPath, " > "), heading) {
+		// When heading is specified, match only the chunk's heading name, not the full path
+		// This prevents false positives when document title contains the heading keyword
+		if heading != "" && !textContainsFold(chunk.Heading, heading) {
 			continue
 		}
 		if query != "" && !textContainsFold(chunk.Body, query) && !textContainsFold(chunk.Heading, query) && !textContainsFold(strings.Join(chunk.HeadingPath, " > "), query) {
