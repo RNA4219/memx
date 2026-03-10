@@ -1,0 +1,15 @@
+{
+  "id": "memx_spec_v3/go",
+  "role": "implementation",
+  "public_api": ["mem CLI", "HTTP API server"],
+  "summary": "Go実装。memx-core機能とresolver機能を提供。SQLiteベースの軽量メモリ基盤。",
+  "deps_out": [],
+  "deps_in": ["docs/design.md", "docs/interfaces.md"],
+  "risks": ["破壊的変更の互換性維持"],
+  "tests": [],
+  "key_sections": {
+    "CLI": "cmd/mem",
+    "API": "api/http_server.go",
+    "Service": "service/service.go"
+  }
+}

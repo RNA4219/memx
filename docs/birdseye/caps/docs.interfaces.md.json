@@ -1,0 +1,23 @@
+{
+  "id": "docs/interfaces.md",
+  "role": "interface",
+  "public_api": [
+    "POST /v1/docs:ingest",
+    "POST /v1/docs:resolve",
+    "POST /v1/chunks:get",
+    "POST /v1/docs:search",
+    "POST /v1/reads:ack",
+    "POST /v1/docs:stale-check",
+    "POST /v1/contracts:resolve"
+  ],
+  "summary": "cookbook-resolver外部インターフェース。文書登録、解決、chunk取得、検索、読了記録、stale判定、契約解決APIを定義。",
+  "deps_out": ["memx_spec_v3/go"],
+  "deps_in": ["docs/requirements.md", "README.md"],
+  "risks": ["MVPは認可機構最小", "read receipt改ざん防止は将来課題"],
+  "tests": [],
+  "key_sections": {
+    "API一覧": "ingest, resolve, chunks:get, search, reads:ack, stale-check, contracts:resolve",
+    "Skill一覧": "/resolve-docs, /read-chunks, /ack-docs, /stale-check, /resolve-contract",
+    "データ構造": "Document, DocumentChunk, ResolveEntry, ReadReceipt, StaleReason"
+  }
+}

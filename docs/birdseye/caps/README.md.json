@@ -1,0 +1,16 @@
+{
+  "id": "README.md",
+  "role": "entrypoint",
+  "public_api": ["mem CLI", "mem api serve"],
+  "summary": "memx-resolverエントリーポイント。ローカルLLM/エージェント向け軽量メモリ基盤。4つのSQLiteストア(short/journal/knowledge/archive)で保存・検索・参照・要約。",
+  "deps_out": ["docs/requirements.md", "docs/interfaces.md", "docs/design.md", "AGENT_GUIDE.md"],
+  "deps_in": [],
+  "risks": [],
+  "tests": [],
+  "key_sections": {
+    "ストア": "short(短期), journal(時系列), knowledge(知識), archive(退避)",
+    "CLI": "mem in/out/gc/summarize/api",
+    "Claude Code Skills": "/remember, /recall, /journal, /knowledge, /show, /memx-help",
+    "API": "/v1/notes:*, /v1/journal:*, /v1/knowledge:*, /v1/archive/*, /v1/docs:*, /v1/chunks:*, /v1/reads:*, /v1/contracts:*"
+  }
+}

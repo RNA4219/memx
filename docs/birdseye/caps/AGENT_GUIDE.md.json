@@ -1,0 +1,14 @@
+{
+  "id": "AGENT_GUIDE.md",
+  "role": "guide",
+  "public_api": [],
+  "summary": "AIエージェント向けガイド。memx-resolverの使い方とClaude Code Skillsの説明。",
+  "deps_out": [],
+  "deps_in": ["README.md"],
+  "risks": [],
+  "tests": [],
+  "key_sections": {
+    "Skills": "/remember, /recall, /journal, /knowledge, /show, /memx-help",
+    "API使用": "mem api serve --addr 127.0.0.1:7766"
+  }
+}

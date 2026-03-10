@@ -1,0 +1,44 @@
+---
+priority: high
+owner: memx-core
+deadline: 2026-03-13
+status: planned
+---
+
+# TASK.migrate-other-ddl-order-03-03-2026
+
+## Source
+| Source | Purpose |
+| --- | --- |
+| `orchestration/memx-v1-bootstrap.md#phase-2` | 実装対象フェーズの起点 |
+| `memx_spec_v3/docs/requirements.md#task-seed-source-fixed` | REQ-* の直接参照固定表 |
+
+## Node IDs
+- requirements: 仕様出典（requirements ノード）
+- service: 実装対象ノード
+
+## Objective
+- `memx_spec_v3/go/db/migrate_other.go` の `journal`/`knowledge`/`archive` DDL 適用順と `user_version` 更新運用を明確化し、再実行安全性を担保する。
+
+## Requirements
+- インシデント再発防止: [`docs/IN-20260303-002.md`](docs/IN-20260303-002.md) の `TP-01/TP-02` に従い、実インシデント由来条件を要件とテストへ明示的に転記する。
+- 正常系: 初回マイグレーションで `journal` → `knowledge` → `archive` の順に DDL が適用され、`user_version` が期待値へ更新されることを検証する。
+- 入力エラー: 想定外 `user_version` または欠損スキーマ時に、既存例外方針に沿って中断/通知されることを検証する。
+- 境界値: 既に最新 `user_version` の DB へ再適用した場合に no-op で終了することを検証する。
+- 順序保証: DDL 実行順の依存関係が壊れないよう、順序を固定するテストを追加する。
+- 互換性: `user_version` 運用ルールを維持し、既存 DB への後方互換を確認する。
+
+## Commands
+- `go test ./memx_spec_v3/go/db -run MigrateOther -count=1`
+- `go test ./memx_spec_v3/go/db -run UserVersion -count=1`
+- `git status --short`
+
+## Dependencies
+- `memx_spec_v3/docs/requirements.md` の「0-1. Release Scope Matrix」およびマイグレーション方針
+- `TASK.memx-bootstrap-03-03-2026.md`
+
+## Release Note Draft
+- `journal`/`knowledge`/`archive` の DDL 適用順と `user_version` 更新運用を明確化し、既存DBの再実行時も安全に移行できるようにする。
+
+## Status
+- planned

@@ -1,10 +1,13 @@
-# memx-core
+# memx-resolver
 
-ローカル LLM / エージェント向けの軽量メモリ基盤です。  
-4つの SQLite ストアで、保存、検索、参照、要約を行えます。
+ローカル LLM / エージェント向けの軽量メモリ基盤を、coding agent 向け resolver 機能で拡張した実験実装です。  
+4つの SQLite ストアで、保存、検索、参照、要約を行い、docs/chunks/read receipts/stale check も扱えます。
 
 AIエージェントはこちらを参照してください。
 - [AGENT_GUIDE.md](./AGENT_GUIDE.md)
+- [docs/requirements.md](./docs/requirements.md)
+- [docs/interfaces.md](./docs/interfaces.md)
+- [docs/design.md](./docs/design.md)
 
 ## ストア
 
@@ -102,6 +105,13 @@ mem out search --api-url http://127.0.0.1:7766 --json "test"
 - `POST /v1/knowledge:search`
 - `GET /v1/knowledge/{id}`
 - `GET /v1/archive/{id}`
+- `POST /v1/docs:ingest`
+- `POST /v1/docs:resolve`
+- `POST /v1/chunks:get`
+- `POST /v1/docs:search`
+- `POST /v1/reads:ack`
+- `POST /v1/docs:stale-check`
+- `POST /v1/contracts:resolve`
 
 ## LLM 要約
 
@@ -136,9 +146,14 @@ Alibaba 互換モードでは `chat/completions` を使います。
 ## 参照先
 
 - [AGENT_GUIDE.md](./AGENT_GUIDE.md)
+- [docs/requirements.md](./docs/requirements.md)
+- [docs/interfaces.md](./docs/interfaces.md)
+- [docs/design.md](./docs/design.md)
 - [memx_spec_v3/docs/requirements.md](./memx_spec_v3/docs/requirements.md)
 - [memx_spec_v3/docs/design.md](./memx_spec_v3/docs/design.md)
 - [memx_spec_v3/docs/contracts/openapi.yaml](./memx_spec_v3/docs/contracts/openapi.yaml)
 - [memx_spec_v3/docs/contracts/cli-json.schema.json](./memx_spec_v3/docs/contracts/cli-json.schema.json)
 
 License: MIT
+
+

@@ -1,0 +1,15 @@
+{
+  "id": "docs/design.md",
+  "role": "design",
+  "public_api": [],
+  "summary": "cookbook-resolver設計。memx_spec_v3/go配下に追加、short.dbにresolver用テーブル、/v1/docs:* HTTP APIを提供。",
+  "deps_out": ["memx_spec_v3/go"],
+  "deps_in": ["docs/requirements.md"],
+  "risks": ["version比較は文字列不一致のみ", "全文検索はLIKEベース"],
+  "tests": [],
+  "key_sections": {
+    "配置": "memx_spec_v3/go配下に追加、既存APIと同じプロセスで提供",
+    "chunking": "見出し優先、section長過ぎる場合のみ固定長再分割",
+    "解決ロジック": "task_id一致→feature_keys一致→tags/title/summary/body部分一致"
+  }
+}

@@ -56,6 +56,15 @@ func (s *HTTPServer) Handler() http.Handler {
 	mux.HandleFunc("/v1/raw", s.handleLoadSelectedRaw)
 	mux.HandleFunc("/v1/bundle:build", s.handleBuildBundle)
 
+	// Cookbook resolver
+	mux.HandleFunc("/v1/docs:ingest", s.handleDocsIngest)
+	mux.HandleFunc("/v1/docs:resolve", s.handleDocsResolve)
+	mux.HandleFunc("/v1/chunks:get", s.handleChunksGet)
+	mux.HandleFunc("/v1/docs:search", s.handleDocsSearch)
+	mux.HandleFunc("/v1/reads:ack", s.handleReadsAck)
+	mux.HandleFunc("/v1/docs:stale-check", s.handleDocsStaleCheck)
+	mux.HandleFunc("/v1/contracts:resolve", s.handleContractsResolve)
+
 	return mux
 }
 

@@ -1,0 +1,15 @@
+{
+  "id": "docs/requirements.md",
+  "role": "requirements",
+  "public_api": [],
+  "summary": "cookbook-resolver要件定義。Markdown文書を管理し、feature/taskから必要文書を解決、chunk取得、読了記録、stale判定を提供する。",
+  "deps_out": ["docs/design.md", "docs/interfaces.md"],
+  "deps_in": ["README.md"],
+  "risks": ["resolver責務肥大化", "chunking粒度設計誤り", "taskstate連携曖昧"],
+  "tests": [],
+  "key_sections": {
+    "目的": "機能名/taskから読むべき文書と必要chunkを解決し、参照結果を契約として残す",
+    "スコープ": "文書登録、chunk化、文書解決API、読了記録連携、stale判定、Skill API",
+    "受け入れ条件": "workflow-cookbook主要文書登録、feature名からdocs解決、chunk取得、読了記録、stale判定"
+  }
+}

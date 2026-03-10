@@ -1,141 +1,45 @@
 {
-  "schema_version": "1.0",
-  "generated_at": "2026-03-04T09:20:45Z",
-  "hub": {
-    "node_id": "hub_memx_birdseye",
-    "role": "HUB",
-    "depends_on": [
-      "requirements",
-      "design",
-      "quickstart",
-      "service",
-      "api"
-    ],
-    "generated_at": "2026-03-04T08:40:55Z"
-  },
-  "nodes": [
-    {
-      "node_id": "requirements",
-      "role": "spec",
-      "depends_on": [],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "memx_spec_v3/docs/requirements.md",
-      "capsule": "docs/birdseye/caps/requirements.json"
+  "generated_at": "2026-03-10T06:20:00Z",
+  "nodes": {
+    "docs/requirements.md": {
+      "role": "requirements",
+      "caps": "docs/birdseye/caps/docs.requirements.md.json",
+      "mtime": "2026-03-10T06:53:00Z"
     },
-    {
-      "node_id": "design",
-      "role": "spec_design",
-      "depends_on": [
-        "requirements"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "memx_spec_v3/docs/design.md",
-      "capsule": "docs/birdseye/caps/design.json"
+    "docs/design.md": {
+      "role": "design",
+      "caps": "docs/birdseye/caps/docs.design.md.json",
+      "mtime": "2026-03-10T06:53:00Z"
     },
-    {
-      "node_id": "interfaces",
-      "role": "spec_interface",
-      "depends_on": [
-        "requirements",
-        "design"
-      ],
-      "generated_at": "2026-03-04T08:40:55Z",
-      "source": "memx_spec_v3/docs/interfaces.md",
-      "capsule": "docs/birdseye/caps/memx_spec_v3__docs__interfaces.md.json"
+    "docs/interfaces.md": {
+      "role": "interface",
+      "caps": "docs/birdseye/caps/docs.interfaces.md.json",
+      "mtime": "2026-03-10T06:58:00Z"
     },
-    {
-      "node_id": "quickstart",
+    "README.md": {
+      "role": "entrypoint",
+      "caps": "docs/birdseye/caps/README.md.json",
+      "mtime": "2026-03-10T06:17:00Z"
+    },
+    "AGENT_GUIDE.md": {
       "role": "guide",
-      "depends_on": [
-        "requirements"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "memx_spec_v3/docs/quickstart.md",
-      "capsule": "docs/birdseye/caps/quickstart.json"
+      "caps": "docs/birdseye/caps/AGENT_GUIDE.md.json",
+      "mtime": "2026-03-10T06:44:00Z"
     },
-    {
-      "node_id": "service",
-      "role": "domain_service",
-      "depends_on": [
-        "requirements"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "memx_spec_v3/go/service/service.go",
-      "capsule": "docs/birdseye/caps/service.json"
-    },
-    {
-      "node_id": "api",
-      "role": "http_api",
-      "depends_on": [
-        "service",
-        "quickstart"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "memx_spec_v3/go/api/http_server.go",
-      "capsule": "docs/birdseye/caps/api.json"
-    },
-    {
-      "node_id": "governance_policy",
-      "role": "spec_policy",
-      "depends_on": [],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "governance/policy.yaml",
-      "capsule": "docs/birdseye/caps/governance.policy.yaml.json"
-    },
-    {
-      "node_id": "governance_prioritization",
-      "role": "spec_prioritization",
-      "depends_on": [
-        "governance_policy"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "governance/prioritization.yaml",
-      "capsule": "docs/birdseye/caps/governance.prioritization.yaml.json"
-    },
-    {
-      "node_id": "guardrails",
-      "role": "operations_guardrail",
-      "depends_on": [
-        "requirements",
-        "governance_policy"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "GUARDRAILS.md",
-      "capsule": "docs/birdseye/caps/GUARDRAILS.md.json"
-    },
-    {
-      "node_id": "runbook",
-      "role": "operations_runbook",
-      "depends_on": [
-        "requirements",
-        "guardrails",
-        "governance_prioritization"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "RUNBOOK.md",
-      "capsule": "docs/birdseye/caps/RUNBOOK.md.json"
-    },
-    {
-      "node_id": "checklists",
-      "role": "operations_checklist",
-      "depends_on": [
-        "guardrails",
-        "runbook"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "CHECKLISTS.md",
-      "capsule": "docs/birdseye/caps/CHECKLISTS.md.json"
-    },
-    {
-      "node_id": "evaluation",
-      "role": "evaluation_quality",
-      "depends_on": [
-        "runbook",
-        "checklists"
-      ],
-      "generated_at": "2026-03-03T08:48:22Z",
-      "source": "EVALUATION.md",
-      "capsule": "docs/birdseye/caps/EVALUATION.md.json"
+    "memx_spec_v3/go": {
+      "role": "implementation",
+      "caps": "docs/birdseye/caps/memx_spec_v3.go.json",
+      "mtime": "2026-03-10T06:44:00Z"
     }
+  },
+  "edges": [
+    ["README.md", "docs/requirements.md"],
+    ["README.md", "docs/interfaces.md"],
+    ["README.md", "docs/design.md"],
+    ["README.md", "AGENT_GUIDE.md"],
+    ["docs/requirements.md", "docs/design.md"],
+    ["docs/requirements.md", "docs/interfaces.md"],
+    ["docs/design.md", "memx_spec_v3/go"],
+    ["docs/interfaces.md", "memx_spec_v3/go"]
   ]
 }

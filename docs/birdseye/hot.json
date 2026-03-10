@@ -1,7 +1,10 @@
 {
-  "generated_at": "2026-03-04T09:20:45Z",
-  "index_snapshot": "docs/birdseye/index.json",
+  "generated_at": "2026-03-10T06:20:00Z",
   "refresh_command": "python tools/codemap/update.py --targets docs/birdseye/index.json,docs/birdseye/hot.json --emit index+caps",
-  "curation_notes": "memx Birdseye の再生成時に index/caps の更新結果を追跡する最小 hot リスト。",
-  "nodes": []
+  "hot_nodes": [
+    "docs/requirements.md",
+    "docs/interfaces.md",
+    "README.md"
+  ],
+  "description": "Frequently accessed nodes for memx-resolver context loading"
 }
